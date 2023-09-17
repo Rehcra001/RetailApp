@@ -1,0 +1,15 @@
+﻿<Application x:Class="RetailAppUI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModel="clr-namespace:RetailAppUI.ViewModels"
+             xmlns:view="clr-namespace:RetailAppUI.Views">
+    <Application.Resources>
+        <DataTemplate DataType="{x:Type TypeName=viewModel:MainViewModel}">
+            <view:MainView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type TypeName=viewModel:VendorViewModel}">
+            <view:VendorView/>
+        </DataTemplate>
+    </Application.Resources>
+</Application>
