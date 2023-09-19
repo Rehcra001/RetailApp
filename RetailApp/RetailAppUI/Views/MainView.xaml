@@ -5,8 +5,116 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RetailAppUI.Views"
         mc:Ignorable="d"
-        Title="MainView" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainView" Height="700" Width="950"
+        Background="Transparent"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        MouseDown="Window_MouseDown">
+    <Border 
+            CornerRadius="25">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0"
+                                 EndPoint="1,1">
+                <GradientStop Color="#FF4E4A4A" Offset="0.25"/>
+                <GradientStop Color="#FF2B2828" Offset="0.75"/>
+            </LinearGradientBrush>
+        </Border.Background>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Column="0"
+                  Grid.Row="0"
+                  Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Rehcra Sales and Inventory Managment"
+                           Grid.Column="1"
+                           Grid.Row="0"
+                           Grid.ColumnSpan="3"
+                           Foreground="White"
+                           Background="Transparent"
+                           FontSize="25"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="4"
+                            HorizontalAlignment="Right">
+                    <Button Content="-"
+                            Width="30"
+                            Margin="5,0,5,0"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            Style="{StaticResource ButtonTheme}"
+                            Click="Window_Minimize"/>
+                    <Button Content="X"
+                            Width="30"
+                            Margin="5,0,5,0"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            Style="{StaticResource ButtonTheme}"
+                            Click="Window_Close"/>
+                </StackPanel>
+                
+            </Grid>
+
+            <StackPanel Grid.Column="0"
+                        Grid.Row="1"
+                        VerticalAlignment="Center">
+                <Button Content="Sales Orders"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"/>
+
+                <Button Content="Purchase Orders"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"/>
+
+                <Button Content="Products"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"/>
+                
+                <Button Content="Inventory"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"/>
+
+                <Button Content="Customers"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"/>
+
+                <Button Content="Vendors"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding NavigateToVendorViewCommand}"/>
+
+                <Button Content="Company Details"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"/>
+            </StackPanel>
+            <Border Grid.Column="1"
+                    Grid.Row="1"
+                    BorderThickness="1"
+                    BorderBrush="Aqua"
+                    CornerRadius="25"
+                    Background="Transparent"
+                    Margin="5">
+                <ContentControl Content="{Binding Navigation.CurrentView}"/>
+            </Border>
+        </Grid>
+    </Border>
+
 </Window>
