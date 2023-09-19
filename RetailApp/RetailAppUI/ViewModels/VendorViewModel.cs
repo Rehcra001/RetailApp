@@ -25,6 +25,7 @@ namespace RetailAppUI.ViewModels
         private string _state;
         private VendorModel undoVendorEdit;
         private bool _textReadOnly;
+        private ICurrentViewService _currentView;
 
         public VendorModel Vendor
         {
@@ -48,6 +49,8 @@ namespace RetailAppUI.ViewModels
 
         public INavigationService Navigation { get => _navigation; set { _navigation = value; OnPropertyChanged(); } }
 
+        public ICurrentViewService CurrentView { get => _currentView ; set { _currentView = value; OnPropertyChanged(); } }
+
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewVendorCommand { get; set; }
         public RelayCommand EditVendorCommand { get; set; }
@@ -55,9 +58,11 @@ namespace RetailAppUI.ViewModels
         public RelayCommand SaveVendorCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public VendorViewModel(IConnectionStringService connectionString, INavigationService navigation)
+        public VendorViewModel(IConnectionStringService connectionString, INavigationService navigation, ICurrentViewService currentView)
         {
             Navigation = navigation;
+            CurrentView = currentView;
+
 
             _connectionString = connectionString.GetConnectionString();
             _vendorRepository = new VendorRepository(_connectionString);
@@ -233,6 +238,7 @@ namespace RetailAppUI.ViewModels
 
         private void CloseView(object obj)
         {
+            CurrentView.CurrentView = "HomeView";
             Navigation.NavigateTo<HomeViewModel>();
         }
 

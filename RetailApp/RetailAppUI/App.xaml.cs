@@ -36,6 +36,7 @@ namespace RetailAppUI
             //Services
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IConnectionStringService, ConnectionStringService>();
+            services.AddSingleton<ICurrentViewService, CurrentViewService>();
 
             services.AddSingleton<Func<Type, BaseViewModel>>(ServiceProvider => viewModelType => (BaseViewModel)ServiceProvider.GetRequiredService(viewModelType));
 
