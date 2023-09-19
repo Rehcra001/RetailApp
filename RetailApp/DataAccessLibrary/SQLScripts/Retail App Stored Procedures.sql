@@ -2,8 +2,9 @@ USE RetailAppDB;
 GO
 
 --**********Vendor--**********
-ALTER PROCEDURE dbo.usp_InsertVendor
+CREATE PROCEDURE dbo.usp_InsertVendor
 (
+	@VatRegistrationNumber NVARCHAR(10),
 	@FirstName NVARCHAR(100),
 	@LastName NVARCHAR(100),
 	@CompanyName NVARCHAR(100),
@@ -22,6 +23,7 @@ BEGIN
 
 			INSERT INTO dbo.Vendors
 			(
+				VatRegistrationNumber,
 				FirstName,
 				LastName,
 				CompanyName,
@@ -35,6 +37,7 @@ BEGIN
 			)
 			VALUES
 			(
+				@VatRegistrationNumber,
 				@FirstName,
 				@LastName,
 				@CompanyName,
@@ -61,9 +64,10 @@ BEGIN
 END;
 GO
 
-ALTER PROCEDURE dbo.usp_UpdateVendor
+CREATE PROCEDURE dbo.usp_UpdateVendor
 (
 	@VendorID INT,
+	@VatRegistrationNumber NVARCHAR(10),
 	@FirstName NVARCHAR(100),
 	@LastName NVARCHAR(100),
 	@CompanyName NVARCHAR(100),
@@ -81,7 +85,8 @@ BEGIN
 			SET NOCOUNT ON;
 
 			UPDATE dbo.Vendors
-			SET	FirstName = @FirstName,
+			SET	VatRegistrationNumber = @VatRegistrationNumber,
+				FirstName = @FirstName,
 				LastName = @LastName,
 				CompanyName = @CompanyName,
 				AddressLine1 = @AddressLine1,
@@ -107,7 +112,7 @@ BEGIN
 END;
 GO
 
-ALTER PROCEDURE dbo.usp_DeleteVendor
+CREATE PROCEDURE dbo.usp_DeleteVendor
 (
 	@VendorID INT
 )AS
@@ -131,14 +136,15 @@ BEGIN
 END;
 GO
 
-ALTER PROCEDURE dbo.usp_GetAllVendors AS
+CREATE PROCEDURE dbo.usp_GetAllVendors AS
 BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 
-		SELECT VendorID, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
+		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
-		FROM dbo.Vendors;
+		FROM dbo.Vendors
+		ORDER BY CompanyName;
 	END TRY
 
 	BEGIN CATCH
@@ -155,7 +161,7 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 
-		SELECT VendorID, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
+		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Vendors
 		WHERE VendorID = @VendorID;
