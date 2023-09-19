@@ -29,9 +29,12 @@ namespace RetailAppUI
                 DataContext = provider.GetRequiredService<MainViewModel>()
             });
             services.AddSingleton<MainViewModel>();
+            services.AddSingleton<HomeViewModel>();
+            services.AddTransient<VendorViewModel>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IConnectionStringService, ConnectionStringService>();
 
             services.AddSingleton<Func<Type, BaseViewModel>>(ServiceProvider => viewModelType => (BaseViewModel)ServiceProvider.GetRequiredService(viewModelType));
 
