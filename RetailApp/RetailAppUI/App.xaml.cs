@@ -31,6 +31,7 @@ namespace RetailAppUI
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<HomeViewModel>();
             services.AddTransient<VendorViewModel>();
+            services.AddTransient<CustomerViewModel>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

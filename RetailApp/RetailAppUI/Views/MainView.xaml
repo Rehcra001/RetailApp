@@ -94,7 +94,8 @@
 
                 <Button Content="Customers"
                         Margin="10"
-                        Style="{StaticResource ButtonTheme}"/>
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding NavigateToCustomerViewModel}"/>
 
                 <Button Content="Vendors"
                         Margin="10"
