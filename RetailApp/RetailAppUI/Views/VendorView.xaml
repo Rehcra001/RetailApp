@@ -5,8 +5,305 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RetailAppUI.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             d:DesignHeight="550" d:DesignWidth="800"
+             Background="Transparent">
+
+    <Grid Margin="20">
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Vendor Management"
+                       FontSize="25"
+                       Foreground="White"
+                       Grid.Column="0"
+                       Grid.Row="0"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"/>
+            <Button Grid.Column="1"                    
+                    Content="X"
+                    Width="30"
+                    Margin="5,0,5,0"
+                    HorizontalAlignment="Right"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Style="{StaticResource ButtonTheme}"
+                    Command="{Binding CloseViewCommand}"/>
+
+            <DataGrid x:Name="vendors"
+                      AlternatingRowBackground="LightGray"
+                      Background="Transparent"
+                      ItemsSource="{Binding Vendors}"
+                      SelectedItem="{Binding Vendor}"
+                      SelectedIndex="{Binding VendorIndex}"
+                      Margin="5"
+                      MaxWidth="190"
+                      HorizontalAlignment="Center"
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False"
+                      HorizontalScrollBarVisibility="Visible"
+                      Grid.Row="1"
+                      CanUserSortColumns="True"
+                      Padding="5,0,0,0"
+                      FontSize="14">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Company Name"
+                                        Binding="{Binding Path=CompanyName}"
+                                        Width="Auto"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Orientation="Vertical"
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Margin="10,5,5,5"
+                        VerticalAlignment="Center">
+                
+                <!--Company Name-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Company Name:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.CompanyName}"
+                             Width="350"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+
+                <!--Vat Registration Number-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Vat Number:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.VatRegistrationNumber}"
+                             Width="100"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"
+                             KeyDown="TxtNumericOnly_KeyDown"/>
+                </StackPanel>
+
+                <!--Address Line 1-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Address Line 1:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.AddressLine1}"
+                             Width="350"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+
+                <!--Address Line 2-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Address Line 2:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.AddressLine2}"
+                             Width="350"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+
+                <!--City-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="City:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.City}"
+                             Width="200"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+
+                <!--Province-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Province:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.Province}"
+                             Width="200"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+
+                <!--Postal Code-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Postal Code:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.PostalCode}"
+                             Width="100"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"
+                             KeyDown="TxtNumericOnly_KeyDown"/>
+                </StackPanel>
+
+                <TextBlock Text="Contact Details:"
+                           Width="150"
+                           Foreground="White"
+                           HorizontalAlignment="Left"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Margin="0,0,0,10"/>
+
+                <!--First Name-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="First Name:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.FirstName}"
+                             Width="350"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+
+                <!--Last Name-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Last Name:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.LastName}"
+                             Width="350"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+                
+                <!--EMail Address-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="EMail Address:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.EmailAddress}"
+                             Width="350"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+
+                <!--Phone Number-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Phone Number:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox x:Name="txtPhoneAreaCode"
+                             Text="{Binding Vendor.PhoneAreaCode}"
+                             Width="30"
+                             FontSize="14"
+                             HorizontalContentAlignment="Center"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"
+                             KeyDown="TxtNumericOnly_KeyDown"
+                             PreviewTextInput="TxtPhone_PreviewTextInput"/>
+
+                    <TextBox x:Name="txtPhonePrefix"
+                             Text="{Binding Vendor.PhonePrefix}"
+                             Width="30"
+                             FontSize="14"
+                             Margin="10,0,0,0"
+                             HorizontalContentAlignment="Center"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"
+                             KeyDown="TxtNumericOnly_KeyDown"
+                             PreviewTextInput="TxtPhone_PreviewTextInput"/>
+                    
+                    <TextBox x:Name="txtPhoneSuffix"
+                             Text="{Binding Vendor.PhoneSuffix}"
+                             Width="40"
+                             FontSize="14"
+                             Margin="5,0,0,0"
+                             HorizontalAlignment="Center"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"
+                             KeyDown="TxtNumericOnly_KeyDown"
+                             PreviewTextInput="TxtPhoneSuffix_PreviewTextInput"/>
+                </StackPanel>
+            </StackPanel>
             
+            <!--Command Buttons-->
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="1"
+                        Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <Button Content="Add New"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding AddNewVendorCommand}"/>
+                <Button Content="Edit"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding EditVendorCommand}"/>
+                <Button Content="Delete"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding DeleteVendorCommand}"/>
+                <Button Content="Save"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding SaveVendorCommand}"/>
+                <Button Content="Cancel"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding CancelActionCommand}"/>
+
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </UserControl>
