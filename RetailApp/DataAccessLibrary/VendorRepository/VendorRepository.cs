@@ -86,13 +86,16 @@ namespace DataAccessLibrary.VendorRepository
                                 vendor.FirstName = reader["FirstName"].ToString();
                                 vendor.LastName = reader["LastName"].ToString();
                                 vendor.CompanyName = reader["CompanyName"].ToString();
+                                vendor.VatRegistrationNumber = reader["VatRegistrationNumber"].ToString();
                                 vendor.AddressLine1 = reader["AddressLine1"].ToString();
                                 vendor.AddressLine2 = reader["AddressLine2"].ToString();
                                 vendor.City = reader["City"].ToString();
                                 vendor.Province = reader["Province"].ToString();
                                 vendor.PostalCode = reader["PostalCode"].ToString();
                                 vendor.EmailAddress = reader["EMailAddress"].ToString();
-                                vendor.PhoneNumber = reader["PhoneNumber"].ToString();
+                                vendor.PhoneAreaCode = reader["PhoneNumber"].ToString().Substring(0, 3);
+                                vendor.PhonePrefix = reader["PhoneNumber"].ToString().Substring(3, 3);
+                                vendor.PhoneSuffix = reader["PhoneNumber"].ToString().Substring(6, 4);
                                 vendors.Add(vendor);
                             }
                         }
@@ -135,13 +138,16 @@ namespace DataAccessLibrary.VendorRepository
                             vendor.FirstName = reader["FirstName"].ToString();
                             vendor.LastName = reader["LastName"].ToString();
                             vendor.CompanyName = reader["CompanyName"].ToString();
+                            vendor.VatRegistrationNumber = reader["VatRegistrationNumber"].ToString();
                             vendor.AddressLine1 = reader["AddressLine1"].ToString();
                             vendor.AddressLine2 = reader["AddressLine2"].ToString();
                             vendor.City = reader["City"].ToString();
                             vendor.Province = reader["Province"].ToString();
                             vendor.PostalCode = reader["PostalCode"].ToString();
                             vendor.EmailAddress = reader["EMailAddress"].ToString();
-                            vendor.PhoneNumber = reader["PhoneNumber"].ToString();
+                            vendor.PhoneAreaCode = reader["PhoneNumber"].ToString().Substring(0, 3);
+                            vendor.PhonePrefix = reader["PhoneNumber"].ToString().Substring(3, 3);
+                            vendor.PhoneSuffix = reader["PhoneNumber"].ToString().Substring(6, 4);
                         }
                         else
                         {
@@ -181,6 +187,7 @@ namespace DataAccessLibrary.VendorRepository
                     command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = vendor.FirstName;
                     command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = vendor.LastName;
                     command.Parameters.Add("@CompanyName", SqlDbType.NVarChar).Value = vendor.CompanyName;
+                    command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = vendor.VatRegistrationNumber;
                     command.Parameters.Add("AddressLine1", SqlDbType.NVarChar).Value = vendor.AddressLine1;
                     if (string.IsNullOrWhiteSpace(vendor.AddressLine2))
                     {
@@ -194,7 +201,7 @@ namespace DataAccessLibrary.VendorRepository
                     command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = vendor.Province;
                     command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = vendor.PostalCode;
                     command.Parameters.Add("@EMailAddress", SqlDbType.NVarChar).Value = vendor.EmailAddress;
-                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = vendor.PhoneNumber;
+                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = (vendor.PhoneAreaCode + vendor.PhonePrefix + vendor.PhoneSuffix);
                     connection.Open();
 
                     //Database will return an ID if successful otherwise an error message
@@ -240,6 +247,7 @@ namespace DataAccessLibrary.VendorRepository
                     command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = vendor.FirstName;
                     command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = vendor.LastName;
                     command.Parameters.Add("@CompanyName", SqlDbType.NVarChar).Value = vendor.CompanyName;
+                    command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = vendor.VatRegistrationNumber;
                     command.Parameters.Add("AddressLine1", SqlDbType.NVarChar).Value = vendor.AddressLine1;
                     if (string.IsNullOrWhiteSpace(vendor.AddressLine2))
                     {
@@ -253,7 +261,7 @@ namespace DataAccessLibrary.VendorRepository
                     command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = vendor.Province;
                     command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = vendor.PostalCode;
                     command.Parameters.Add("@EMailAddress", SqlDbType.NVarChar).Value = vendor.EmailAddress;
-                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = vendor.PhoneNumber;
+                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = (vendor.PhoneAreaCode + vendor.PhonePrefix + vendor.PhoneSuffix);
                     connection.Open();
 
                     //if not error then "No Error" string is returned
