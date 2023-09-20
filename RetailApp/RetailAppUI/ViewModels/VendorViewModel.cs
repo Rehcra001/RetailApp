@@ -97,7 +97,7 @@ namespace RetailAppUI.ViewModels
 
         private void DeleteVendor(object obj)
         {
-            MessageBoxResult result = MessageBox.Show("Are you want to delete this vendor?", 
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this vendor?", 
                                                       "Delete Vendor", 
                                                       MessageBoxButton.YesNo, 
                                                       MessageBoxImage.Question, 

@@ -95,8 +95,8 @@ namespace RetailAppUI.ViewModels
 
         private void DeleteCustomer(object obj)
         {
-            MessageBoxResult result = MessageBox.Show("Are you want to delete this vendor?",
-                                                      "Delete Vendor",
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this customer?",
+                                                      "Delete Customer",
                                                       MessageBoxButton.YesNo,
                                                       MessageBoxImage.Question,
                                                       MessageBoxResult.No);
@@ -106,8 +106,8 @@ namespace RetailAppUI.ViewModels
                 //check for errors
                 if (errorMessage != null)
                 {
-                    MessageBox.Show("Unable to delete this vendor. \r\n" + errorMessage,
-                                    "Error Deleting Vendor",
+                    MessageBox.Show("Unable to delete this customer. \r\n" + errorMessage,
+                                    "Error Deleting Customer",
                                     MessageBoxButton.OK,
                                     MessageBoxImage.Error);
                     return;
@@ -140,7 +140,7 @@ namespace RetailAppUI.ViewModels
             else
             {
                 //error copying existing vendor
-                MessageBox.Show(customer.Item2, "Error Editing Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(customer.Item2, "Error Editing Customer", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
         }
@@ -190,7 +190,7 @@ namespace RetailAppUI.ViewModels
                     else
                     {
                         //Problem adding the new vendor
-                        MessageBox.Show(customer.Item2, "Error Adding Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(customer.Item2, "Error Adding Customer", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                 }
@@ -201,7 +201,7 @@ namespace RetailAppUI.ViewModels
                     if (errorMessage != null)
                     {
                         //Error saving edit
-                        MessageBox.Show(errorMessage, "Error Saving Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(errorMessage, "Error Saving Customer", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                 }
