@@ -118,6 +118,25 @@ USE RetailAppDB;
 GO
 --CREATE TABLES***************************************************************
 
+--Company Detail
+--Intended to only have one record of this company
+CREATE TABLE dbo.CompanyDetail
+(
+	CompanyID INT IDENTITY(10000, 1) PRIMARY KEY CLUSTERED,
+	CompanyName NVARCHAR(100) NOT NULL,
+	VatRegistrationNumber NVARCHAR(10),
+	AddressLine1 NVARCHAR(255) NOT NULL,
+	AddressLine2 NVARCHAR(255) NULL,
+	City NVARCHAR(50) NOT NULL,
+	Province NVARCHAR (50) NOT NULL,
+	PostalCode NVARCHAR (4) NOT NULL,
+	FirstName NVARCHAR(100) NOT NULL,
+	LastName NVARCHAR(100) NOT NULL,	
+	EMailAddress NVARCHAR(255) NOT NULL,
+	PhoneNumber NVARCHAR (10) NOT NULL
+);
+GO
+
 --Customers
 CREATE TABLE dbo.Customers
 (
