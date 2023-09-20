@@ -104,7 +104,8 @@
 
                 <Button Content="Company Details"
                         Margin="10"
-                        Style="{StaticResource ButtonTheme}"/>
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding NavigateToCompanyDetailViewCommand}"/>
             </StackPanel>
             <Border Grid.Column="1"
                     Grid.Row="1"

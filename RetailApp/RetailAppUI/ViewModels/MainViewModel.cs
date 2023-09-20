@@ -1,5 +1,6 @@
 ﻿using RetailAppUI.Commands;
 using RetailAppUI.Services;
+using RetailAppUI.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,8 @@ namespace RetailAppUI.ViewModels
 
         public RelayCommand NavigateToVendorViewCommand { get; set; }
         public RelayCommand NavigateToCustomerViewModel { get; set; }
+        public RelayCommand NavigateToCompanyDetailViewCommand { get; set; }
+
         public MainViewModel(INavigationService navigation, ICurrentViewService currentView)
         {
             Navigation = navigation;
@@ -38,6 +41,18 @@ namespace RetailAppUI.ViewModels
 
             NavigateToVendorViewCommand = new RelayCommand(NavigateToVendorView, CanNavigateToVendorView);
             NavigateToCustomerViewModel = new RelayCommand(NavigateToCustomerView, CanNavigateToCustomerView);
+            NavigateToCompanyDetailViewCommand = new RelayCommand(NavigateToCompanyDetailView, CanNavigateToCompanyDetailView);
+        }
+
+        private bool CanNavigateToCompanyDetailView(object obj)
+        {
+            return !CurrentView.CurrentView!.Equals("CompanyDetailView");
+        }
+
+        private void NavigateToCompanyDetailView(object obj)
+        {
+            CurrentView.CurrentView = "CompanyDetailView";
+            Navigation.NavigateTo<CompanyDetailViewModel>();
         }
 
         private bool CanNavigateToCustomerView(object obj)

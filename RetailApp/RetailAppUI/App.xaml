@@ -22,6 +22,10 @@
                 <view:CustomerView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type TypeName=viewModel:CompanyDetailViewModel}">
+                <view:CompanyDetailView/>
+            </DataTemplate>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/ButtonTheme.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxTheme.xaml"/>
