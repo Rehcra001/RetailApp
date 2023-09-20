@@ -92,7 +92,7 @@ namespace RetailAppUI.ViewModels
 
         private bool CanDeleteVendor(object obj)
         {
-            return _state.Equals("View");
+            return _state.Equals("View") && Vendors.Count > 0;
         }
 
         private void DeleteVendor(object obj)
@@ -124,7 +124,7 @@ namespace RetailAppUI.ViewModels
 
         private bool CanEditVendor(object obj)
         {
-            return _state.Equals("View");
+            return _state.Equals("View") && Vendors.Count > 0;
         }
 
         private void EditVendor(object obj)
