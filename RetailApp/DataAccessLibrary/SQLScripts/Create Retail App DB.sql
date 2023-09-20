@@ -158,19 +158,19 @@ GO
 --SalesOrderHeader
 CREATE TABLE dbo.SalesOrderHeader
 (
-	SalesOrderID INT IDENTITY(200000000, 1) PRIMARY KEY,
+	SalesOrderID BIGINT IDENTITY(200000000, 1) PRIMARY KEY,
 	CustomerID INT NOT NULL,
 	CustomerPurchaseOrder NVARCHAR(100) NULL,
 	OrderDate DATE NOT NULL,
 	OrderAmount MONEY NOT NULL,
-	Invoiced BIT DEFAULT(0) NOT NULL
+	OrderCompleted BIT DEFAULT(0) NOT NULL
 );
 GO
 
 --SalesOrderDetail
 CREATE TABLE dbo.SalesOrderDetail
 (
-	SalesOrderID INT NOT NULL,
+	SalesOrderID BIGINT NOT NULL,
 	ProductID INT NOT NULL,
 	Quantity INT NOT NULL,
 	UnitPrice MONEY NOT NULL,
@@ -191,6 +191,7 @@ CREATE TABLE dbo.Products
 	UnitCost MONEY DEFAULT(0) NOT NULL,
 	OnHand INT DEFAULT(0) NOT NULL,
 	OnOrder INT DEFAULT(0) NOT NULL,
+	SalesDemand INT DEFAULT(0) NOT NULL,
 	ReorderPoint INT DEFAULT(0) NOT NULL,
 	UnitPerID INT NOT NULL,
 	UnitWeight NUMERIC DEFAULT(0) NOT NULL,
@@ -207,26 +208,12 @@ CREATE TABLE dbo.Units
 );
 GO
 
-----StockTransactions
---CREATE TABLE dbo.StockTransactions
---(
---	TransactionID INT IDENTITY(1,1) PRIMARY KEY,
---	TransactionType NCHAR(1) NOT NULL,	--'p'for purchase and 's' for sale
---	OrderID INT NOT NULL,
---	ProductID INT NOT NULL,
---	TransactionDate Date NOT NULL,	
---	Quantity INT NOT NULL
---);
---GO
-
-
---Purchase line receipts
 
 
 --PurchaseOrderHeader
 CREATE TABLE dbo.PurchaseOrderHeader
 (
-	PurchaseOrderID INT IDENTITY(450000000,1) PRIMARY KEY,
+	PurchaseOrderID BIGINT IDENTITY(450000000,1) PRIMARY KEY,
 	VendorID INT NOT NULL,
 	VendorReference NVARCHAR(20),
 	OrderDate DATETIME NOT NULL,
@@ -242,13 +229,26 @@ GO
 --PurchaseOrderDetail
 CREATE TABLE dbo.PurchaseOrderDetail
 (
-	PurchaseOrderID INT NOT NULL,
+	PurchaseOrderID BIGINT NOT NULL,
 	ProductID INT NOT NULL,
 	Quantity INT NOT NULL,
 	UnitCost MONEY NOT NULL,
 	UnitFreightCost MONEY DEFAULT(0) NOT NULL,
-	QuantityReceipted INT DEFAULT(0) NOT NULL,
 	LineFilled BIT DEFAULT(0) NOT NULL
+);
+GO
+
+--Receipts
+CREATE TABLE dbo.Receipts
+(
+	ReceiptID INT IDENTITY(1,1) PRIMARY KEY,
+	PurchaseOrderID BIGINT NOT NULL,
+	ProductID INT NOT NULL,
+	ReceiptDate DATETIME NOT NULL,
+	QuantityReceipted INT NOT NULL,
+	UnitCost MONEY NOT NULL,
+	QuantitySold INT DEFAULT(0) NOT NULL,
+	QuantityInStock AS QuantityReceipted - QuantitySold
 );
 GO
 
@@ -335,24 +335,9 @@ FOREIGN KEY (ProductID)
 REFERENCES dbo.Products(ProductID);
 GO
 
-----Stock Transactions
---ALTER TABLE dbo.StockTransactions
---ADD CONSTRAINT Unique_OrderID_ProductID
---UNIQUE(OrderID, ProductID);
---GO
-----ALTER TABLE dbo.StockTransactions
-----ADD CONSTRAINT PK_StockTransactions_TransactionType_OrderID_ProductID
-----PRIMARY KEY (TransactionType, OrderID, ProductID);
-----GO
-
---ALTER TABLE dbo.StockTransactions
---ADD CONSTRAINT FK_StockTransactions_PurchaseOrderDetail_OrderID_PurchaseOrderID_ProductID
---FOREIGN KEY (OrderID, ProductID)
---REFERENCES dbo.PurchaseOrderDetail(PurchaseOrderID, ProductID);
---GO
-
---ALTER TABLE dbo.StockTransactions
---ADD CONSTRAINT FK_StockTransactions_SalesOrderDetail_OrderID_SalesOrderID_ProductID
---FOREIGN KEY (OrderID, ProductID)
---REFERENCES dbo.SalesOrderDetail(SalesOrderID, ProductID);
---GO
+--Receipts
+ALTER TABLE dbo.Receipts
+ADD CONSTRAINT FK_Receipts_PurchaseOrderDetail_PurchaseOrderID_ProductID
+FOREIGN KEY (PurchaseOrderID, ProductID)
+REFERENCES dbo.PurchaseOrderDetail(PurchaseOrderID, ProductID);
+GO
