@@ -134,7 +134,7 @@ namespace ModelsLibrary
             }
 
             //Address Line 2
-            if (AddressLine2.Length > 255)
+            if (!string.IsNullOrWhiteSpace(AddressLine2) && AddressLine2.Length > 255)
             {
                 ValidationMessage += "Address Line 2 cannot have more than 255 characters\r\n";
                 isValid = false;
