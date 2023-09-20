@@ -5,12 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RetailAppUI.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="550" d:DesignWidth="800">
+             d:DesignHeight="550" d:DesignWidth="850">
     <Grid Margin="20">
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="250"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
@@ -44,7 +44,7 @@
                   SelectedItem="{Binding Customer}"
                   SelectedIndex="{Binding CustomerIndex}"
                   Margin="5"
-                  MaxWidth="190"
+                  Width="230"
                   HorizontalAlignment="Center"
                   IsReadOnly="True"
                   AutoGenerateColumns="False"
@@ -57,6 +57,9 @@
                     <DataGridTextColumn Header="Company Name"
                                     Binding="{Binding Path=CompanyName}"
                                     Width="Auto"/>
+                    <DataGridTextColumn Header="Contact Name"
+                                        Binding="{Binding Path=FullName}"
+                Width="Auto"/>
                 </DataGrid.Columns>
             </DataGrid>
 
