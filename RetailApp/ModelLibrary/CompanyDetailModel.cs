@@ -15,16 +15,6 @@ namespace ModelsLibrary
         public int CompanyID { get; set; }
 
         /// <summary>
-        /// Holds is the first name of the vendor contact
-        /// </summary>
-        public string? FirstName { get; set; }
-
-        /// <summary>
-        /// Holds is the last name of the vendor contact
-        /// </summary>
-        public string? LastName { get; set; }
-
-        /// <summary>
         /// Holds is the vendors company name
         /// </summary>
         public string? CompanyName { get; set; }
@@ -58,6 +48,16 @@ namespace ModelsLibrary
         /// Holds the postal code of the vendor
         /// </summary>
         public string? PostalCode { get; set; }
+
+        /// <summary>
+        /// Holds is the first name of the vendor contact
+        /// </summary>
+        public string? FirstName { get; set; }
+
+        /// <summary>
+        /// Holds is the last name of the vendor contact
+        /// </summary>
+        public string? LastName { get; set; }
 
         /// <summary>
         /// Holds the email address of the vendor contact

@@ -29,9 +29,9 @@ namespace ModelsLibrary
         public decimal UnitCost { get; set; }
 
         /// <summary>
-        /// Quantity of product received
+        /// Freight cost per unit
         /// </summary>
-        public int QuantityReceipted { get; set; }
+        public decimal UnitFreightcost { get; set; }
 
         /// <summary>
         /// Indicates if this line is complete

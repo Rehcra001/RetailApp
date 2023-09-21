@@ -54,6 +54,11 @@ namespace ModelsLibrary
         public int OnOrder { get; set; }
 
         /// <summary>
+        /// Amount required based on generated sales orders
+        /// </summary>
+        public int SalesDemand { get; set; }
+
+        /// <summary>
         /// Holds the reorder point of this product (quantity)
         /// </summary>
         public int ReorderPoint { get; set; }

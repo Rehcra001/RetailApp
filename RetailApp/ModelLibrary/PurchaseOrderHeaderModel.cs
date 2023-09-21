@@ -34,11 +34,6 @@ namespace ModelsLibrary
         public decimal OrderAmount { get; set; }
 
         /// <summary>
-        /// The shipping cost of the products purchased
-        /// </summary>
-        public decimal Freight { get; set; }
-
-        /// <summary>
         /// VAT percentage
         /// </summary>
         public double VATPercentage { get; set; }
@@ -47,6 +42,11 @@ namespace ModelsLibrary
         /// The VAT on the order amount
         /// </summary>
         public decimal VATAmount { get; set; }
+
+        /// <summary>
+        /// The sum of the OrderAmount and VATAmount
+        /// </summary>
+        public decimal TotalAmount { get; set; }
 
         /// <summary>
         /// The date the products purchased are expected
