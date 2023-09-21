@@ -1,11 +1,6 @@
 ﻿using RetailAppUI.Commands;
 using RetailAppUI.Services;
-using RetailAppUI.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using RetailAppUI.ViewModels.Products;
 
 namespace RetailAppUI.ViewModels
 {
@@ -30,8 +25,9 @@ namespace RetailAppUI.ViewModels
 
 
         public RelayCommand NavigateToVendorViewCommand { get; set; }
-        public RelayCommand NavigateToCustomerViewModel { get; set; }
+        public RelayCommand NavigateToCustomerViewCommand { get; set; }
         public RelayCommand NavigateToCompanyDetailViewCommand { get; set; }
+        public RelayCommand NavigateToProductsSwithboardViewCommand { get; set; }
 
         public MainViewModel(INavigationService navigation, ICurrentViewService currentView)
         {
@@ -40,8 +36,20 @@ namespace RetailAppUI.ViewModels
             CurrentView.CurrentView = "MainView";
 
             NavigateToVendorViewCommand = new RelayCommand(NavigateToVendorView, CanNavigateToVendorView);
-            NavigateToCustomerViewModel = new RelayCommand(NavigateToCustomerView, CanNavigateToCustomerView);
+            NavigateToCustomerViewCommand = new RelayCommand(NavigateToCustomerView, CanNavigateToCustomerView);
             NavigateToCompanyDetailViewCommand = new RelayCommand(NavigateToCompanyDetailView, CanNavigateToCompanyDetailView);
+            NavigateToProductsSwithboardViewCommand = new RelayCommand(NavigateToProductsSwithboardView, CanNavigateToProductsSwithboardView);
+        }
+
+        private bool CanNavigateToProductsSwithboardView(object obj)
+        {
+            return !CurrentView.CurrentView!.Equals("ProductViews");
+        }
+
+        private void NavigateToProductsSwithboardView(object obj)
+        {
+            CurrentView.CurrentView = "ProductViews";
+            Navigation.NavigateTo<ProductsSwitchboardViewModel>();
         }
 
         private bool CanNavigateToCompanyDetailView(object obj)

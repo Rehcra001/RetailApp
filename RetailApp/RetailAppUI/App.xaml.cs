@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RetailAppUI.Services;
 using RetailAppUI.ViewModels;
+using RetailAppUI.ViewModels.Products;
 using RetailAppUI.Views;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace RetailAppUI
@@ -33,11 +29,13 @@ namespace RetailAppUI
             services.AddTransient<VendorViewModel>();
             services.AddTransient<CustomerViewModel>();
             services.AddTransient<CompanyDetailViewModel>();
+            services.AddTransient<ProductsSwitchboardViewModel>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IConnectionStringService, ConnectionStringService>();
             services.AddSingleton<ICurrentViewService, CurrentViewService>();
+            services.AddSingleton<ISharedDataService, SharedDataService>();
 
             services.AddSingleton<Func<Type, BaseViewModel>>(ServiceProvider => viewModelType => (BaseViewModel)ServiceProvider.GetRequiredService(viewModelType));
 

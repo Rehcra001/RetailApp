@@ -2,7 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:viewModel="clr-namespace:RetailAppUI.ViewModels"
-             xmlns:view="clr-namespace:RetailAppUI.Views">
+             xmlns:view="clr-namespace:RetailAppUI.Views"
+             xmlns:ProductViewModel="clr-namespace:RetailAppUI.ViewModels.Products"
+             xmlns:ProductView="clr-namespace:RetailAppUI.Views.Products">
     <Application.Resources>
         <ResourceDictionary>
             
@@ -24,6 +26,10 @@
 
             <DataTemplate DataType="{x:Type TypeName=viewModel:CompanyDetailViewModel}">
                 <view:CompanyDetailView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type TypeName=ProductViewModel:ProductsSwitchboardViewModel}">
+                <ProductView:ProductsSwitchboardView/>
             </DataTemplate>
 
             <ResourceDictionary.MergedDictionaries>

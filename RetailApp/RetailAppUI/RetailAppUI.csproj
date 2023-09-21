@@ -15,4 +15,11 @@
     <ProjectReference Include="..\BussinessLogicLibrary\BussinessLogicLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\Sales\" />
+    <Folder Include="ViewModels\Purchases\" />
+    <Folder Include="Views\Sales\" />
+    <Folder Include="Views\Purchases\" />
+  </ItemGroup>
+
 </Project>
