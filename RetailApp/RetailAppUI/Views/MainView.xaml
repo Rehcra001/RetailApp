@@ -86,7 +86,8 @@
 
                 <Button Content="Products"
                         Margin="10"
-                        Style="{StaticResource ButtonTheme}"/>
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding NavigateToProductsSwithboardViewCommand}"/>
                 
                 <Button Content="Inventory"
                         Margin="10"
@@ -95,7 +96,7 @@
                 <Button Content="Customers"
                         Margin="10"
                         Style="{StaticResource ButtonTheme}"
-                        Command="{Binding NavigateToCustomerViewModel}"/>
+                        Command="{Binding NavigateToCustomerViewCommand}"/>
 
                 <Button Content="Vendors"
                         Margin="10"
