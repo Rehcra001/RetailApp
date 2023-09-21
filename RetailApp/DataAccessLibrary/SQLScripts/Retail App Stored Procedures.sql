@@ -345,7 +345,7 @@ BEGIN
 END;
 GO
 
---**********Company Detail**********
+
 CREATE PROCEDURE dbo.usp_InsertCompanyDetail
 (
 	@VatRegistrationNumber NVARCHAR(10),
@@ -462,6 +462,212 @@ BEGIN
 		SELECT TOP(1) CompanyID, CompanyName, VatRegistrationNumber, AddressLine1, AddressLine2, City,
 				      Province, PostalCode, FirstName, LastName, EMailAddress, PhoneNumber
 		FROM dbo.CompanyDetail;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--**********Products**********
+--Returns a ProductID on success or an error message on failure
+CREATE PROCEDURE dbo.usp_InsertProduct
+(
+	--Only these fields need to be added
+	--The remaining product fields will be
+	--caluclated on reciept, creation of sale order
+	--and invoicing where applicable
+	@ProductName NVARCHAR(100),
+	@ProductDescription NVARCHAR(255),
+	@VendorID INT,
+	@VendorProductName NVARCHAR(100),
+	@UnitPrice MONEY,--Can be entered at a later stage
+	@UnitPerID INT,
+	@UnitWeight NUMERIC
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.Products
+			(
+				ProductName,
+				ProductDescription,
+				VendorID,
+				VendorProductName,
+				UnitPrice,
+				UnitPerID,
+				UnitWeight
+			)
+			VALUES
+			(
+				@ProductName,
+				@ProductDescription,
+				@VendorID,
+				@VendorProductName,
+				@UnitPrice,
+				@UnitPerID,
+				@UnitWeight
+			);
+
+			SELECT SCOPE_IDENTITY() AS ID;
+		COMMIT TRAN
+	END TRY
+		
+	BEGIN CATCH
+	IF (@@TRANCOUNT > 0)
+	BEGIN
+		ROLLBACK TRAN;
+	END
+	SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Return a message on success or failure on updating
+CREATE PROCEDURE dbo.usp_UpdateProduct
+(
+	--Only these fields need to be update
+	--The remaining product fields will be
+	--caluclated on reciept, creation of sale order
+	--and invoicing where applicable
+	@ProductID INT,
+	@ProductName NVARCHAR(100),
+	@ProductDescription NVARCHAR(255),
+	@VendorID INT,
+	@VendorProductName NVARCHAR(100),
+	@UnitPrice MONEY,--Can be entered at a later stage
+	@UnitPerID INT,
+	@UnitWeight NUMERIC
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			UPDATE dbo.Products
+			SET ProductName = @ProductName,
+				ProductDescription = @ProductDescription,
+				VendorID = @VendorID,
+				VendorProductName = @VendorProductName,
+				UnitPrice = @UnitPrice,
+				UnitPerID = @UnitPerID,
+				UnitWeight = @UnitWeight
+			WHERE ProductID = @ProductID;
+
+			SELECT 'No Error' AS Message;	
+		COMMIT TRAN
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Returns a list of all products on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetAllProducts AS
+BEGIN
+	BEGIN TRY
+		SELECT ProductID, ProductName, ProductDescription, VendorID, VendorProductName,
+			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
+			   UnitPerID, UnitWeight, Obsolete
+		FROM dbo.Products;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--**********Units**********
+
+--Returns the UnitPer ID on success
+--or error message on failure
+CREATE PROCEDURE dbo.usp_InsertUnit
+(
+	@UnitPer NVARCHAR(10),
+	@UnitPerDescription NVARCHAR(30)
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.Units
+			(
+				UnitPer,
+				UnitPerDescription
+			)
+			VALUES
+			(
+				@UnitPer,
+				@UnitPerDescription
+			);
+
+			SELECT SCOPE_IDENTITY() AS ID;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Returns a message on success or failure of the update
+CREATE PROCEDURE dbo.usp_UpdateUnit
+(
+	@UnitPerID INT,
+	@UnitPer NVARCHAR(10),
+	@UnitPerDescription NVARCHAR(30)
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			UPDATE dbo.Units
+			SET UnitPer = @UnitPer,
+				UnitPerDescription = @UnitPerDescription
+			WHERE UnitPerID = @UnitPerID;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+
+--Returns a list of all units on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetAllUnits AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT UnitPerID, UnitPer, UnitPerDescription
+		FROM dbo.Units;
 	END TRY
 
 	BEGIN CATCH
