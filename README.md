@@ -1,2 +1,2 @@
 # RetailApp
-Simple Sales and Inventory management app
+Generic Sales and Inventory management app
