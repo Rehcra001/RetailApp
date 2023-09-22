@@ -50,7 +50,7 @@ namespace ModelsLibrary
         /// Return an observable collection of customers if successfull - null otherwise
         /// Returns a string error message if not successfull - null otherwise
         /// </returns>
-        (ObservableCollection<CustomerModel>, string) GetAll();
+        (IEnumerable<CustomerModel>, string) GetAll();
 
         /// <summary>
         /// Get a customer by ID

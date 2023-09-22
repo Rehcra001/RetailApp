@@ -60,9 +60,9 @@ namespace DataAccessLibrary.VendorRepository
         /// Return an observable collection of customers if successfull - null otherwise
         /// Returns a string error message if not successfull - null otherwise
         /// </returns>
-        public (ObservableCollection<CustomerModel>, string) GetAll()
+        public (IEnumerable<CustomerModel>, string) GetAll()
         {
-            ObservableCollection<CustomerModel> customers = new ObservableCollection<CustomerModel>();
+            List<CustomerModel> customers = new List<CustomerModel>();
             string? errorMessage = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))

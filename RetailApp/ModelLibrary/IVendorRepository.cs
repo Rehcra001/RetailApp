@@ -50,7 +50,7 @@ namespace ModelsLibrary
         /// Return an observable collection of vendors if successfull - null otherwise
         /// Returns a string error message if not successfull - null otherwise
         /// </returns>
-        (ObservableCollection<VendorModel>, string) GetAll();
+        (IEnumerable<VendorModel>, string) GetAll();
 
         /// <summary>
         /// Get a vendor by ID
