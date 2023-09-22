@@ -484,7 +484,7 @@ CREATE PROCEDURE dbo.usp_InsertProduct
 	@VendorProductName NVARCHAR(100),
 	@UnitPrice MONEY,--Can be entered at a later stage
 	@UnitPerID INT,
-	@UnitWeight NUMERIC
+	@UnitWeight FLOAT
 )AS
 BEGIN
 	BEGIN TRY
@@ -540,7 +540,7 @@ CREATE PROCEDURE dbo.usp_UpdateProduct
 	@VendorProductName NVARCHAR(100),
 	@UnitPrice MONEY,--Can be entered at a later stage
 	@UnitPerID INT,
-	@UnitWeight NUMERIC
+	@UnitWeight FLOAT
 )AS
 BEGIN
 	BEGIN TRY
