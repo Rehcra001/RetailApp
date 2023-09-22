@@ -71,7 +71,7 @@ namespace ModelsLibrary
         /// <summary>
         /// Holds the unit weight of this product
         /// </summary>
-        public double UnitWeight { get; set; }
+        public float UnitWeight { get; set; }
 
         /// <summary>
         /// Holds if this product should be reordered when reorder point is reached
@@ -145,6 +145,12 @@ namespace ModelsLibrary
             {
                 ValidationMessage += "Unit price must be a positive value.\r\n";
                 isValid = false;
+            }
+
+            //Reorder Point
+            if (ReorderPoint < 0)
+            {
+                ValidationMessage += "Reorder Point must be a positive value.\r\n";
             }
 
             //Unit Per ID
