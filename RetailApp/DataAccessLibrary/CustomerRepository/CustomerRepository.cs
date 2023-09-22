@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLibrary.VendorRepository
+namespace DataAccessLibrary.CustomerRepository
 {
     public class CustomerRepository : ICustomerRepository
     {

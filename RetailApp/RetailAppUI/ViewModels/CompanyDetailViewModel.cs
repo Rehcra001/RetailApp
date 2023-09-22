@@ -1,4 +1,4 @@
-﻿using DataAccessLibrary.VendorRepository;
+﻿using DataAccessLibrary.CompanyDetailRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
