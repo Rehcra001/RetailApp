@@ -588,6 +588,27 @@ BEGIN
 END;
 GO
 
+--Returns a product on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetProductByID
+(
+	@ProductID INT
+)AS
+BEGIN
+	BEGIN TRY
+		SELECT ProductID, ProductName, ProductDescription, VendorID, VendorProductName,
+			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
+			   UnitPerID, UnitWeight, Obsolete
+		FROM dbo.Products
+		WHERE ProductID = @ProductID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
 --**********Units**********
 
 --Returns the UnitPer ID on success
