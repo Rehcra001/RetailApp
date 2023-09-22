@@ -54,11 +54,12 @@
                   FontSize="14">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Company Name"
-                                    Binding="{Binding Path=CompanyName}"
-                                    Width="Auto"/>
-                    <DataGridTextColumn Header="Contact Name"
-                                        Binding="{Binding Path=FullName}"
-                Width="Auto"/>
+                            Binding="{Binding Path=CompanyName}"
+                            Width="Auto"/>
+                    <DataGridTextColumn Header="First Name"
+                            Binding="{Binding Path=FirstName}"/>
+                    <DataGridTextColumn Header="Last Name"
+                            Binding="{Binding Path=LastName}"/>
                 </DataGrid.Columns>
             </DataGrid>
 

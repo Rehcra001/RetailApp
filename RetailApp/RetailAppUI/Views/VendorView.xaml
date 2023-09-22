@@ -22,45 +22,47 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="Vendor Management"
-                   FontSize="25"
-                   Foreground="White"
-                   Grid.Column="0"
-                   Grid.Row="0"
-                   Grid.ColumnSpan="2"
-                   HorizontalAlignment="Center"/>
+                           FontSize="25"
+                           Foreground="White"
+                           Grid.Column="0"
+                           Grid.Row="0"
+                           Grid.ColumnSpan="2"
+                           HorizontalAlignment="Center"/>
                 <Button Grid.Column="1"                    
-                Content="X"
-                Width="30"
-                Margin="5,0,5,0"
-                HorizontalAlignment="Right"
-                VerticalContentAlignment="Center"
-                HorizontalContentAlignment="Center"
-                Style="{StaticResource ButtonTheme}"
-                Command="{Binding CloseViewCommand}"/>
+                        Content="X"
+                        Width="30"
+                        Margin="5,0,5,0"
+                        HorizontalAlignment="Right"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding CloseViewCommand}"/>
 
                 <DataGrid x:Name="vendors"
-                  AlternatingRowBackground="LightGray"
-                  Background="Transparent"
-                  ItemsSource="{Binding Vendors}"
-                  SelectedItem="{Binding Vendor}"
-                  SelectedIndex="{Binding VendorIndex}"
-                  Margin="5"
-                  Width="230"
-                  HorizontalAlignment="Center"
-                  IsReadOnly="True"
-                  AutoGenerateColumns="False"
-                  HorizontalScrollBarVisibility="Visible"
-                  Grid.Row="1"
-                  CanUserSortColumns="True"
-                  Padding="5,0,0,0"
-                  FontSize="14">
+                          AlternatingRowBackground="LightGray"
+                          Background="Transparent"
+                          ItemsSource="{Binding Vendors}"
+                          SelectedItem="{Binding Vendor}"
+                          SelectedIndex="{Binding VendorIndex}"
+                          Margin="5"
+                          Width="230"
+                          HorizontalAlignment="Center"
+                          IsReadOnly="True"
+                          AutoGenerateColumns="False"
+                          HorizontalScrollBarVisibility="Visible"
+                          Grid.Row="1"
+                          CanUserSortColumns="True"
+                          Padding="5,0,0,0"
+                          FontSize="14">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Company Name"
-                                    Binding="{Binding Path=CompanyName}"
-                                    Width="Auto"/>
-                        <DataGridTextColumn Header="Contact Name"
-                                    Binding="{Binding Path=FullName}"/>
-                    </DataGrid.Columns>
+                                            Binding="{Binding Path=CompanyName}"
+                                            Width="Auto"/>
+                        <DataGridTextColumn Header="First Name"
+                                            Binding="{Binding Path=FirstName}"/>
+                        <DataGridTextColumn Header="Last Name"
+                                            Binding="{Binding Path=LastName}"/>
+                </DataGrid.Columns>
                 </DataGrid>
 
                 <StackPanel Orientation="Vertical"
