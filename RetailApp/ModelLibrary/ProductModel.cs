@@ -77,5 +77,92 @@ namespace ModelsLibrary
         /// Holds if this product should be reordered when reorder point is reached
         /// </summary>
         public bool Obsolete { get; set; }
+
+        /// <summary>
+        /// Holds the vendor detail for this product
+        /// </summary>
+        public VendorModel? Vendor { get; set; }
+
+        /// <summary>
+        /// Holds the unit per for this product
+        /// </summary>
+        public UnitsModel? Unit { get; set; }
+
+        // TODO - Add a list of product transactions
+
+        public string? ValidationMessage { get; private set; }
+
+        public bool Validate()
+        {
+            ValidationMessage = "";
+            bool isValid = true;
+
+            //Product Name
+            if (string.IsNullOrWhiteSpace(ProductName))
+            {
+                ValidationMessage += "Product name is required.\r\n";
+                isValid = false;
+            }
+            else if (ProductName.Length > 100)
+            {
+                ValidationMessage += "Product name cannot have more than 100 characters.\r\n";
+                isValid = false;
+            }
+
+            //Product description
+            if (string.IsNullOrWhiteSpace(ProductDescription))
+            {
+                ValidationMessage += "Product description is required.\r\n";
+                isValid = false;
+            }
+            else if (ProductDescription.Length > 255)
+            {
+                ValidationMessage += "Product description cannot have more than 255 characters.\r\n";
+                isValid = false;
+            }
+
+            //Vendor ID
+            if (VendorID == 0)
+            {
+                ValidationMessage += "Vendor is required.\r\n";
+                isValid = false;
+            }
+
+            //Vendor Product Name
+            if (string.IsNullOrWhiteSpace(VendorProductName))
+            {
+                ValidationMessage += "Vendor Product Name is required.\r\n";
+                isValid = false;
+            }
+            else if (VendorProductName.Length > 100)
+            {
+                ValidationMessage += "Vendor Product Name cannot have more than 100 characters.\r\n";
+                isValid = false;
+            }
+
+            //Unit Price
+            if (UnitPrice < 0)
+            {
+                ValidationMessage += "Unit price must be a positive value.\r\n";
+                isValid = false;
+            }
+
+            //Unit Per ID
+            if (UnitPerID == 0)
+            {
+                ValidationMessage += "Unit Per is required.\r\n";
+                isValid = false;
+            }
+
+            //Unit Weight
+            if (UnitWeight < 0)
+            {
+                ValidationMessage += "Unit Weight must be a positive value.\r\n";
+                isValid = false;
+            }
+
+
+            return isValid;
+        }
     }
 }
