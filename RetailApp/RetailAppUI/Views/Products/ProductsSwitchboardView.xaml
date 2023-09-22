@@ -46,22 +46,29 @@
                            Margin="5"/>
                 
                 <DataGrid Margin="5" 
-                          FontSize="12"
-                          HorizontalScrollBarVisibility="Visible">
+                          ItemsSource="{Binding Products}"
+                          HorizontalAlignment="Center"
+                          IsReadOnly="True"
+                          AutoGenerateColumns="False"
+                          HorizontalScrollBarVisibility="Visible"
+                          Grid.Row="1"
+                          CanUserSortColumns="True"
+                          Padding="5,0,0,0"
+                          FontSize="14">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Product Name"/>
-                        <DataGridTextColumn Header="Product Description"/>
-                        <DataGridTextColumn Header="Vendor"/>
-                        <DataGridTextColumn Header="Vendor Product Name"/>
-                        <DataGridTextColumn Header="Unit Price"/>
-                        <DataGridTextColumn Header="Unit Cost"/>
-                        <DataGridTextColumn Header="Qty On Hand"/>
-                        <DataGridTextColumn Header="Qty On Order"/>
-                        <DataGridTextColumn Header="Sales Demand"/>
-                        <DataGridTextColumn Header="Reorder Point"/>
-                        <DataGridTextColumn Header="Unit Per"/>
-                        <DataGridTextColumn Header="Unit Weight"/>
-                        <DataGridTextColumn Header="Is Obsolete"/>
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding Path=ProductName}"/>
+                        <DataGridTextColumn Header="Product Description" Binding="{Binding Path=ProductDescription}"/>
+                        <DataGridTextColumn Header="Vendor" Binding="{Binding Path=Vendor.CompanyName}"/>
+                        <DataGridTextColumn Header="Vendor Product Name" Binding="{Binding Path=VendorProductName}"/>
+                        <DataGridTextColumn Header="Unit Price" Binding="{Binding Path=UnitPrice}"/>
+                        <DataGridTextColumn Header="Unit Cost" Binding="{Binding Path=UnitCost}"/>
+                        <DataGridTextColumn Header="Qty On Hand" Binding="{Binding Path=OnHand}"/>
+                        <DataGridTextColumn Header="Qty On Order" Binding="{Binding Path=OnOrder}"/>
+                        <DataGridTextColumn Header="Sales Demand" Binding="{Binding Path=SalesDemand}"/>
+                        <DataGridTextColumn Header="Reorder Point" Binding="{Binding Path=ReorderPoint}"/>
+                        <DataGridTextColumn Header="Unit Per" Binding="{Binding Path=Unit.UnitPer}"/>
+                        <DataGridTextColumn Header="Unit Weight" Binding="{Binding Path=UnitWeight}"/>
+                        <DataGridCheckBoxColumn Header="Is Obsolete" Binding="{Binding Path=Obsolete}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>
