@@ -64,11 +64,11 @@ namespace RetailAppUI.ViewModels
 
             _connectionString = connectionString.GetConnectionString();
             _customerRepository = new CustomerRepository(_connectionString);
-            Tuple<ObservableCollection<CustomerModel>, string> customers = _customerRepository.GetAll().ToTuple();
+            Tuple<IEnumerable<CustomerModel>, string> customers = _customerRepository.GetAll().ToTuple();
             if (customers.Item2 == null)
             {
                 //No error retrieving vendors
-                Customers = customers.Item1;
+                Customers = new ObservableCollection<CustomerModel>(customers.Item1);
                 CustomerIndex = 0;
             }
             else

@@ -66,11 +66,11 @@ namespace RetailAppUI.ViewModels
 
             _connectionString = connectionString.GetConnectionString();
             _vendorRepository = new VendorRepository(_connectionString);
-            Tuple<ObservableCollection<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
+            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
             if (vendors.Item2 == null)
             {
                 //No error retrieving vendors
-                Vendors = vendors.Item1;
+                Vendors = new ObservableCollection<VendorModel>(vendors.Item1);
                 VendorIndex = 0;
             }
             else
