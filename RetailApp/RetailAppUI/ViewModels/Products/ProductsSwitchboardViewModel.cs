@@ -1,7 +1,10 @@
-﻿using RetailAppUI.Commands;
+﻿using BussinessLogicLibrary.Products;
+using ModelsLibrary;
+using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +13,8 @@ namespace RetailAppUI.ViewModels.Products
 {
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
+		private ProductManager _productManager;
+
 		private ICurrentViewService	_currentView;
 
 		public ICurrentViewService CurrentView
@@ -34,14 +39,31 @@ namespace RetailAppUI.ViewModels.Products
 			set { _sharedData = value; }
 		}
 
+        private IConnectionStringService _connectionString;
+        public IConnectionStringService ConnectionString { get => _connectionString; set => _connectionString = value; }
+
+        private ObservableCollection<ProductModel> _products;        
+
+        public ObservableCollection<ProductModel> Products
+		{
+			get { return _products; }
+			set { _products = value; OnPropertyChanged(); }
+		}
+
+
 
 		public RelayCommand CloseViewCommand { get; set; }
 
-        public ProductsSwitchboardViewModel(INavigationService navigation, ICurrentViewService currentView, ISharedDataService sharedData)
+        public ProductsSwitchboardViewModel(INavigationService navigation, ICurrentViewService currentView, ISharedDataService sharedData, IConnectionStringService connectionString)
         {
 			Navigation = navigation;
 			CurrentView = currentView;
 			SharedData = sharedData;
+			ConnectionString = connectionString;
+
+			_productManager = new ProductManager(ConnectionString.GetConnectionString());
+			Products = new ObservableCollection<ProductModel>(_productManager.GetAll());
+
 
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
         }
