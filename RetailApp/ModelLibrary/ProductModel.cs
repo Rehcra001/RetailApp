@@ -86,7 +86,7 @@ namespace ModelsLibrary
         /// <summary>
         /// Holds the unit per for this product
         /// </summary>
-        public UnitsModel? Unit { get; set; }
+        public UnitsPerModel? Unit { get; set; }
 
         // TODO - Add a list of product transactions
 
