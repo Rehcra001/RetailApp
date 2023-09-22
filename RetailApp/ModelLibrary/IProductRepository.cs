@@ -10,7 +10,7 @@ namespace ModelsLibrary
     {
         (ProductModel, string) Insert(ProductModel product);
         string Update(ProductModel product);
-        (IList<ProductModel>, string) GetAll();
+        (IEnumerable<ProductModel>, string) GetAll();
         (ProductModel, string) GetByID(int id);
     }
 }

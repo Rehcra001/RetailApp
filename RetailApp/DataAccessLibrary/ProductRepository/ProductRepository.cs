@@ -13,10 +13,10 @@ namespace DataAccessLibrary.ProductRepository
         {
             _connectionString = connectionString;
         }
-        public (IList<ProductModel>, string) GetAll()
+        public (IEnumerable<ProductModel>, string) GetAll()
         {
             string? errorMessage = null;
-            IList<ProductModel> products = new List<ProductModel>();
+            List<ProductModel> products = new List<ProductModel>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
