@@ -68,7 +68,7 @@ namespace DataAccessLibrary.ProductRepository
                 }
             }
 
-                return (products, errorMessage);
+                return (products, errorMessage);//errorMessage is null if no error raised by database
         }
 
         public (ProductModel, string) GetByID(int id)
@@ -124,7 +124,7 @@ namespace DataAccessLibrary.ProductRepository
                 }
             }
 
-            return (product, errorMessage);
+            return (product, errorMessage);//errorMessage is null if no error raised by database
         }
 
         public (ProductModel, string) Insert(ProductModel product)
@@ -161,7 +161,7 @@ namespace DataAccessLibrary.ProductRepository
                 }
             }
 
-                return (product, errorMessage);
+                return (product, errorMessage);//errorMessage is null if no error raised by database
         }
 
         public string Update(ProductModel product)
