@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModelsLibrary
 {
-    public class UnitsModel
+    public class UnitsPerModel
     {
         /// <summary>
         /// Unique unitPer id key
