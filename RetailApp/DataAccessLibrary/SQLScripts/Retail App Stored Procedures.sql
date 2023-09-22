@@ -483,6 +483,7 @@ CREATE PROCEDURE dbo.usp_InsertProduct
 	@VendorID INT,
 	@VendorProductName NVARCHAR(100),
 	@UnitPrice MONEY,--Can be entered at a later stage
+	@ReorderPoint INT, --Can be entered at a later stage
 	@UnitPerID INT,
 	@UnitWeight FLOAT
 )AS
@@ -498,6 +499,7 @@ BEGIN
 				VendorID,
 				VendorProductName,
 				UnitPrice,
+				ReorderPoint,
 				UnitPerID,
 				UnitWeight
 			)
@@ -508,6 +510,7 @@ BEGIN
 				@VendorID,
 				@VendorProductName,
 				@UnitPrice,
+				@ReorderPoint,
 				@UnitPerID,
 				@UnitWeight
 			);
@@ -539,6 +542,7 @@ CREATE PROCEDURE dbo.usp_UpdateProduct
 	@VendorID INT,
 	@VendorProductName NVARCHAR(100),
 	@UnitPrice MONEY,--Can be entered at a later stage
+	@ReorderPoint INT,
 	@UnitPerID INT,
 	@UnitWeight FLOAT
 )AS
@@ -553,6 +557,7 @@ BEGIN
 				VendorID = @VendorID,
 				VendorProductName = @VendorProductName,
 				UnitPrice = @UnitPrice,
+				ReorderPoint = @ReorderPoint,
 				UnitPerID = @UnitPerID,
 				UnitWeight = @UnitWeight
 			WHERE ProductID = @ProductID;
