@@ -13,10 +13,9 @@ namespace RetailAppUI.ViewModels.Products
 {
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
-		private ProductManager _productManager;
+		private ProductsManager _productManager;
 
 		private ICurrentViewService	_currentView;
-
 		public ICurrentViewService CurrentView
 		{
 			get { return _currentView; }
@@ -24,7 +23,6 @@ namespace RetailAppUI.ViewModels.Products
 		}
 
 		private INavigationService _navigation;
-
 		public INavigationService Navigation
 		{
 			get { return _navigation; }
@@ -32,7 +30,6 @@ namespace RetailAppUI.ViewModels.Products
 		}
 
 		private ISharedDataService _sharedData;
-
 		public ISharedDataService SharedData
 		{
 			get { return _sharedData; }
@@ -61,7 +58,7 @@ namespace RetailAppUI.ViewModels.Products
 			SharedData = sharedData;
 			ConnectionString = connectionString;
 
-			_productManager = new ProductManager(ConnectionString.GetConnectionString());
+			_productManager = new ProductsManager(ConnectionString.GetConnectionString());
 			Products = new ObservableCollection<ProductModel>(_productManager.GetAll());
 
 
