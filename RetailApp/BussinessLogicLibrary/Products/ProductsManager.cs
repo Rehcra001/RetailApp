@@ -18,7 +18,7 @@ namespace BussinessLogicLibrary.Products
 
         /// <summary>
         /// Gets a list of Products and their related 
-        /// Vendord, unitPer
+        /// Vendor and unitPer
         /// </summary>
         /// <returns>
         /// Returns an IEnumerable</ProductModel>
