@@ -93,6 +93,7 @@
                         <DataGridTextColumn Header="Product Description" Binding="{Binding Path=ProductDescription}"/>
                         <DataGridTextColumn Header="Vendor" Binding="{Binding Path=Vendor.CompanyName}"/>
                         <DataGridTextColumn Header="Vendor Product Name" Binding="{Binding Path=VendorProductName}"/>
+                        <DataGridTextColumn Header="Category" Binding="{Binding Path=Category.CategoryName}"/>
                         <DataGridTextColumn Header="Unit Price" Binding="{Binding Path=UnitPrice}"/>
                         <DataGridTextColumn Header="Unit Cost" Binding="{Binding Path=UnitCost}"/>
                         <DataGridTextColumn Header="Qty On Hand" Binding="{Binding Path=OnHand}"/>
