@@ -31,7 +31,7 @@ namespace BussinessLogicLibrary.Products
 			// TODO - Transactions list still to be implemented
         }
 
-		public void Update(VendorModel vendor, UnitsPerModel unitsPer)
+		public void Update(VendorModel vendor, UnitsPerModel unitsPer, CategoryModel category)
 		{
             throw new NotImplementedException();
 
