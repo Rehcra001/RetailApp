@@ -717,6 +717,8 @@ BEGIN
 
 			INSERT INTO dbo.Category (CategoryName)
 			VALUES (@CategoryName);
+
+			SELECT SCOPE_IDENTITY() AS ID;
 		COMMIT TRAN;
 	END TRY
 
