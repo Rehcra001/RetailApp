@@ -12,6 +12,7 @@ using System.Windows;
 using DataAccessLibrary.UnitsPerRepository;
 using RetailAppUI.Commands;
 using System.Text.RegularExpressions;
+using DataAccessLibrary.CategoryRepository;
 
 namespace RetailAppUI.ViewModels.Products
 {
@@ -139,7 +140,20 @@ namespace RetailAppUI.ViewModels.Products
                 // TODO - Add return to products switch board on error
             }
 
-            // TODO Add List of Categories
+            //Add list of categories to Categories
+            Tuple<IEnumerable<CategoryModel>, string> categories = new CategoryRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            //Check for errors
+            if (categories.Item2 == null)//null if no error raised
+            {
+                Categories = new ObservableCollection<CategoryModel>(categories.Item1);
+            }
+            else
+            {
+                //error retrieving Categories
+                MessageBox.Show("Unable to retrieve the categories.\r\n" + categories.Item2, "Categories Errror",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                // TODO - Add return to products switch board on error
+            }
 
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
@@ -154,7 +168,7 @@ namespace RetailAppUI.ViewModels.Products
 
         private void SaveProduct(object obj)
         {
-            //Make sure vendor and unit per are not null
+            //Make sure vendor, unit per and category are not null
             if (Vendor == null)
             {
                 MessageBox.Show("Please select a vendor.", "Vendor Missing", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -165,7 +179,11 @@ namespace RetailAppUI.ViewModels.Products
                 MessageBox.Show("Please select a unit per.", "Unit Per Missing", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            // TODO - Check that category is not null
+            if (Category == null)
+            {
+                MessageBox.Show("Please select a category.", "Category Missing", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             try
             {
                 _productManager.Insert(Vendor, UnitPer, Category);
