@@ -485,7 +485,8 @@ CREATE PROCEDURE dbo.usp_InsertProduct
 	@UnitPrice MONEY,--Can be entered at a later stage
 	@ReorderPoint INT, --Can be entered at a later stage
 	@UnitPerID INT,
-	@UnitWeight FLOAT
+	@UnitWeight FLOAT,
+	@CategoryID INT
 )AS
 BEGIN
 	BEGIN TRY
@@ -501,7 +502,8 @@ BEGIN
 				UnitPrice,
 				ReorderPoint,
 				UnitPerID,
-				UnitWeight
+				UnitWeight,
+				CategoryID
 			)
 			VALUES
 			(
@@ -512,7 +514,8 @@ BEGIN
 				@UnitPrice,
 				@ReorderPoint,
 				@UnitPerID,
-				@UnitWeight
+				@UnitWeight,
+				@CategoryID
 			);
 
 			SELECT SCOPE_IDENTITY() AS ID;
@@ -544,7 +547,8 @@ CREATE PROCEDURE dbo.usp_UpdateProduct
 	@UnitPrice MONEY,--Can be entered at a later stage
 	@ReorderPoint INT,
 	@UnitPerID INT,
-	@UnitWeight FLOAT
+	@UnitWeight FLOAT,
+	@CategoryID INT
 )AS
 BEGIN
 	BEGIN TRY
@@ -559,7 +563,8 @@ BEGIN
 				UnitPrice = @UnitPrice,
 				ReorderPoint = @ReorderPoint,
 				UnitPerID = @UnitPerID,
-				UnitWeight = @UnitWeight
+				UnitWeight = @UnitWeight,
+				CategoryID = @CategoryID
 			WHERE ProductID = @ProductID;
 
 			SELECT 'No Error' AS Message;	
@@ -583,7 +588,7 @@ BEGIN
 	BEGIN TRY
 		SELECT ProductID, ProductName, ProductDescription, VendorID, VendorProductName,
 			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
-			   UnitPerID, UnitWeight, Obsolete
+			   UnitPerID, UnitWeight, Obsolete, CategoryID
 		FROM dbo.Products;
 	END TRY
 
@@ -603,7 +608,7 @@ BEGIN
 	BEGIN TRY
 		SELECT ProductID, ProductName, ProductDescription, VendorID, VendorProductName,
 			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
-			   UnitPerID, UnitWeight, Obsolete
+			   UnitPerID, UnitWeight, Obsolete, CategoryID
 		FROM dbo.Products
 		WHERE ProductID = @ProductID;
 	END TRY
