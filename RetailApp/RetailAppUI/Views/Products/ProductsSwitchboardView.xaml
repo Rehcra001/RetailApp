@@ -92,7 +92,7 @@
                                                                    FontSize="14"
                                                                    Foreground="White"/>
                                                         
-                                                        <TextBlock Text="{Binding Path=ItemCount, StringFormat=Count: {0}}"
+                                                        <TextBlock Text="{Binding Path=ItemCount, StringFormat=Number of Products: {0}}"
                                                                    Margin="30,0,0,0"
                                                                    FontSize="14"
                                                                    Foreground="White"/>
