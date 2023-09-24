@@ -203,7 +203,7 @@ namespace RetailAppUI.ViewModels.Products
 
         private void CancelAction(object obj)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to cancel this add. \r\n No changes made will be saved!\r\n",
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to cancel this add. \r\n Changes made will not be saved!\r\n",
                                                       "Cancel Add New Product", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result == MessageBoxResult.Yes)
             {
