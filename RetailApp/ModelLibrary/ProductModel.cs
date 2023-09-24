@@ -79,6 +79,11 @@ namespace ModelsLibrary
         public bool Obsolete { get; set; }
 
         /// <summary>
+        /// Unique category ID
+        /// </summary>
+        public int CategoryID { get; set; }
+
+        /// <summary>
         /// Holds the vendor detail for this product
         /// </summary>
         public VendorModel Vendor { get; set; } = new VendorModel();
@@ -87,6 +92,11 @@ namespace ModelsLibrary
         /// Holds the unit per for this product
         /// </summary>
         public UnitsPerModel Unit { get; set; } = new UnitsPerModel();
+
+        /// <summary>
+        /// Holds the category detail for this product
+        /// </summary>
+        public CategoryModel Category { get; set; } = new CategoryModel();
 
         // TODO - Add a list of product transactions
 
@@ -167,6 +177,12 @@ namespace ModelsLibrary
                 isValid = false;
             }
 
+            //Category ID
+            if (CategoryID == 0)
+            {
+                ValidationMessage += "Category is required.\r\n";
+                isValid = false;
+            }
 
             return isValid;
         }
