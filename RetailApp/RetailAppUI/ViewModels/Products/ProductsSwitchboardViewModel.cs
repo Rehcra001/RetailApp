@@ -16,7 +16,7 @@ namespace RetailAppUI.ViewModels.Products
 {
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
-		private readonly ProductsManager _productManager;
+		private readonly ProductsManager _productsManager;
 
 		public ICollectionView ProductsCollectionView { get; set; }
 
@@ -71,7 +71,7 @@ namespace RetailAppUI.ViewModels.Products
 			ConnectionString = connectionString;
 
 			//Fetch a list of products
-            _productManager = new ProductsManager(ConnectionString.GetConnectionString());
+            _productsManager = new ProductsManager(ConnectionString.GetConnectionString());
             GetProductsList();
 
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
@@ -83,7 +83,7 @@ namespace RetailAppUI.ViewModels.Products
 		{
 			try
 			{
-                Products = new ObservableCollection<ProductModel>(_productManager.GetAll());
+                Products = new ObservableCollection<ProductModel>(_productsManager.GetAll());
                 SetProductCollectionView();
             }
 			catch (Exception ex)
