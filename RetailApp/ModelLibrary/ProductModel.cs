@@ -81,12 +81,12 @@ namespace ModelsLibrary
         /// <summary>
         /// Holds the vendor detail for this product
         /// </summary>
-        public VendorModel? Vendor { get; set; }
+        public VendorModel Vendor { get; set; } = new VendorModel();
 
         /// <summary>
         /// Holds the unit per for this product
         /// </summary>
-        public UnitsPerModel? Unit { get; set; }
+        public UnitsPerModel Unit { get; set; } = new UnitsPerModel();
 
         // TODO - Add a list of product transactions
 

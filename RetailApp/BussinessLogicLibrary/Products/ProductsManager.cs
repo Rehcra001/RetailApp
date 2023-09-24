@@ -1,6 +1,6 @@
 ﻿using DataAccessLibrary.ProductRepository;
-using DataAccessLibrary.VendorRepository;
 using DataAccessLibrary.UnitsPerRepository;
+using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 
 namespace BussinessLogicLibrary.Products
