@@ -701,3 +701,97 @@ BEGIN
 	END CATCH;
 END;
 GO
+
+--**********Category**********
+
+--Returns a CategoryID on success
+--or an error message on failiure
+CREATE PROCEDURE dbo.usp_InsertCategory
+(
+	@CategoryName NVARCHAR(50)
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.Category (CategoryName)
+			VALUES (@CategoryName);
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+	 IF (@@TRANCOUNT > 0)
+	 BEGIN
+		ROLLBACK TRAN;
+	 END;
+	 SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Returns a message "No Error" on success
+--or an error message on failiure
+CREATE PROCEDURE dbo.usp_UpdateCategory
+(
+	@CategoryID INT,
+	@CategoryName NVARCHAR(50)
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			UPDATE dbo.Category
+			SET CategoryName = @CategoryName
+			WHERE CategoryID = @CategoryID;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Returns a list of all categories on success
+--or an error message on failiure
+CREATE PROCEDURE dbo.usp_GetAllCategories AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT CategoryID, CategoryName
+		FROM dbo.Category;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Returns a category by id on success
+--or an error message on failiure
+CREATE PROCEDURE dbo.usp_GetCategoryByID
+(
+	@CategoryID INT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT CategoryID, CategoryName
+		FROM dbo.Category
+		WHERE CategoryID = @CategoryID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO

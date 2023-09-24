@@ -195,7 +195,15 @@ CREATE TABLE dbo.Products
 	ReorderPoint INT DEFAULT(0) NOT NULL,
 	UnitPerID INT NOT NULL,
 	UnitWeight FLOAT DEFAULT(0) NOT NULL,
-	Obsolete BIT DEFAULT(0) NOT NULL
+	Obsolete BIT DEFAULT(0) NOT NULL,
+	CategoryID INT NOT NULL
+);
+GO
+
+CREATE TABLE dbo.Category
+(
+	CategoryID INT IDENTITY(1,1) PRIMARY KEY,
+	CategoryName NVARCHAR(50) NOT NULL
 );
 GO
 
@@ -308,6 +316,12 @@ ALTER TABLE dbo.Products
 ADD CONSTRAINT FK_Products_Units_UnitPerID
 FOREIGN KEY (UnitPerID)
 REFERENCES dbo.Units(UnitPerID);
+GO
+
+ALTER TABLE dbo.Products
+ADD CONSTRAINT FK_Products_Category_CategoryID
+FOREIGN KEY (CategoryID)
+REFERENCES dbo.Category(CategoryID);
 GO
 
 --Purchase Order Header
