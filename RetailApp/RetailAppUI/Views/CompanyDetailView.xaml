@@ -250,7 +250,7 @@
             <StackPanel Orientation="Horizontal"
                 Grid.Column="1"
                 Grid.Row="2"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center">
                 <Button Content="Add New"
                 Width="75"
