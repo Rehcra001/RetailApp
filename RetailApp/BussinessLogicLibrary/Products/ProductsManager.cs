@@ -1,4 +1,5 @@
-﻿using DataAccessLibrary.ProductRepository;
+﻿using DataAccessLibrary.CategoryRepository;
+using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
@@ -29,8 +30,28 @@ namespace BussinessLogicLibrary.Products
             GetProducts();
             GetVendors();
             GetUnitsPer();
+            GetCategories();            
 
             return _products;
+        }
+
+        private void GetCategories()
+        {
+            Tuple<IEnumerable<CategoryModel>, string> categories = new CategoryRepository(_connectionString).GetAll().ToTuple();
+
+            if (categories.Item2 == null)
+            {
+                //No errors
+                foreach (ProductModel product in _products)
+                {
+                    product.Category = categories.Item1.First(c => c.CategoryID == product.CategoryID);
+                }
+            }
+            else
+            {
+                //Error retrieving categories
+                throw new Exception(categories.Item2);
+            }
         }
 
         private void GetUnitsPer()

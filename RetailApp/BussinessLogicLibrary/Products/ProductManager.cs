@@ -1,16 +1,11 @@
-﻿using ModelsLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccessLibrary.ProductRepository;
+﻿using DataAccessLibrary.ProductRepository;
+using ModelsLibrary;
 
 namespace BussinessLogicLibrary.Products
 {
-	/// <summary>
-	/// Managers a single product model
-	/// </summary>
+    /// <summary>
+    /// Managers a single product model
+    /// </summary>
     public class ProductManager
     {
 		private string _connectionString;
@@ -43,11 +38,12 @@ namespace BussinessLogicLibrary.Products
 			// TODO - Update method still needs to be implemented
         }
 
-		public void Insert(VendorModel vendor, UnitsPerModel unitsPer)
+		public void Insert(VendorModel vendor, UnitsPerModel unitsPer, CategoryModel category)
 		{
 			//Add the vendor and unitsPer id
 			Product.VendorID = vendor.VendorID;
 			Product.UnitPerID = unitsPer.UnitPerID;
+			Product.CategoryID = category.CategoryID;
 
 			//Validate the model
 			if (Product.Validate())
