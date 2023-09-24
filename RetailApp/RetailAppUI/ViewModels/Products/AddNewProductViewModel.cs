@@ -54,6 +54,22 @@ namespace RetailAppUI.ViewModels.Products
             set { _unitPers = value; OnPropertyChanged(); }
         }
 
+        private CategoryModel _category;
+        public CategoryModel Category
+        {
+            get { return _category; }
+            set { _category = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<CategoryModel> _categories;
+        public ObservableCollection<CategoryModel> Categories
+        {
+            get { return _categories; }
+            set { _categories = value; OnPropertyChanged(); }
+        }
+
+
+
         private IConnectionStringService  _connectionString;
         public IConnectionStringService ConnectionString
         {
@@ -123,6 +139,8 @@ namespace RetailAppUI.ViewModels.Products
                 // TODO - Add return to products switch board on error
             }
 
+            // TODO Add List of Categories
+
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
             CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
@@ -147,9 +165,10 @@ namespace RetailAppUI.ViewModels.Products
                 MessageBox.Show("Please select a unit per.", "Unit Per Missing", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            // TODO - Check that category is not null
             try
             {
-                _productManager.Insert(Vendor, UnitPer);
+                _productManager.Insert(Vendor, UnitPer, Category);
             }
             catch (Exception ex)
             {
