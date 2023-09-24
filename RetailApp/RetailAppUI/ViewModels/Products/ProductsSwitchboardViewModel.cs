@@ -3,12 +3,8 @@ using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -17,6 +13,7 @@ namespace RetailAppUI.ViewModels.Products
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
 		private readonly ProductsManager _productsManager;
+		private string _groupByState;
 
 		public ICollectionView ProductsCollectionView { get; set; }
 
@@ -62,6 +59,9 @@ namespace RetailAppUI.ViewModels.Products
 
 		public RelayCommand CloseViewCommand { get; set; }
 		public RelayCommand NavigateToAddNewProductViewCommand { get; set; }
+        public RelayCommand GroupByCategoryCommand { get; set; }
+        public RelayCommand GroupByVendorCommand { get; set; }
+        public RelayCommand ClearGroupByCommand { get; set; }
 
         public ProductsSwitchboardViewModel(INavigationService navigation, ICurrentViewService currentView, ISharedDataService sharedData, IConnectionStringService connectionString)
         {
@@ -76,7 +76,72 @@ namespace RetailAppUI.ViewModels.Products
 
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
 			NavigateToAddNewProductViewCommand = new RelayCommand(NavigateToAddNewProductView, CanNavigateToAddNewProductView);
+			GroupByCategoryCommand = new RelayCommand(GroupByCategory, CanGroupByCategory);
+			GroupByVendorCommand = new RelayCommand(GroupByVendor, CanGroupByVendor);
+			ClearGroupByCommand = new RelayCommand(ClearGroupBy, CanClearGroupBy);
+
+			SetGroupByState("Clear");
         }
+
+        private bool CanGroupByVendor(object obj)
+        {
+			return !_groupByState.Equals("Vendor");
+        }
+
+        private void GroupByVendor(object obj)
+        {
+			SetGroupByState("Vendor");
+        }
+
+        private bool CanGroupByCategory(object obj)
+        {
+			return !_groupByState.Equals("Category");
+        }
+
+        private void GroupByCategory(object obj)
+        {
+			SetGroupByState("Category");
+        }
+
+        private bool CanClearGroupBy(object obj)
+        {
+			return !_groupByState.Equals("Clear");
+        }
+
+        private void ClearGroupBy(object obj)
+        {
+			SetGroupByState("Clear");
+			
+        }
+
+        private void SetGroupByState(string state)
+		{
+			_groupByState = state;
+
+			switch (_groupByState)
+			{
+				case "Clear":
+					if (ProductsCollectionView.GroupDescriptions.Count > 0)
+					{
+                        ProductsCollectionView.GroupDescriptions.Clear();
+                    }                    
+                    break;
+				case "Category":
+                    if (ProductsCollectionView.GroupDescriptions.Count > 0)
+                    {
+                        ProductsCollectionView.GroupDescriptions.Clear();
+                    }
+					ProductsCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Category.CategoryName"));
+                    break;
+                case "Vendor":
+                    if (ProductsCollectionView.GroupDescriptions.Count > 0)
+                    {
+                        ProductsCollectionView.GroupDescriptions.Clear();
+                    }
+                    ProductsCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Vendor.CompanyName"));
+                    break;
+            }
+		}
 
         #region ProductsMethods
         private void GetProductsList()
@@ -84,8 +149,8 @@ namespace RetailAppUI.ViewModels.Products
 			try
 			{
                 Products = new ObservableCollection<ProductModel>(_productsManager.GetAll());
-                SetProductCollectionView();
-            }
+				SetProductCollectionView();
+			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.Message, "Error Retrieving Products", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -96,16 +161,10 @@ namespace RetailAppUI.ViewModels.Products
 		private void SetProductCollectionView()
 		{
 			ProductsCollectionView = CollectionViewSource.GetDefaultView(Products);
-			SetProductGrouping();
 		}
+		#endregion ProductsMethods
 
-		private void SetProductGrouping()
-		{
-			ProductsCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Vendor.CompanyName"));
-		}
-        #endregion ProductsMethods
-
-        private bool CanNavigateToAddNewProductView(object obj)
+		private bool CanNavigateToAddNewProductView(object obj)
         {
 			return true;
         }
