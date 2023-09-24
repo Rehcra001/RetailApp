@@ -1,4 +1,5 @@
 ﻿using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
