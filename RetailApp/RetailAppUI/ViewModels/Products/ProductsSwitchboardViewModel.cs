@@ -83,6 +83,7 @@ namespace RetailAppUI.ViewModels.Products
 			SetGroupByState("Clear");
         }
 
+        #region GroupBy Methods
         private bool CanGroupByVendor(object obj)
         {
 			return !_groupByState.Equals("Vendor");
@@ -142,6 +143,7 @@ namespace RetailAppUI.ViewModels.Products
                     break;
             }
 		}
+        #endregion GroupBy Methods
 
         #region ProductsMethods
         private void GetProductsList()
