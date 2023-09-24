@@ -55,6 +55,7 @@ namespace DataAccessLibrary.ProductRepository
                                     product.UnitPerID = Convert.ToInt32(reader["UnitPerID"]);
                                     product.UnitWeight = Convert.ToSingle(reader["UnitWeight"]);
                                     product.Obsolete = Convert.ToBoolean(reader["Obsolete"]);
+                                    product.CategoryID = Convert.ToInt32(reader["CategoryID"]);
                                     products.Add(product);
                                 }
                             }
@@ -112,6 +113,7 @@ namespace DataAccessLibrary.ProductRepository
                                     product.UnitPerID = Convert.ToInt32(reader["UnitPerID"]);
                                     product.UnitWeight = Convert.ToSingle(reader["UnitWeight"]);
                                     product.Obsolete = Convert.ToBoolean(reader["Obsolete"]);
+                                    product.CategoryID = Convert.ToInt32(reader["CategoryID"]);
                                 }
                             }
                         }
@@ -147,6 +149,7 @@ namespace DataAccessLibrary.ProductRepository
                     command.Parameters.Add("@ReorderPoint", SqlDbType.Int).Value = product.ReorderPoint;
                     command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = product.UnitPerID;
                     command.Parameters.Add("@UnitWeight", SqlDbType.Float).Value = product.UnitWeight;
+                    command.Parameters.Add("@CategoryID", SqlDbType.Int).Value = product.CategoryID;
                     connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
@@ -186,6 +189,7 @@ namespace DataAccessLibrary.ProductRepository
                     command.Parameters.Add("@ReorderPoint", SqlDbType.Int).Value = product.ReorderPoint;
                     command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = product.UnitPerID;
                     command.Parameters.Add("@UnitWeight", SqlDbType.Float).Value = product.UnitWeight;
+                    command.Parameters.Add("@CategoryID", SqlDbType.Int).Value = product.CategoryID;
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
                     if (!returnedMessage.Equals("No Error"))
