@@ -182,6 +182,31 @@
                              Style="{StaticResource NumericTextBoxTheme}"/>
                 </StackPanel>
 
+                <!--Categories-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Category:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+
+                    <ComboBox Style="{StaticResource ComboBoxTheme}" 
+                              Width="350"
+                              ItemsSource="{Binding Categories}"
+                              SelectedItem="{Binding Category}"
+                              FontSize="14"
+                              Foreground="White">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding CategoryName}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
             </StackPanel>
 
             <!--Command Buttons-->
