@@ -97,7 +97,7 @@
                         <TextBox Text="{Binding Vendor.VatRegistrationNumber}"
                          Width="100"
                          FontSize="14"
-                         Style="{StaticResource TextBoxTheme}"
+                         Style="{StaticResource NumericTextBoxTheme}"
                          IsReadOnly="{Binding TextReadOnly}"
                          KeyDown="TxtNumericOnly_KeyDown"/>
                     </StackPanel>
@@ -173,7 +173,7 @@
                         <TextBox Text="{Binding Vendor.PostalCode}"
                          Width="100"
                          FontSize="14"
-                         Style="{StaticResource TextBoxTheme}"
+                         Style="{StaticResource NumericTextBoxTheme}"
                          IsReadOnly="{Binding TextReadOnly}"
                          KeyDown="TxtNumericOnly_KeyDown"/>
                     </StackPanel>

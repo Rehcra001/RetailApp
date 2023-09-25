@@ -17,7 +17,7 @@
                                      VerticalContentAlignment="Center"
                                      Padding="1"
                                      Foreground="White"/>
-                </Grid>
+                        </Grid>
                     </Border>
 
                 </ControlTemplate>
