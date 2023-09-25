@@ -324,6 +324,11 @@ FOREIGN KEY (CategoryID)
 REFERENCES dbo.Category(CategoryID);
 GO
 
+ALTER TABLE dbo.Products
+ADD CONSTRAINT UK_ProductName
+UNIQUE(ProductName);
+GO
+
 --Purchase Order Header
 ALTER TABLE dbo.PurchaseOrderHeader
 ADD CONSTRAINT FK_PurchaseOrderHeader_Vendors_VendorID
