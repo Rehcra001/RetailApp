@@ -36,6 +36,10 @@
                 <ProductView:AddNewProductView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type TypeName=ProductViewModel:ProductViewModel}">
+                <ProductView:ProductView/>
+            </DataTemplate>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/ButtonTheme.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxTheme.xaml"/>
