@@ -40,7 +40,8 @@
                         Grid.Row="1"
                         Margin="5"
                         Background="Transparent"
-                        BorderThickness="0">
+                        BorderThickness="0"
+                        ItemsSource="{Binding Product}">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="Template">
@@ -95,11 +96,12 @@
                 <!--Product Detail-->
                 <TabItem Header="Product Detail"
                          FontSize="14">
-                    <StackPanel Margin="0,20,0,0">
+                    <StackPanel Margin="0,20,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
                         
                         <StackPanel Orientation="Horizontal"
-                                    Margin="0,0,0,10">
-                            
+                                    Margin="0,0,0,10">                            
                             <!--Product Name-->
                             <TextBlock Text="Product Name:"
                                        Width="150"
@@ -119,18 +121,214 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"
                                        Margin="20,0,5,0"/>
-                            <TextBox Text="{Binding Category.CategoryName}"
-                                     Width="150"
+                            <ComboBox Style="{StaticResource ComboBoxTheme}" 
+                                      Width="150"
+                                      ItemsSource="{Binding Categories}"
+                                      SelectedItem="{Binding Category}"
+                                      FontSize="14"
+                                      Foreground="White"
+                                      IsEnabled="{Binding TextReadOnly}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding CategoryName}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!--Product Description-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <!--Product Name-->
+                            <TextBlock Text="Product Description:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding ProductDescription}"
+                                     Width="585"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
                                      IsReadOnly="{Binding TextReadOnly}"/>
                         </StackPanel>
 
-                        <!--Product Description-->
-                        <StackPanel>
+                        <!--Vendor-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,30,0,10">
+                            <!--Vendor Name-->
+                            <TextBlock Text="Vendor:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <ComboBox Style="{StaticResource ComboBoxTheme}" 
+                                      Width="350"
+                                      ItemsSource="{Binding Vendors}"
+                                      SelectedItem="{Binding Vendor}"
+                                      FontSize="14"
+                                      Foreground="White"
+                                      IsEnabled="{Binding TextReadOnly}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding CompanyName}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!--Vendor Product Name-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Vendor Product Name:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding VendorProductName}"
+                                     Width="350"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="{Binding TextReadOnly}"/>
+                        </StackPanel>
+
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,30,0,10">
+
+                            <!--Unit Price-->
+                            <TextBlock Text="Unit Price:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding UnitPrice}"
+                                     Width="75"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Right"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="{Binding TextReadOnly}"/>
+
+                            <!--Unit Cost-->
+                            <TextBlock Text="Unit Cost:"
+                                       Width="100"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="20,0,0,0"/>
+                            <TextBox Text="{Binding UnitCost}"
+                                     Width="75"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Right"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"/>
+
+                            <!--Unit Weight-->
+                            <TextBlock Text="Unit Weight:"
+                                        Width="100"
+                                        Foreground="White"
+                                        HorizontalAlignment="Left"
+                                        FontSize="14"
+                                        Margin="20,0,0,0"/>
+                            <TextBox Text="{Binding Product.UnitWeight}"
+                                     Width="75"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Right"
+                                     Style="{StaticResource NumericTextBoxTheme}"/>
                             
                         </StackPanel>
                         
+                        <StackPanel Orientation="Horizontal">
+                            <!--Unit per-->
+                        <TextBlock Text="Unit Per:"
+                                   Width="150"
+                                   Foreground="White"
+                                   HorizontalAlignment="Left"
+                                   FontSize="14"/>
+                        <ComboBox Style="{StaticResource ComboBoxTheme}" 
+                                  Width="75"
+                                  ItemsSource="{Binding UnitPers}"
+                                  SelectedItem="{Binding UnitPer}"
+                                  FontSize="14"
+                                  Foreground="White"
+                                  IsEnabled="{Binding TextReadOnly}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding UnitPer}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!--Inventory-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,30,0,10">
+                            
+                            <!--Qty On Hand-->
+                            <TextBlock Text="Qty On Hand:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding OnHand}"
+                                     Width="75"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Right"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"/>
+                            
+                            <!--Qty On Order-->
+                            <TextBlock Text="Qty On Order:"
+                                       Width="100"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="20,0,0,0"/>
+                            <TextBox Text="{Binding OnOrder}"
+                                     Width="75"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Right"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"/>
+
+                            <!--Sales Demand-->
+                            <TextBlock Text="Sales Demand:"
+                                       Width="100"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="20,0,0,0"/>
+                            <TextBox Text="{Binding SalesDemand}"
+                                     Width="75"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Right"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"/>
+
+                        </StackPanel>
+
+                        <!--Reorder Point-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Reorder Point:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding ReorderPoint}"
+                                     Width="75"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Right"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="{Binding TextReadOnly}"/>
+                        </StackPanel>
+
+
                     </StackPanel>
                 </TabItem>
                 

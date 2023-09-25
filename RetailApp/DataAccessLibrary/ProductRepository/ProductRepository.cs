@@ -14,6 +14,7 @@ namespace DataAccessLibrary.ProductRepository
         {
             _connectionString = connectionString;
         }
+
         public (IEnumerable<ProductModel>, string) GetAll()
         {
             string? errorMessage = null;
