@@ -40,8 +40,7 @@
                         Grid.Row="1"
                         Margin="5"
                         Background="Transparent"
-                        BorderThickness="0"
-                        ItemsSource="{Binding Product}">
+                        BorderThickness="0">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="Template">
@@ -108,7 +107,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding ProductName}"
+                            <TextBox Text="{Binding Product.ProductName}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -124,10 +123,10 @@
                             <ComboBox Style="{StaticResource ComboBoxTheme}" 
                                       Width="150"
                                       ItemsSource="{Binding Categories}"
-                                      SelectedItem="{Binding Category}"
+                                      SelectedItem="{Binding SelectedCategory}"
                                       FontSize="14"
                                       Foreground="White"
-                                      IsEnabled="{Binding TextReadOnly}">
+                                      IsEnabled="{Binding AllowCategoryEdit}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
@@ -147,7 +146,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding ProductDescription}"
+                            <TextBox Text="{Binding Product.ProductDescription}"
                                      Width="585"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -166,10 +165,10 @@
                             <ComboBox Style="{StaticResource ComboBoxTheme}" 
                                       Width="350"
                                       ItemsSource="{Binding Vendors}"
-                                      SelectedItem="{Binding Vendor}"
+                                      SelectedItem="{Binding SelectedVendor}"
                                       FontSize="14"
                                       Foreground="White"
-                                      IsEnabled="{Binding TextReadOnly}">
+                                      IsEnabled="{Binding AllowVendorEdit}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
@@ -188,7 +187,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding VendorProductName}"
+                            <TextBox Text="{Binding Product.VendorProductName}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -205,7 +204,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding UnitPrice}"
+                            <TextBox Text="{Binding Product.UnitPrice}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
@@ -219,7 +218,7 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"
                                        Margin="20,0,0,0"/>
-                            <TextBox Text="{Binding UnitCost}"
+                            <TextBox Text="{Binding Product.UnitCost}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
@@ -237,7 +236,8 @@
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
-                                     Style="{StaticResource NumericTextBoxTheme}"/>
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="{Binding TextReadOnly}"/>
                             
                         </StackPanel>
                         
@@ -251,10 +251,10 @@
                         <ComboBox Style="{StaticResource ComboBoxTheme}" 
                                   Width="75"
                                   ItemsSource="{Binding UnitPers}"
-                                  SelectedItem="{Binding UnitPer}"
+                                  SelectedItem="{Binding SelectedUnitPer}"
                                   FontSize="14"
                                   Foreground="White"
-                                  IsEnabled="{Binding TextReadOnly}">
+                                  IsEnabled="{Binding AllowUnitPerEdit}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -275,7 +275,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding OnHand}"
+                            <TextBox Text="{Binding Product.OnHand}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
@@ -289,7 +289,7 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"
                                        Margin="20,0,0,0"/>
-                            <TextBox Text="{Binding OnOrder}"
+                            <TextBox Text="{Binding Product.OnOrder}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
@@ -303,7 +303,7 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"
                                        Margin="20,0,0,0"/>
-                            <TextBox Text="{Binding SalesDemand}"
+                            <TextBox Text="{Binding Product.SalesDemand}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
@@ -320,21 +320,40 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding ReorderPoint}"
+                            <TextBox Text="{Binding Product.ReorderPoint}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
                                      Style="{StaticResource NumericTextBoxTheme}"
                                      IsReadOnly="{Binding TextReadOnly}"/>
                         </StackPanel>
-
-
                     </StackPanel>
-                </TabItem>
-                
+                    
+                </TabItem>                
                 <!--Product Transactions-->
                 <TabItem Header="Product Transactions"
                          FontSize="14">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <DataGrid Margin="5" 
+                                  HorizontalAlignment="Center"
+                                  IsReadOnly="True"
+                                  AutoGenerateColumns="False"
+                                  CanUserSortColumns="False"
+                                  Padding="5,0,0,0"
+                                  FontSize="12"
+                                  SelectionMode="Single"
+                                  ItemsSource="{Binding Product}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding InventoryTransactions.TransactionID}"/>
+                                <DataGridTextColumn Header="Type" Binding="{Binding InventoryTransactions.TransactionType}"/>
+                                <DataGridTextColumn Header="Date" Binding="{Binding InventoryTransactions.TransactionDate}"/>
+                                <DataGridTextColumn Header="Product ID" Binding="{Binding InventoryTransactions.ProductID}"/>
+                                <DataGridTextColumn Header="Order ID" Binding="{Binding InventoryTransactions.OrderID}"/>
+                                <DataGridTextColumn Header="Quantity" Binding="{Binding InventoryTransactions.Quantity}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
                     
                 </TabItem>
                 
@@ -355,7 +374,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.CompanyName}"
+                            <TextBox Text="{Binding SelectedVendor.CompanyName}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -370,7 +389,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.VatRegistrationNumber}"
+                            <TextBox Text="{Binding SelectedVendor.VatRegistrationNumber}"
                                         Width="100"
                                         FontSize="14"
                                         Style="{StaticResource NumericTextBoxTheme}"
@@ -385,7 +404,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.AddressLine1}"
+                            <TextBox Text="{Binding SelectedVendor.AddressLine1}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -400,7 +419,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.AddressLine2}"
+                            <TextBox Text="{Binding SelectedVendor.AddressLine2}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -415,7 +434,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.City}"
+                            <TextBox Text="{Binding SelectedVendor.City}"
                                      Width="200"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -430,7 +449,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.Province}"
+                            <TextBox Text="{Binding SelectedVendor.Province}"
                                      Width="200"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -445,7 +464,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.PostalCode}"
+                            <TextBox Text="{Binding SelectedVendor.PostalCode}"
                                      Width="100"
                                      FontSize="14"
                                      Style="{StaticResource NumericTextBoxTheme}"
@@ -468,7 +487,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.FirstName}"
+                            <TextBox Text="{Binding SelectedVendor.FirstName}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -483,7 +502,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.LastName}"
+                            <TextBox Text="{Binding SelectedVendor.LastName}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -498,7 +517,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Vendor.EmailAddress}"
+                            <TextBox Text="{Binding SelectedVendor.EmailAddress}"
                                      Width="350"
                                      FontSize="14"
                                      Style="{StaticResource TextBoxTheme}"
@@ -514,7 +533,7 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
                             <TextBox x:Name="txtPhoneAreaCode"
-                                     Text="{Binding Vendor.PhoneAreaCode}"
+                                     Text="{Binding SelectedVendor.PhoneAreaCode}"
                                      Width="30"
                                      FontSize="14"
                                      HorizontalContentAlignment="Center"
@@ -522,7 +541,7 @@
                                      IsReadOnly="True"/>
 
                             <TextBox x:Name="txtPhonePrefix"
-                                     Text="{Binding Vendor.PhonePrefix}"
+                                     Text="{Binding SelectedVendor.PhonePrefix}"
                                      Width="30"
                                      FontSize="14"
                                      Margin="10,0,0,0"
@@ -531,7 +550,7 @@
                                      IsReadOnly="True"/>
 
                             <TextBox x:Name="txtPhoneSuffix"
-                                     Text="{Binding Vendor.PhoneSuffix}"
+                                     Text="{Binding SelectedVendor.PhoneSuffix}"
                                      Width="40"
                                      FontSize="14"
                                      Margin="5,0,0,0"

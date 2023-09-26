@@ -150,13 +150,13 @@
                 <Button Content="Add New Product"
                         Command="{Binding NavigateToAddNewProductViewCommand}"
                         Style="{StaticResource ButtonTheme}"
-                        Width="150"
+                        Width="155"
                         Margin="0,10"/>
                 
                 <Button Content="Open Selected Product"
                         Command="{Binding NavigateToProductViewCommand}"
                         Style="{StaticResource ButtonTheme}"
-                        Width="150"
+                        Width="155"
                         Margin="0,10"/>
             </StackPanel>
             

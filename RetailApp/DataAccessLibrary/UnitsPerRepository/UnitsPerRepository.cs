@@ -56,6 +56,50 @@ namespace DataAccessLibrary.UnitsPerRepository
                 return (unitsPers, errorMessage); //errorMessage will be null if no error raised by the database
         }
 
+        public (UnitsPerModel, string) GetByID(int id)
+        {
+            UnitsPerModel unitsPer = new UnitsPerModel();
+            string? errorMessage = null;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_GetUnitByID";
+                    command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = id;
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        //Check if more than one column returned
+                        //only one column indicates an error
+                        if (reader.FieldCount > 1)
+                        {
+                            //No error
+                            //Check if data returned
+                            if (reader.HasRows)
+                            {
+                                reader.Read();
+                                unitsPer.UnitPerID = Convert.ToInt32(reader["UnitPerID"]);
+                                unitsPer.UnitPer = reader["UnitPer"].ToString();
+                                unitsPer.UnitPerDescription = reader["UnitPerDescription"].ToString();
+                            }
+                        }
+                        else
+                        {
+                            //error
+                            reader.Read();
+                            errorMessage = reader["Message"].ToString();
+                        }
+                    }
+                }
+            }
+
+                return (unitsPer, errorMessage);//Error message will be null if no error raised by datasource
+        }
+
         public (UnitsPerModel, string) Insert(UnitsPerModel unitsPer)
         {
             string? errorMessage = null;

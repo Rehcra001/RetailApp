@@ -219,6 +219,8 @@ namespace RetailAppUI.ViewModels.Products
 
         private void NavigateToProductView(object obj)
         {
+            //ProductView will need this product id
+            SharedData.SharedData = Product.ProductID;
 			Navigation.NavigateTo<ProductViewModel>();
         }
         #endregion Navigate To Views

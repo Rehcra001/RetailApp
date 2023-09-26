@@ -252,11 +252,9 @@ CREATE TABLE dbo.Receipts
 	ReceiptID INT IDENTITY(1,1) PRIMARY KEY,
 	PurchaseOrderID BIGINT NOT NULL,
 	ProductID INT NOT NULL,
-	ReceiptDate DATETIME NOT NULL,
+	ReceiptDate DATETIME DEFAULT(GETDATE()) NOT NULL, --No need to insert date
 	QuantityReceipted INT NOT NULL,
-	UnitCost MONEY NOT NULL,
-	QuantitySold INT DEFAULT(0) NOT NULL,
-	QuantityInStock AS QuantityReceipted - QuantitySold
+	UnitCost MONEY NOT NULL
 );
 GO
 
@@ -277,6 +275,17 @@ CREATE TABLE dbo.Vendors
 	PhoneNumber NVARCHAR (10) NOT NULL
 );
 GO
+
+CREATE TABLE dbo.InventoryTransactions
+(
+	TransactionID INT IDENTITY(1,1) PRIMARY KEY,
+	TransactionType CHAR(1) NOT NULL, --'R' for Receipt - 'I' for issue
+	TransactionDate DATETIME NOT NULL,
+	ProductID INT NOT NULL,
+	OrderID INT NOT NUll UNIQUE, --One receipt or issue per transaction
+	Quantity INT NOT NULL, --Positive for Reciept - Negative for Issue
+	
+);
 
 --CONSTRAINTS***********************************************
 --Sales Order Header
@@ -359,4 +368,22 @@ ALTER TABLE dbo.Receipts
 ADD CONSTRAINT FK_Receipts_PurchaseOrderDetail_PurchaseOrderID_ProductID
 FOREIGN KEY (PurchaseOrderID, ProductID)
 REFERENCES dbo.PurchaseOrderDetail(PurchaseOrderID, ProductID);
+GO
+
+--Inventory Transactions
+ALTER TABLE dbo.InventoryTransactions
+ADD CONSTRAINT FK_InventoryTransaction_Products_ProductID
+FOREIGN KEY (ProductID)
+REFERENCES dbo.Products(ProductID);
+GO
+
+ALTER TABLE dbo.InventoryTransactions
+ADD CONSTRAINT FK_InventoryTransactions_Receipts_OrderID_ReceiptsID
+FOREIGN KEY (OrderID)
+REFERENCES dbo.Receipts(ReceiptID);
+GO
+
+ALTER TABLE dbo.InventoryTransactions
+ADD CONSTRAINT CH_InventoryTransactions_TransactionType_R_I
+CHECK (TransactionType IN ('R', 'I'));
 GO

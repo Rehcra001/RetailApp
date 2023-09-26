@@ -11,5 +11,7 @@ namespace ModelsLibrary.RepositoryInterfaces
         (UnitsPerModel, string) Insert(UnitsPerModel unitsPer);
         string Update(UnitsPerModel unitsPer);
         (IEnumerable<UnitsPerModel>, string) GetAll();
+        (UnitsPerModel, string) GetByID(int id);
+
     }
 }

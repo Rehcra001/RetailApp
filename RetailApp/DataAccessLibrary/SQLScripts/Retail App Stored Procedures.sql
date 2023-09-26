@@ -707,6 +707,26 @@ BEGIN
 END;
 GO
 
+--Returns a unitPer 
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetUnitByID
+(
+	@UnitPerID INT
+)AS
+BEGIN
+	BEGIN TRY
+		SELECT UnitPerID, UnitPer, UnitPerDescription
+		FROM dbo.Units
+		WHERE UnitPerID = @UnitPerID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+
 --**********Category**********
 
 --Returns a CategoryID on success
@@ -795,6 +815,30 @@ BEGIN
 		SELECT CategoryID, CategoryName
 		FROM dbo.Category
 		WHERE CategoryID = @CategoryID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--**********Inventory Transactions**********
+
+--Returns a list of inventory transactions per ProductID
+--or an error message on failiure
+CREATE PROCEDURE dbo.usp_GetInventoryTransactionsByProductID
+(
+	@ProductID INT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT TransactionID, TransactionType, TransactionDate,
+			   ProductID, OrderID, Quantity
+		FROM InventoryTransactions
+		WHERE ProductID = @ProductID;
 	END TRY
 
 	BEGIN CATCH

@@ -98,7 +98,10 @@ namespace ModelsLibrary
         /// </summary>
         public CategoryModel Category { get; set; } = new CategoryModel();
 
-        // TODO - Add a list of product transactions
+        /// <summary>
+        /// Holds the list of product transactions
+        /// </summary>
+        public IEnumerable<InventoryTransactionModel>? InventoryTransactions { get; set; }
 
         public string? ValidationMessage { get; private set; }
 

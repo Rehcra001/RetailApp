@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModelsLibrary", "ModelLibra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BussinessLogicLibrary", "BussinessLogicLibrary\BussinessLogicLibrary.csproj", "{27207B67-0BBA-4A14-BCAA-D15409B1634A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailAppUI", "RetailAppUI\RetailAppUI.csproj", "{81F153D4-35B6-46A4-B4F4-8824A8C2EC66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetailAppUI", "RetailAppUI\RetailAppUI.csproj", "{81F153D4-35B6-46A4-B4F4-8824A8C2EC66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -186,11 +186,13 @@ namespace DataAccessLibrary.ProductRepository
                     command.Parameters.Add("@ProductName", SqlDbType.NVarChar).Value = product.ProductName;
                     command.Parameters.Add("@ProductDescription", SqlDbType.NVarChar).Value = product.ProductDescription;
                     command.Parameters.Add("@VendorID", SqlDbType.Int).Value = product.VendorID;
+                    command.Parameters.Add("@VendorProductName", SqlDbType.NVarChar).Value = product.VendorProductName;
                     command.Parameters.Add("@UnitPrice", SqlDbType.Money).Value = product.UnitPrice;
                     command.Parameters.Add("@ReorderPoint", SqlDbType.Int).Value = product.ReorderPoint;
                     command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = product.UnitPerID;
                     command.Parameters.Add("@UnitWeight", SqlDbType.Float).Value = product.UnitWeight;
                     command.Parameters.Add("@CategoryID", SqlDbType.Int).Value = product.CategoryID;
+                    connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
                     if (!returnedMessage.Equals("No Error"))
