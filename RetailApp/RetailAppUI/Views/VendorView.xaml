@@ -289,11 +289,11 @@
                     Style="{StaticResource ButtonTheme}"
                     Margin="5"
                     Command="{Binding EditVendorCommand}"/>
-                    <Button Content="Delete"
+                    <!--<Button Content="Delete"
                     Width="75"
                     Style="{StaticResource ButtonTheme}"
                     Margin="5"
-                    Command="{Binding DeleteVendorCommand}"/>
+                    Command="{Binding DeleteVendorCommand}"/>-->
                     <Button Content="Save"
                     Width="75"
                     Style="{StaticResource ButtonTheme}"

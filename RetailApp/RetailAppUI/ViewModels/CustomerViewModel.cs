@@ -52,7 +52,7 @@ namespace RetailAppUI.ViewModels
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewCustomerCommand { get; set; }
         public RelayCommand EditCustomerCommand { get; set; }
-        public RelayCommand DeleteCustomerCommand { get; set; }
+        //public RelayCommand DeleteCustomerCommand { get; set; }
         public RelayCommand SaveCustomerCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
@@ -82,43 +82,43 @@ namespace RetailAppUI.ViewModels
             SaveCustomerCommand = new RelayCommand(SaveCustomer, CanSaveCustomer);
             CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
             EditCustomerCommand = new RelayCommand(EditCustomer, CanEditCustomer);
-            DeleteCustomerCommand = new RelayCommand(DeleteCustomer, CanDeleteCustomer);
+            //DeleteCustomerCommand = new RelayCommand(DeleteCustomer, CanDeleteCustomer);
 
 
             SetState("View");
         }
 
-        private bool CanDeleteCustomer(object obj)
-        {
-            return _state.Equals("View") && Customers.Count > 0;
-        }
+        //private bool CanDeleteCustomer(object obj)
+        //{
+        //    return _state.Equals("View") && Customers.Count > 0;
+        //}
 
-        private void DeleteCustomer(object obj)
-        {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this customer?",
-                                                      "Delete Customer",
-                                                      MessageBoxButton.YesNo,
-                                                      MessageBoxImage.Question,
-                                                      MessageBoxResult.No);
-            if (result == MessageBoxResult.Yes)
-            {
-                string errorMessage = _customerRepository.Delete(Customer);
-                //check for errors
-                if (errorMessage != null)
-                {
-                    MessageBox.Show("Unable to delete this customer. \r\n" + errorMessage,
-                                    "Error Deleting Customer",
-                                    MessageBoxButton.OK,
-                                    MessageBoxImage.Error);
-                    return;
-                }
-                else
-                {
-                    Customers.RemoveAt(CustomerIndex);
-                    CustomerIndex = 0;
-                }
-            }
-        }
+        //private void DeleteCustomer(object obj)
+        //{
+        //    MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this customer?",
+        //                                              "Delete Customer",
+        //                                              MessageBoxButton.YesNo,
+        //                                              MessageBoxImage.Question,
+        //                                              MessageBoxResult.No);
+        //    if (result == MessageBoxResult.Yes)
+        //    {
+        //        string errorMessage = _customerRepository.Delete(Customer);
+        //        //check for errors
+        //        if (errorMessage != null)
+        //        {
+        //            MessageBox.Show("Unable to delete this customer. \r\n" + errorMessage,
+        //                            "Error Deleting Customer",
+        //                            MessageBoxButton.OK,
+        //                            MessageBoxImage.Error);
+        //            return;
+        //        }
+        //        else
+        //        {
+        //            Customers.RemoveAt(CustomerIndex);
+        //            CustomerIndex = 0;
+        //        }
+        //    }
+        //}
 
         private bool CanEditCustomer(object obj)
         {

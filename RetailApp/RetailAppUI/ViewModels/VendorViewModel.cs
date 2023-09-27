@@ -54,7 +54,7 @@ namespace RetailAppUI.ViewModels
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewVendorCommand { get; set; }
         public RelayCommand EditVendorCommand { get; set; }
-        public RelayCommand DeleteVendorCommand { get; set; }
+        //public RelayCommand DeleteVendorCommand { get; set; }
         public RelayCommand SaveVendorCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
@@ -84,43 +84,43 @@ namespace RetailAppUI.ViewModels
             SaveVendorCommand = new RelayCommand(SaveVendor, CanSaveVendor);
             CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
             EditVendorCommand = new RelayCommand(EditVendor, CanEditVendor);
-            DeleteVendorCommand = new RelayCommand(DeleteVendor, CanDeleteVendor);
+            //DeleteVendorCommand = new RelayCommand(DeleteVendor, CanDeleteVendor);
 
 
             SetState("View");
         }
 
-        private bool CanDeleteVendor(object obj)
-        {
-            return _state.Equals("View") && Vendors.Count > 0;
-        }
+        //private bool CanDeleteVendor(object obj)
+        //{
+        //    return _state.Equals("View") && Vendors.Count > 0;
+        //}
 
-        private void DeleteVendor(object obj)
-        {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this vendor?", 
-                                                      "Delete Vendor", 
-                                                      MessageBoxButton.YesNo, 
-                                                      MessageBoxImage.Question, 
-                                                      MessageBoxResult.No);
-            if (result == MessageBoxResult.Yes)
-            {
-                string errorMessage = _vendorRepository.Delete(Vendor);
-                //check for errors
-                if (errorMessage != null)
-                {
-                    MessageBox.Show("Unable to delete this vendor. \r\n" + errorMessage, 
-                                    "Error Deleting Vendor", 
-                                    MessageBoxButton.OK, 
-                                    MessageBoxImage.Error);
-                    return;
-                }
-                else
-                {
-                    Vendors.RemoveAt(VendorIndex);
-                    VendorIndex = 0;
-                }
-            }
-        }
+        //private void DeleteVendor(object obj)
+        //{
+        //    MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this vendor?", 
+        //                                              "Delete Vendor", 
+        //                                              MessageBoxButton.YesNo, 
+        //                                              MessageBoxImage.Question, 
+        //                                              MessageBoxResult.No);
+        //    if (result == MessageBoxResult.Yes)
+        //    {
+        //        string errorMessage = _vendorRepository.Delete(Vendor);
+        //        //check for errors
+        //        if (errorMessage != null)
+        //        {
+        //            MessageBox.Show("Unable to delete this vendor. \r\n" + errorMessage, 
+        //                            "Error Deleting Vendor", 
+        //                            MessageBoxButton.OK, 
+        //                            MessageBoxImage.Error);
+        //            return;
+        //        }
+        //        else
+        //        {
+        //            Vendors.RemoveAt(VendorIndex);
+        //            VendorIndex = 0;
+        //        }
+        //    }
+        //}
 
         private bool CanEditVendor(object obj)
         {
