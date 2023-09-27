@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RetailAppUI.Services;
 using RetailAppUI.ViewModels;
+using RetailAppUI.ViewModels.Adminstration;
 using RetailAppUI.ViewModels.Products;
 using RetailAppUI.Views;
 using System;

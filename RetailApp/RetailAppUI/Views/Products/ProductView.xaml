@@ -204,7 +204,7 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox Text="{Binding Product.UnitPrice}"
+                            <TextBox Text="{Binding Product.UnitPrice, StringFormat=N2}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"
@@ -218,7 +218,7 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"
                                        Margin="20,0,0,0"/>
-                            <TextBox Text="{Binding Product.UnitCost}"
+                            <TextBox Text="{Binding Product.UnitCost, StringFormat=N2}"
                                      Width="75"
                                      FontSize="14"
                                      HorizontalContentAlignment="Right"

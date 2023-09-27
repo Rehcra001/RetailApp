@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:viewModel="clr-namespace:RetailAppUI.ViewModels"
              xmlns:view="clr-namespace:RetailAppUI.Views"
+             xmlns:adminModel="clr-namespace:RetailAppUI.ViewModels.Adminstration"
+             xmlns:adminView="clr-namespace:RetailAppUI.Views.Administration"
              xmlns:ProductViewModel="clr-namespace:RetailAppUI.ViewModels.Products"
              xmlns:ProductView="clr-namespace:RetailAppUI.Views.Products">
     <Application.Resources>
@@ -16,16 +18,16 @@
                 <view:HomeView/>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type TypeName=viewModel:VendorViewModel}">
-                <view:VendorView/>
+            <DataTemplate DataType="{x:Type TypeName=adminModel:VendorViewModel}">
+                <adminView:VendorView/>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type TypeName=viewModel:CustomerViewModel}">
-                <view:CustomerView/>
+            <DataTemplate DataType="{x:Type TypeName=adminModel:CustomerViewModel}">
+                <adminView:CustomerView/>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type TypeName=viewModel:CompanyDetailViewModel}">
-                <view:CompanyDetailView/>
+            <DataTemplate DataType="{x:Type TypeName=adminModel:CompanyDetailViewModel}">
+                <adminView:CompanyDetailView/>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type TypeName=ProductViewModel:ProductsSwitchboardViewModel}">

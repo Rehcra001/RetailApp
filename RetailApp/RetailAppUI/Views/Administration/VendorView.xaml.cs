@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RetailAppUI.Views
+namespace RetailAppUI.Views.Administration
 {
     /// <summary>
     /// Interaction logic for VendorView.xaml

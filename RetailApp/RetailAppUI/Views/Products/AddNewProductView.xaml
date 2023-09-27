@@ -120,7 +120,7 @@
                                Foreground="White"
                                HorizontalAlignment="Left"
                                FontSize="14"/>
-                    <TextBox Text="{Binding Product.UnitPrice}"
+                    <TextBox Text="{Binding Product.UnitPrice, StringFormat=N2}"
                              Width="75"
                              FontSize="14"
                              HorizontalContentAlignment="Right"
