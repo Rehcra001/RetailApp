@@ -16,7 +16,6 @@ namespace RetailAppUI.ViewModels.Adminstration
         private string _state;
         private CompanyDetailModel undoCompanyDetailEdit;
         private bool _textReadOnly;
-        private ICurrentViewService _currentView;
         private string _addIsVisible;
 
         public CompanyDetailModel CompanyDetail
@@ -31,7 +30,6 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         public INavigationService Navigation { get => _navigation; set { _navigation = value; OnPropertyChanged(); } }
 
-        public ICurrentViewService CurrentView { get => _currentView; set { _currentView = value; OnPropertyChanged(); } }
 
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewCompanyDetailCommand { get; set; }
@@ -39,10 +37,9 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand SaveCompanyDetailCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public CompanyDetailViewModel(IConnectionStringService connectionString, INavigationService navigation, ICurrentViewService currentView)
+        public CompanyDetailViewModel(IConnectionStringService connectionString, INavigationService navigation)
         {
             Navigation = navigation;
-            CurrentView = currentView;
 
 
             _connectionString = connectionString.GetConnectionString();
@@ -189,8 +186,7 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void CloseView(object obj)
         {
-            CurrentView.CurrentView = "HomeView";
-            Navigation.NavigateTo<HomeViewModel>();
+            Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
         }
 
         private void SetState(string state)

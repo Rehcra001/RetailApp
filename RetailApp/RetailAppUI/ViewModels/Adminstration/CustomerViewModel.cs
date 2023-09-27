@@ -20,7 +20,6 @@ namespace RetailAppUI.ViewModels.Adminstration
         private string _state;
         private CustomerModel undoCustomerEdit;
         private bool _textReadOnly;
-        private ICurrentViewService _currentView;
 
         public CustomerModel Customer
         {
@@ -44,7 +43,6 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         public INavigationService Navigation { get => _navigation; set { _navigation = value; OnPropertyChanged(); } }
 
-        public ICurrentViewService CurrentView { get => _currentView; set { _currentView = value; OnPropertyChanged(); } }
 
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewCustomerCommand { get; set; }
@@ -53,10 +51,9 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand SaveCustomerCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public CustomerViewModel(IConnectionStringService connectionString, INavigationService navigation, ICurrentViewService currentView)
+        public CustomerViewModel(IConnectionStringService connectionString, INavigationService navigation)
         {
             Navigation = navigation;
-            CurrentView = currentView;
 
 
             _connectionString = connectionString.GetConnectionString();
@@ -233,8 +230,7 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void CloseView(object obj)
         {
-            CurrentView.CurrentView = "HomeView";
-            Navigation.NavigateTo<HomeViewModel>();
+            Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
         }
 
         private void SetState(string state)

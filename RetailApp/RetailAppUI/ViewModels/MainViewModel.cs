@@ -2,6 +2,7 @@
 using RetailAppUI.Services;
 using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Adminstration;
+using System;
 
 namespace RetailAppUI.ViewModels
 {
@@ -22,13 +23,9 @@ namespace RetailAppUI.ViewModels
             get { return _currentView; }
             set { _currentView = value; OnPropertyChanged(); }
         }
-
-
-
-        public RelayCommand NavigateToVendorViewCommand { get; set; }
-        public RelayCommand NavigateToCustomerViewCommand { get; set; }
-        public RelayCommand NavigateToCompanyDetailViewCommand { get; set; }
+        
         public RelayCommand NavigateToProductsSwithboardViewCommand { get; set; }
+        public RelayCommand NavigateToAdministrationSwitchboardViewCommand { get; set; }
 
         public MainViewModel(INavigationService navigation, ICurrentViewService currentView)
         {
@@ -36,10 +33,20 @@ namespace RetailAppUI.ViewModels
             CurrentView = currentView;
             CurrentView.CurrentView = "MainView";
 
-            NavigateToVendorViewCommand = new RelayCommand(NavigateToVendorView, CanNavigateToVendorView);
-            NavigateToCustomerViewCommand = new RelayCommand(NavigateToCustomerView, CanNavigateToCustomerView);
-            NavigateToCompanyDetailViewCommand = new RelayCommand(NavigateToCompanyDetailView, CanNavigateToCompanyDetailView);
+            
             NavigateToProductsSwithboardViewCommand = new RelayCommand(NavigateToProductsSwithboardView, CanNavigateToProductsSwithboardView);
+            NavigateToAdministrationSwitchboardViewCommand = new RelayCommand(NavigateToAdministrationSwitchboardView, CanNavigateToAdministrationSwitchboardView);
+        }
+
+        private bool CanNavigateToAdministrationSwitchboardView(object obj)
+        {
+            return !CurrentView.CurrentView!.Equals("Administration");
+        }
+
+        private void NavigateToAdministrationSwitchboardView(object obj)
+        {
+            CurrentView.CurrentView = "Administration";
+            Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
         }
 
         private bool CanNavigateToProductsSwithboardView(object obj)
@@ -51,39 +58,6 @@ namespace RetailAppUI.ViewModels
         {
             CurrentView.CurrentView = "ProductViews";
             Navigation.NavigateTo<ProductsSwitchboardViewModel>();
-        }
-
-        private bool CanNavigateToCompanyDetailView(object obj)
-        {
-            return !CurrentView.CurrentView!.Equals("CompanyDetailView");
-        }
-
-        private void NavigateToCompanyDetailView(object obj)
-        {
-            CurrentView.CurrentView = "CompanyDetailView";
-            Navigation.NavigateTo<CompanyDetailViewModel>();
-        }
-
-        private bool CanNavigateToCustomerView(object obj)
-        {
-            return !CurrentView.CurrentView!.Equals("CustomerView");
-        }
-
-        private void NavigateToCustomerView(object obj)
-        {
-            CurrentView.CurrentView = "CustomerView";
-            Navigation.NavigateTo<CustomerViewModel>();
-        }
-
-        private bool CanNavigateToVendorView(object obj)
-        {
-            return !CurrentView.CurrentView!.Equals("VendorView");
-        }
-
-        private void NavigateToVendorView(object obj)
-        {
-            CurrentView.CurrentView = "VendorView";
-            Navigation.NavigateTo<VendorViewModel>();
         }
     }
 }

@@ -93,24 +93,16 @@
                         Margin="10"
                         Style="{StaticResource ButtonTheme}"/>
 
-                <Button Content="Customers"
-                        Margin="10"
-                        Style="{StaticResource ButtonTheme}"
-                        Command="{Binding NavigateToCustomerViewCommand}"/>
-
-                <Button Content="Vendors"
-                        Margin="10"
-                        Style="{StaticResource ButtonTheme}"
-                        Command="{Binding NavigateToVendorViewCommand}"/>
-
-                <Button Content="Company Details"
-                        Margin="10"
-                        Style="{StaticResource ButtonTheme}"
-                        Command="{Binding NavigateToCompanyDetailViewCommand}"/>
+                
                 
                 <Button Content="Reports"
                         Margin="10"
                         Style="{StaticResource ButtonTheme}"/>
+
+                <Button Content="Administration"
+                        Margin="10"
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding NavigateToAdministrationSwitchboardViewCommand}"/>
             </StackPanel>
             <Border Grid.Column="1"
                     Grid.Row="1"

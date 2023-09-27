@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RetailAppUI.Views
+namespace RetailAppUI.Views.Administration
 {
     /// <summary>
-    /// Interaction logic for PurchaseOrderViewModel.xaml
+    /// Interaction logic for AdministrativeSwitchboardView.xaml
     /// </summary>
-    public partial class PurchaseOrderViewModel : UserControl
+    public partial class AdministrationSwitchboardView : UserControl
     {
-        public PurchaseOrderViewModel()
+        public AdministrationSwitchboardView()
         {
             InitializeComponent();
         }
