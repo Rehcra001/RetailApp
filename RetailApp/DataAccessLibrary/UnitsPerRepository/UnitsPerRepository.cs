@@ -135,7 +135,29 @@ namespace DataAccessLibrary.UnitsPerRepository
 
         public string Update(UnitsPerModel unitsPer)
         {
-            throw new NotImplementedException();
+            string? errorMessage = null;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_UpdateUnit";
+                    command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = unitsPer.UnitPerID;
+                    command.Parameters.Add("@UnitPer", SqlDbType.NVarChar).Value = unitsPer.UnitPer;
+                    command.Parameters.Add("@UnitPerDescription", SqlDbType.NVarChar).Value = unitsPer.UnitPerDescription;
+                    connection.Open();
+
+                    string returnedMessage = command.ExecuteScalar().ToString()!;
+                    if (!returnedMessage.Equals("No Error"))
+                    {
+                        //Error raised
+                        errorMessage = returnedMessage;
+                    }
+                }
+            }
+            return errorMessage;// will be null if no error raised by the database
         }
     }
 }
