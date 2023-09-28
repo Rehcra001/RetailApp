@@ -393,3 +393,9 @@ ALTER TABLE dbo.Category
 ADD CONSTRAINT UK_CategoryName
 UNIQUE(CategoryName);
 GO
+
+--Unit pers
+ALTER TABLE dbo.Units
+ADD CONSTRAINT UK_UnitPer
+UNIQUE(UnitPer);
+GO
