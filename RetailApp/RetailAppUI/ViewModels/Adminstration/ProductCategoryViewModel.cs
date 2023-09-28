@@ -153,6 +153,19 @@ namespace RetailAppUI.ViewModels.Adminstration
             //Check if state is add or edit
 			if (_state.Equals("Add"))
 			{
+				if (!string.IsNullOrWhiteSpace(SelectedCategory.CategoryName))
+				{
+                    //Check that the new category does not exist yet
+                    foreach (CategoryModel model in Categories)
+                    {
+                        if (SelectedCategory.CategoryName.Equals(model.CategoryName, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            MessageBox.Show("This category already extis.", "Category Exists", MessageBoxButton.OK, MessageBoxImage.Stop);
+                            return;
+                        }
+                    }
+                }
+				
 				//Validate data
 				if (SelectedCategory.Validate())
 				{
@@ -180,8 +193,40 @@ namespace RetailAppUI.ViewModels.Adminstration
 			}
 			else if (_state.Equals("Edit"))
 			{
+                if (!string.IsNullOrWhiteSpace(SelectedCategory.CategoryName))
+                {
+                    //Check that the edited category does not exist yet
+                    foreach (CategoryModel model in Categories)
+                    {
+                        if (SelectedCategory.CategoryID != model.CategoryID && SelectedCategory.CategoryName.Equals(model.CategoryName, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            MessageBox.Show("This category already extis.", "Category Exists", MessageBoxButton.OK, MessageBoxImage.Stop);
+                            return;
+                        }
+                    }
+                }
 
-			}
+				if (SelectedCategory.Validate())
+				{
+					//No validation errors
+					//try and save edited category
+					string errorMessage = _categoryRepository.Update(SelectedCategory);
+					//Check for error
+					if (errorMessage != null)
+					{
+                        //Error raised by database
+                        MessageBox.Show(errorMessage, "Error Saving Category", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+				}
+				else
+				{
+                    //Validation error
+                    //Shows data validation errors
+                    MessageBox.Show(SelectedCategory.ValidationMessage, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
 			SetState("View");
         }
 
