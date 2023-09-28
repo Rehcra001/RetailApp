@@ -793,7 +793,8 @@ BEGIN
 		SET NOCOUNT ON;
 
 		SELECT CategoryID, CategoryName
-		FROM dbo.Category;
+		FROM dbo.Category
+		ORDER BY CategoryName;
 	END TRY
 
 	BEGIN CATCH

@@ -387,3 +387,9 @@ ALTER TABLE dbo.InventoryTransactions
 ADD CONSTRAINT CH_InventoryTransactions_TransactionType_R_I
 CHECK (TransactionType IN ('R', 'I'));
 GO
+
+--Categories
+ALTER TABLE dbo.Category
+ADD CONSTRAINT UK_CategoryName
+UNIQUE(CategoryName);
+GO

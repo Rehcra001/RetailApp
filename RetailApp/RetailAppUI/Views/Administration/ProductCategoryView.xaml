@@ -1,0 +1,118 @@
+﻿<UserControl x:Class="RetailAppUI.Views.Administration.ProductCategoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RetailAppUI.Views.Administration"
+             mc:Ignorable="d" 
+             d:DesignHeight="740" d:DesignWidth="830">
+    <Grid Margin="20">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Product Category Management"
+                       FontSize="25"
+                       Foreground="White"
+                       Grid.Column="0"
+                       Grid.Row="0"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"/>
+            <Button Grid.Column="1"                    
+                    Content="X"
+                    Width="30"
+                    Margin="5,0,5,0"
+                    HorizontalAlignment="Right"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Style="{StaticResource ButtonTheme}"
+                    Command="{Binding CloseViewCommand}"/>
+
+            <DataGrid x:Name="customers"
+                      Background="Transparent"
+                      ItemsSource="{Binding CategoryCollectionView}"
+                      SelectedItem="{Binding SelectedCategory}"
+                      Margin="5"
+                      Width="230"
+                      HorizontalAlignment="Center"
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False"
+                      HorizontalScrollBarVisibility="Visible"
+                      Grid.Row="1"
+                      CanUserSortColumns="False"
+                      Padding="5,0,0,0"
+                      FontSize="14">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Category"
+                        Binding="{Binding Path=CategoryName}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Orientation="Vertical"
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Margin="10,5,5,5"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+
+                <!--Category Name-->
+                <StackPanel Orientation="Horizontal"
+                    Margin="0,0,0,10">
+                    <TextBlock Text="Category Name:"
+                       Width="150"
+                       Foreground="White"
+                       HorizontalAlignment="Left"
+                       FontSize="14"/>
+                    <TextBox Text="{Binding SelectedCategory.CategoryName}"
+                     Width="250"
+                     FontSize="14"
+                     Style="{StaticResource TextBoxTheme}"
+                     IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!--Command Buttons-->
+            <StackPanel Orientation="Horizontal"
+                Grid.Column="1"
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <Button Content="Add New"
+                Width="75"
+                Style="{StaticResource ButtonTheme}"
+                Margin="5"
+                Command="{Binding AddNewCommand}"/>
+                <Button Content="Edit"
+                Width="75"
+                Style="{StaticResource ButtonTheme}"
+                Margin="5"
+                Command="{Binding EditCommand}"/>
+                <!--<Button Content="Delete"
+                Width="75"
+                Style="{StaticResource ButtonTheme}"
+                Margin="5"
+                Command="{Binding DeleteCustomerCommand}"/>-->
+                <Button Content="Save"
+                Width="75"
+                Style="{StaticResource ButtonTheme}"
+                Margin="5"
+                Command="{Binding SaveCommand}"/>
+                <Button Content="Cancel"
+                Width="75"
+                Style="{StaticResource ButtonTheme}"
+                Margin="5"
+                Command="{Binding CancelActionCommand}"/>
+
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</UserControl>
