@@ -158,7 +158,7 @@ namespace RetailAppUI.ViewModels.Adminstration
                     //Check that the new category does not exist yet
                     foreach (CategoryModel model in Categories)
                     {
-                        if (SelectedCategory.CategoryName.Equals(model.CategoryName, StringComparison.InvariantCultureIgnoreCase))
+                        if (SelectedCategory.CategoryID != 0 && SelectedCategory.CategoryName.Equals(model.CategoryName, StringComparison.InvariantCultureIgnoreCase))
                         {
                             MessageBox.Show("This category already extis.", "Category Exists", MessageBoxButton.OK, MessageBoxImage.Stop);
                             return;

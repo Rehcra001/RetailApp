@@ -38,6 +38,10 @@
                 <adminView:ProductCategoryView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type TypeName=adminViewModel:ProductUnitPerViewModel}">
+                <adminView:ProductUnitPerView/>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type TypeName=ProductViewModel:ProductsSwitchboardViewModel}">
                 <ProductView:ProductsSwitchboardView/>
             </DataTemplate>

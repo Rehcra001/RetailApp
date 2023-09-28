@@ -35,6 +35,7 @@ namespace RetailAppUI
             services.AddTransient<ProductViewModel>();
             services.AddTransient<AdministrativeSwitchboardViewModel>();
             services.AddTransient<ProductCategoryViewModel>();
+            services.AddTransient<ProductUnitPerViewModel>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

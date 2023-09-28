@@ -33,6 +33,7 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand NavigateToCustomerViewCommand { get; set; }
         public RelayCommand NavigateToCompanyDetailViewCommand { get; set; }
         public RelayCommand NavigateToProductCategoryViewCommand { get; set; }
+        public RelayCommand NavigateToProductUnitPerViewCommand { get; set; }
 
         public AdministrativeSwitchboardViewModel(INavigationService navigation, ICurrentViewService currentView)
         {
@@ -44,6 +45,17 @@ namespace RetailAppUI.ViewModels.Adminstration
             NavigateToCustomerViewCommand = new RelayCommand(NavigateToCustomerView, CanNavigateToCustomerView);
             NavigateToCompanyDetailViewCommand = new RelayCommand(NavigateToCompanyDetailView, CanNavigateToCompanyDetailView);
             NavigateToProductCategoryViewCommand = new RelayCommand(NavigateToProductCategoryView, CanNavigateToProductCategoryView);
+            NavigateToProductUnitPerViewCommand = new RelayCommand(NavigateToProductUnitPerView, CanNavigateToProductUnitPerView);
+        }
+
+        private bool CanNavigateToProductUnitPerView(object obj)
+        {
+            return true;
+        }
+
+        private void NavigateToProductUnitPerView(object obj)
+        {
+            Navigation.NavigateTo<ProductUnitPerViewModel>();
         }
 
         private bool CanNavigateToProductCategoryView(object obj)
