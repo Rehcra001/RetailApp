@@ -874,7 +874,8 @@ CREATE PROCEDURE dbo.usp_InsertPurchaseOrderHeader
 	@VATAmount MONEY,
 	@TotalAmount MONEY,
 	@RequiredDate DATE,
-	@OrderStatusID INT = 1
+	@OrderStatusID INT = 1,
+	@IsImport BIT
 )AS
 BEGIN
 	BEGIN TRY
@@ -891,7 +892,8 @@ BEGIN
 				VATAmount,
 				TotalAmount,
 				RequiredDate,
-				OrderStatusID
+				OrderStatusID,
+				IsImport
 			)
 			VALUES
 			(
@@ -903,7 +905,8 @@ BEGIN
 				@VATAmount,
 				@TotalAmount,
 				@RequiredDate,
-				@OrderStatusID
+				@OrderStatusID,
+				@IsImport
 			);
 			--Return purchase order id
 			SELECT SCOPE_IDENTITY() AS ID;
@@ -934,7 +937,8 @@ CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderHeader
 	@VATAmount MONEY,
 	@TotalAmount MONEY,
 	@RequiredDate DATE,
-	@OrderStatusID INT = 1
+	@OrderStatusID INT = 1,
+	@IsImport BIT
 )AS
 BEGIN
 	BEGIN TRY
@@ -951,7 +955,8 @@ BEGIN
 				VATAmount = @VATAmount,
 				TotalAmount = @TotalAmount,
 				RequiredDate = @RequiredDate,
-				OrderStatusID = @OrderStatusID
+				OrderStatusID = @OrderStatusID,
+				IsImport = @IsImport
 			WHERE PurchaseOrderID = @PurchaseOrderID;
 
 			SELECT 'No Error' AS Message;
@@ -978,7 +983,7 @@ BEGIN
 
 		SELECT PurchaseOrderID, VendorID, VendorReference, OrderDate,
 			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
-			   RequiredDate, OrderStatusID
+			   RequiredDate, OrderStatusID, IsImport
 		FROM dbo.PurchaseOrderHeader
 		WITH (NOLOCK);
 	END TRY
@@ -1002,7 +1007,7 @@ BEGIN
 
 		SELECT PurchaseOrderID, VendorID, VendorReference, OrderDate,
 			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
-			   RequiredDate, OrderStatusID
+			   RequiredDate, OrderStatusID, IsImport
 		FROM dbo.PurchaseOrderHeader
 		WITH (NOLOCK)
 		WHERE PurchaseOrderID = @PurchaseOrderID;
