@@ -131,25 +131,22 @@ namespace BussinessLogicLibrary.Products
         #endregion Retrieve a product
 
 
-        public void Update(VendorModel vendor, UnitsPerModel unitsPer, CategoryModel category)
+        public void Update()
 		{
             //Update Product
-            if (Product.VendorID != vendor.VendorID)
+            if (Product.VendorID != Product.Vendor.VendorID)
             {
-                Product.Vendor = vendor;
-                Product.VendorID = vendor.VendorID;
+                Product.VendorID = Product.Vendor.VendorID;
             }
 
-            if (Product.UnitPerID != unitsPer.UnitPerID)
+            if (Product.UnitPerID != Product.Unit.UnitPerID)
             {
-                Product.Unit = unitsPer;
-                Product.UnitPerID = unitsPer.UnitPerID;
+                Product.UnitPerID = Product.Unit.UnitPerID;
             }
 
-            if (Product.CategoryID != category.CategoryID)
+            if (Product.CategoryID != Product.Category.CategoryID)
             {
-                Product.CategoryID = category.CategoryID;
-                Product.Category = category;
+                Product.CategoryID = Product.Category.CategoryID;
             }
 
             //Validate the model
@@ -184,12 +181,12 @@ namespace BussinessLogicLibrary.Products
         /// Requires a Category model
         /// </param>
         /// <exception cref="Exception"></exception>
-		public void Insert(VendorModel vendor, UnitsPerModel unitsPer, CategoryModel category)
+		public void Insert()
 		{
 			//Add the vendor and unitsPer id
-			Product.VendorID = vendor.VendorID;
-			Product.UnitPerID = unitsPer.UnitPerID;
-			Product.CategoryID = category.CategoryID;
+			Product.VendorID = Product.Vendor.VendorID;
+			Product.UnitPerID = Product.Unit.UnitPerID;
+			Product.CategoryID = Product.Category.CategoryID;
 
 			//Validate the model
 			if (Product.Validate())

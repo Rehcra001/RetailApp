@@ -82,7 +82,7 @@
                     <ComboBox Style="{StaticResource ComboBoxTheme}" 
                               Width="350"
                               ItemsSource="{Binding Vendors}"
-                              SelectedItem="{Binding Vendor}"
+                              SelectedItem="{Binding Product.Vendor}"
                               FontSize="14"
                               Foreground="White">
                         <ComboBox.ItemTemplate>
@@ -154,7 +154,7 @@
                     <ComboBox Style="{StaticResource ComboBoxTheme}" 
                               Width="50"
                               ItemsSource="{Binding UnitPers}"
-                              SelectedItem="{Binding UnitPer}"
+                              SelectedItem="{Binding Product.Unit}"
                               FontSize="14"
                               Foreground="White">
                         <ComboBox.ItemTemplate>
@@ -194,7 +194,7 @@
                     <ComboBox Style="{StaticResource ComboBoxTheme}" 
                               Width="350"
                               ItemsSource="{Binding Categories}"
-                              SelectedItem="{Binding Category}"
+                              SelectedItem="{Binding Product.Category}"
                               FontSize="14"
                               Foreground="White">
                         <ComboBox.ItemTemplate>

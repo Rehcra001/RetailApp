@@ -30,7 +30,7 @@ namespace BussinessLogicLibrary.Products
             GetProducts();
             GetVendors();
             GetUnitsPer();
-            GetCategories();            
+            GetCategories();
 
             return _products;
         }

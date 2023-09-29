@@ -27,13 +27,6 @@ namespace RetailAppUI.ViewModels.Products
             set { _product = value; OnPropertyChanged(); }
         }
 
-        private VendorModel? _vendor;
-        public VendorModel? Vendor
-        {
-            get => _vendor;
-            set { _vendor = value; OnPropertyChanged(); }
-        }
-
         private ObservableCollection<VendorModel> _vendors;
         public ObservableCollection<VendorModel> Vendors
         {
@@ -41,25 +34,11 @@ namespace RetailAppUI.ViewModels.Products
             set { _vendors = value; OnPropertyChanged(); }
         }
 
-        private UnitsPerModel? _unitPer;
-        public UnitsPerModel? UnitPer
-        {
-            get => _unitPer;
-            set { _unitPer = value; OnPropertyChanged(); }
-        }
-
         private ObservableCollection<UnitsPerModel> _unitPers;
         public ObservableCollection<UnitsPerModel> UnitPers
         {
             get => _unitPers;
             set { _unitPers = value; OnPropertyChanged(); }
-        }
-
-        private CategoryModel _category;
-        public CategoryModel Category
-        {
-            get { return _category; }
-            set { _category = value; OnPropertyChanged(); }
         }
 
         private ObservableCollection<CategoryModel> _categories;
@@ -167,26 +146,26 @@ namespace RetailAppUI.ViewModels.Products
         }
 
         private void SaveProduct(object obj)
-        {
+        {            
             //Make sure vendor, unit per and category are not null
-            if (Vendor == null)
+            if (Product!.Vendor == null)
             {
                 MessageBox.Show("Please select a vendor.", "Vendor Missing", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            if (UnitPer == null)
+            if (Product.Unit == null)
             {
                 MessageBox.Show("Please select a unit per.", "Unit Per Missing", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            if (Category == null)
+            if (Product.Category == null)
             {
                 MessageBox.Show("Please select a category.", "Category Missing", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             try
             {
-                _productManager.Insert(Vendor, UnitPer, Category);
+                _productManager.Insert();
             }
             catch (Exception ex)
             {

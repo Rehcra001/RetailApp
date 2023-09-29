@@ -58,12 +58,6 @@ namespace RetailAppUI.ViewModels.Products
         #endregion Product Property
 
         #region Vendor Properties
-        private VendorModel _selectedVendor;
-		public VendorModel SelectedVendor
-		{
-			get { return _selectedVendor; }
-			set { _selectedVendor = value; OnPropertyChanged(); }
-		}
 
 		private ObservableCollection<VendorModel> _vendors;
 		public ObservableCollection<VendorModel> Vendors
@@ -74,12 +68,6 @@ namespace RetailAppUI.ViewModels.Products
         #endregion Vendor Properties
 
         #region Category Properties
-        private CategoryModel _selectedCategory;
-		public CategoryModel SelectedCategory
-		{
-			get { return _selectedCategory; }
-			set { _selectedCategory = value; OnPropertyChanged(); }
-		}
 
 		private ObservableCollection<CategoryModel> _categories;
 		public ObservableCollection<CategoryModel> Categories
@@ -90,12 +78,6 @@ namespace RetailAppUI.ViewModels.Products
         #endregion Category Properties
 
         #region Unit Per Properties
-        private UnitsPerModel _selectedUnitPer;
-		public UnitsPerModel SelectedUnitPer
-		{
-			get { return _selectedUnitPer; }
-			set { _selectedUnitPer = value; OnPropertyChanged(); }
-		}
 
 		private ObservableCollection<UnitsPerModel> _unitPers;
 		public ObservableCollection<UnitsPerModel> UnitPers
@@ -192,7 +174,7 @@ namespace RetailAppUI.ViewModels.Products
         {
 			try
 			{
-				_productManager.Update(SelectedVendor, SelectedUnitPer, SelectedCategory);
+				_productManager.Update();
 			}
 			catch (Exception ex)
 			{
@@ -215,13 +197,13 @@ namespace RetailAppUI.ViewModels.Products
 				Product = ProductUndoEdit;
 
                 //Set Selected vendor to product vendor
-                SelectedVendor = Vendors.First(v => v.VendorID == Product.VendorID);
+                Product.Vendor = Vendors.First(v => v.VendorID == Product.VendorID);
 
                 //Set Selected Unit per to Product Unit Per
-                SelectedUnitPer = UnitPers.First(u => u.UnitPerID == Product.UnitPerID);
+                Product.Unit = UnitPers.First(u => u.UnitPerID == Product.UnitPerID);
 
 				//Set Selected Category to Product Category
-				SelectedCategory = Categories.First(c => c.CategoryID == Product.CategoryID);
+				Product.Category = Categories.First(c => c.CategoryID == Product.CategoryID);
             }
 			SetState("View");
         }
@@ -297,7 +279,7 @@ namespace RetailAppUI.ViewModels.Products
 				Categories = new ObservableCollection<CategoryModel>(categories.Item1);
 
                 //Set selected category
-                SelectedCategory = Categories.First(c => c.CategoryID == Product.CategoryID);
+                Product.Category = Categories.First(c => c.CategoryID == Product.CategoryID);
             }
             else
             {
@@ -318,7 +300,7 @@ namespace RetailAppUI.ViewModels.Products
 				UnitPers = new ObservableCollection<UnitsPerModel>(unitPers.Item1);
 
                 //Set selected unit per
-                SelectedUnitPer = UnitPers.First(u => u.UnitPerID == Product.UnitPerID);
+                Product.Unit = UnitPers.First(u => u.UnitPerID == Product.UnitPerID);
             }
             else
             {
@@ -339,7 +321,7 @@ namespace RetailAppUI.ViewModels.Products
 				Vendors = new ObservableCollection<VendorModel>(vendors.Item1);
 
                 //Set selected vendor
-                SelectedVendor = Vendors.First(v => v.VendorID == Product.VendorID);
+                Product.Vendor = Vendors.First(v => v.VendorID == Product.VendorID);
 
             }
             else
