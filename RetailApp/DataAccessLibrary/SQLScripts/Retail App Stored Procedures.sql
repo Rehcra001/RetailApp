@@ -144,6 +144,7 @@ BEGIN
 		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Vendors
+		WITH (NOLOCK)
 		ORDER BY CompanyName;
 	END TRY
 
@@ -164,6 +165,7 @@ BEGIN
 		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Vendors
+		WITH (NOLOCK)
 		WHERE VendorID = @VendorID;
 	END TRY
 
@@ -316,6 +318,7 @@ BEGIN
 		SELECT CustomerID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Customers
+		WITH (NOLOCK)
 		ORDER BY CompanyName;
 	END TRY
 
@@ -336,6 +339,7 @@ BEGIN
 		SELECT CustomerID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Customers
+		WITH (NOLOCK)
 		WHERE CustomerID = @CustomerID;
 	END TRY
 
@@ -461,7 +465,8 @@ BEGIN
 	BEGIN TRY
 		SELECT TOP(1) CompanyID, CompanyName, VatRegistrationNumber, AddressLine1, AddressLine2, City,
 				      Province, PostalCode, FirstName, LastName, EMailAddress, PhoneNumber
-		FROM dbo.CompanyDetail;
+		FROM dbo.CompanyDetail
+		WITH (NOLOCK);
 	END TRY
 
 	BEGIN CATCH
@@ -589,7 +594,8 @@ BEGIN
 		SELECT ProductID, ProductName, ProductDescription, VendorID, VendorProductName,
 			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
 			   UnitPerID, UnitWeight, Obsolete, CategoryID
-		FROM dbo.Products;
+		FROM dbo.Products
+		WITH (NOLOCK);
 	END TRY
 
 	BEGIN CATCH
@@ -610,6 +616,7 @@ BEGIN
 			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
 			   UnitPerID, UnitWeight, Obsolete, CategoryID
 		FROM dbo.Products
+		WITH (NOLOCK)
 		WHERE ProductID = @ProductID;
 	END TRY
 
@@ -698,7 +705,8 @@ BEGIN
 		SET NOCOUNT ON;
 
 		SELECT UnitPerID, UnitPer, UnitPerDescription
-		FROM dbo.Units;
+		FROM dbo.Units
+		WITH (NOLOCK);
 	END TRY
 
 	BEGIN CATCH
@@ -717,6 +725,7 @@ BEGIN
 	BEGIN TRY
 		SELECT UnitPerID, UnitPer, UnitPerDescription
 		FROM dbo.Units
+		WITH (NOLOCK)
 		WHERE UnitPerID = @UnitPerID;
 	END TRY
 
@@ -730,7 +739,7 @@ GO
 --**********Category**********
 
 --Returns a CategoryID on success
---or an error message on failiure
+--or an error message on failure
 CREATE PROCEDURE dbo.usp_InsertCategory
 (
 	@CategoryName NVARCHAR(50)
@@ -758,7 +767,7 @@ END;
 GO
 
 --Returns a message "No Error" on success
---or an error message on failiure
+--or an error message on failure
 CREATE PROCEDURE dbo.usp_UpdateCategory
 (
 	@CategoryID INT,
@@ -786,7 +795,7 @@ END;
 GO
 
 --Returns a list of all categories on success
---or an error message on failiure
+--or an error message on failure
 CREATE PROCEDURE dbo.usp_GetAllCategories AS
 BEGIN
 	BEGIN TRY
@@ -794,6 +803,7 @@ BEGIN
 
 		SELECT CategoryID, CategoryName
 		FROM dbo.Category
+		WITH (NOLOCK)
 		ORDER BY CategoryName;
 	END TRY
 
@@ -804,7 +814,7 @@ END;
 GO
 
 --Returns a category by id on success
---or an error message on failiure
+--or an error message on failure
 CREATE PROCEDURE dbo.usp_GetCategoryByID
 (
 	@CategoryID INT
@@ -815,6 +825,7 @@ BEGIN
 
 		SELECT CategoryID, CategoryName
 		FROM dbo.Category
+		WITH (NOLOCK)
 		WHERE CategoryID = @CategoryID;
 	END TRY
 
@@ -827,7 +838,7 @@ GO
 --**********Inventory Transactions**********
 
 --Returns a list of inventory transactions per ProductID
---or an error message on failiure
+--or an error message on failure
 CREATE PROCEDURE dbo.usp_GetInventoryTransactionsByProductID
 (
 	@ProductID INT
@@ -839,7 +850,162 @@ BEGIN
 		SELECT TransactionID, TransactionType, TransactionDate,
 			   ProductID, OrderID, Quantity
 		FROM InventoryTransactions
+		WITH (NOLOCK)
 		WHERE ProductID = @ProductID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--**********Purchase Order Header**********
+--Insert
+--Returns the purchase order id
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_InsertPurchaseOrderHeader
+(
+	@VendorID INT,
+	@VendorReference NVARCHAR(20),
+	@OrderDate DATETIME,
+	@OrderAmount MONEY,
+	@VATPercentage DECIMAL,
+	@VATAmount MONEY,
+	@TotalAmount MONEY,
+	@RequiredDate DATE,
+	@OrderStatusID INT = 1
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.PurchaseOrderHeader
+			(
+				VendorID,
+				VendorReference,
+				OrderDate,
+				OrderAmount,
+				VATPercentage,
+				VATAmount,
+				TotalAmount,
+				RequiredDate,
+				OrderStatusID
+			)
+			VALUES
+			(
+				@VendorID,
+				@VendorReference,
+				@OrderDate,
+				@OrderAmount,
+				@VATPercentage,
+				@VATAmount,
+				@TotalAmount,
+				@RequiredDate,
+				@OrderStatusID
+			);
+			--Return purchase order id
+			SELECT SCOPE_IDENTITY() AS ID;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Update
+--Returns 'No Error' on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderHeader
+(
+	@PurchaseOrderID BIGINT,
+	@VendorID INT,
+	@VendorReference NVARCHAR(20),
+	@OrderDate DATETIME,
+	@OrderAmount MONEY,
+	@VATPercentage DECIMAL,
+	@VATAmount MONEY,
+	@TotalAmount MONEY,
+	@RequiredDate DATE,
+	@OrderStatusID INT = 1
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			UPDATE dbo.PurchaseOrderHeader
+			SET 
+				VendorID = @VendorID,
+				VendorReference = @VendorReference,
+				OrderDate = @OrderDate,
+				OrderAmount = @OrderAmount,
+				VATPercentage = @VATPercentage,
+				VATAmount = @VATAmount,
+				TotalAmount = @TotalAmount,
+				RequiredDate = @RequiredDate,
+				OrderStatusID = @OrderStatusID
+			WHERE PurchaseOrderID = @PurchaseOrderID;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--GetAll
+--Returns a list of Purchase order headers
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetAllPurchaseOrderHeaders AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT PurchaseOrderID, VendorID, VendorReference, OrderDate,
+			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
+			   RequiredDate, OrderStatusID
+		FROM dbo.PurchaseOrderHeader
+		WITH (NOLOCK);
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--GetByID
+--Returns a purchase order header
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetPurchaseOrderHeaderByID
+(
+	@PurchaseOrderID BIGINT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT PurchaseOrderID, VendorID, VendorReference, OrderDate,
+			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
+			   RequiredDate, OrderStatusID
+		FROM dbo.PurchaseOrderHeader
+		WITH (NOLOCK)
+		WHERE PurchaseOrderID = @PurchaseOrderID;
 	END TRY
 
 	BEGIN CATCH
@@ -850,9 +1016,143 @@ GO
 
 --**********Purchase Order Details**********
 --Insert
+--Return 'No Error' on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_InsertPurchaseOrderDetail
+(
+	@PurchaseOrderID BIGINT,
+	@ProductID INT,
+	@Quantity INT,
+	@UnitCost MONEY,
+	@UnitFreightCost MONEY,
+	@LineFilled BIT
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.PurchaseOrderDetail
+			(
+				PurchaseOrderID,
+				ProductID,
+				Quantity,
+				UnitCost,
+				UnitFreightCost,
+				LineFilled
+			)
+			VALUES
+			(
+				@PurchaseOrderID,
+				@ProductID,
+				@Quantity,
+				@UnitCost,
+				@UnitFreightCost,
+				@LineFilled
+			);
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
 
 --Update
+--Return 'No Error' on success
+--or an error message on failure
+CREATE PROCEDURE dbo.UpdatePurchaseOrderDetail
+(
+	@PurchaseOrderID BIGINT,
+	@ProductID INT,
+	@Quantity INT,
+	@UnitCost MONEY,
+	@UnitFreightCost MONEY,
+	@LineFilled BIT
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			UPDATE dbo.PurchaseOrderDetail
+			SET Quantity = @Quantity,
+				UnitCost = @UnitCost,
+				UnitFreightCost = @UnitFreightCost,
+				LineFilled = @LineFilled
+			WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
 
 --GetAll
+--Returns a list of purchase order details
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetAllPurchaseOrderDetails AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, LineFilled
+		FROM dbo.PurchaseOrderDetail;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
 
 --GetByPurchaseOrderID
+--Returns one or more purchase order lines that have PurchaseOrderID
+CREATE PROCEDURE dbo.usp_GetPurchaseOrderDetailByPurchaseOrderID
+(
+	@PurchaseOrderID BIGINT
+)AS
+BEGIN
+	BEGIN TRY
+		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, LineFilled
+		FROM dbo.PurchaseOrderDetail
+		WHERE PurchaseOrderID = @PurchaseOrderID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--**********VAT**********
+--Get VAT
+--Returns the VAT
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetVat AS
+BEGIN
+	BEGIN TRY
+		SELECT TOP(1) VAT, VATDecimal
+		FROM dbo.VAT;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
