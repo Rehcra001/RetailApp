@@ -155,28 +155,7 @@ CREATE TABLE dbo.Customers
 );
 GO
 
---SalesOrderHeader
-CREATE TABLE dbo.SalesOrderHeader
-(
-	SalesOrderID BIGINT IDENTITY(200000000, 1) PRIMARY KEY,
-	CustomerID INT NOT NULL,
-	CustomerPurchaseOrder NVARCHAR(100) NULL,
-	OrderDate DATE NOT NULL,
-	OrderAmount MONEY NOT NULL,
-	OrderCompleted BIT DEFAULT(0) NOT NULL
-);
-GO
 
---SalesOrderDetail
-CREATE TABLE dbo.SalesOrderDetail
-(
-	SalesOrderID BIGINT NOT NULL,
-	ProductID INT NOT NULL,
-	Quantity INT NOT NULL,
-	UnitPrice MONEY NOT NULL,
-	UnitCost MONEY NOT NULL	
-);
-GO
 
 
 --Products
@@ -216,21 +195,56 @@ CREATE TABLE dbo.Units
 );
 GO
 
+--Look up table for order status
+CREATE TABLE dbo.OrderStatusLK
+(
+	OrderStatusID INT IDENTITY(1,1) PRIMARY KEY,
+	OrderStatus NVARCHAR(10) UNIQUE NOT NULL
+);
+GO
 
+--Fill OrderStatusLK
+INSERT INTO dbo.OrderStatusLK (OrderStatus)
+VALUES ('Open'), ('Completed'), ('Filled'), ('Cancelled');
+GO
+
+--SalesOrderHeader
+CREATE TABLE dbo.SalesOrderHeader
+(
+	SalesOrderID BIGINT IDENTITY(200000000, 1) PRIMARY KEY,
+	CustomerID INT NOT NULL,
+	CustomerPurchaseOrder NVARCHAR(100) NULL,
+	OrderDate DATE NOT NULL,
+	OrderAmount MONEY NOT NULL,
+	OrderStatusID INT DEFAULT(1) NOT NULL
+);
+GO
+
+--SalesOrderDetail
+CREATE TABLE dbo.SalesOrderDetail
+(
+	SalesOrderID BIGINT NOT NULL,
+	ProductID INT NOT NULL,
+	Quantity INT NOT NULL,
+	UnitPrice MONEY NOT NULL,
+	UnitCost MONEY NOT NULL,
+	LineComplete BIT DEFAULT(0) NOT NULL
+);
+GO
 
 --PurchaseOrderHeader
 CREATE TABLE dbo.PurchaseOrderHeader
 (
 	PurchaseOrderID BIGINT IDENTITY(450000000,1) PRIMARY KEY,
 	VendorID INT NOT NULL,
-	VendorReference NVARCHAR(20),
+	VendorReference NVARCHAR(20), --Vendor quote number or sales order number
 	OrderDate DATETIME NOT NULL,
 	OrderAmount MONEY DEFAULT(0) NOT NULL,
 	VATPercentage NUMERIC DEFAULT(0) NOT NULL,
 	VATAmount MONEY DEFAULT(0) NOT NULL,
 	TotalAmount MONEY DEFAULT(0) NOT NULL,
 	RequiredDate DATE NOT NULL,
-	OrderFilled BIT DEFAULT(0) NOT NULL
+	OrderStatusID INT DEFAULT(1) NOT NULL
 );
 GO
 
@@ -295,6 +309,12 @@ FOREIGN KEY (CustomerID)
 REFERENCES dbo.Customers(CustomerID)
 GO
 
+ALTER TABLE dbo.SalesOrderHeader
+ADD CONSTRAINT FK_SalesOrderHeader_OrderStatusLK_OrderStatusID
+FOREIGN KEY (OrderStatusID)
+REFERENCES dbo.OrderStatusLK(OrderStatusID);
+GO
+
 
 --Sales Order Detail
 ALTER TABLE dbo.SalesOrderDetail
@@ -343,6 +363,12 @@ ALTER TABLE dbo.PurchaseOrderHeader
 ADD CONSTRAINT FK_PurchaseOrderHeader_Vendors_VendorID
 FOREIGN KEY (VendorID)
 REFERENCES dbo.Vendors(VendorID);
+GO
+
+ALTER TABLE dbo.PurchaseOrderHeader
+ADD CONSTRAINT FK_PurchaseOrderHeader_OrderStatusLK_OrderStatusID
+FOREIGN KEY (OrderStatusID)
+REFERENCES dbo.OrderStatusLK(OrderStatusID);
 GO
 
 --Purchase Order Detail
