@@ -54,8 +54,23 @@ namespace ModelsLibrary
         public DateOnly RequiredDate { get; set; }
 
         /// <summary>
-        /// Indicates if the order is complete or not
+        /// Holds the status ID of this order
         /// </summary>
-        public bool OrderFilled { get; set; }
+        public int OrderStatusID { get; set; }
+
+        /// <summary>
+        /// Holds the Vendor detail associated with this purchase order
+        /// </summary>
+        public VendorModel Vendor { get; set; } = new VendorModel();
+
+        /// <summary>
+        /// Holds a list of purchase order details associated with this purchase order
+        /// </summary>
+        public List<PurchaseOrderDetailModel> PurchaseOrderDetails { get; set; } = new List<PurchaseOrderDetailModel>();
+
+        /// <summary>
+        /// Holds the Order status of this purchase order
+        /// </summary>
+        public OrderStatusModel OrderStatus { get; set; } = new OrderStatusModel();
     }
 }
