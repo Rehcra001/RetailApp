@@ -389,6 +389,26 @@ FOREIGN KEY (ProductID)
 REFERENCES dbo.Products(ProductID);
 GO
 
+ALTER TABLE dbo.PurchaseOrderDetail
+ADD CONSTRAINT CH_PurchaseOrderDetail_PurchaseOrderID_GreaterThanZero
+CHECK (PurchaseOrderID > 0);
+GO
+
+ALTER TABLE dbo.PurchaseOrderDetail
+ADD CONSTRAINT CH_PurchaseOrderDetail_ProductID_GreaterThanZero
+CHECK (ProductID > 0);
+GO
+
+ALTER TABLE dbo.PurchaseOrderDetail
+ADD CONSTRAINT CH_PurchaseOrderDetail_Quantity_GreaterThanZero
+CHECK (Quantity > 0);
+GO
+
+ALTER TABLE dbo.PurchaseOrderDetail
+ADD CONSTRAINT CH_PurchaseOrderDetail_UnitCost_GreaterThanZero
+CHECK (UnitCost > 0);
+GO
+
 --Receipts
 ALTER TABLE dbo.Receipts
 ADD CONSTRAINT FK_Receipts_PurchaseOrderDetail_PurchaseOrderID_ProductID
