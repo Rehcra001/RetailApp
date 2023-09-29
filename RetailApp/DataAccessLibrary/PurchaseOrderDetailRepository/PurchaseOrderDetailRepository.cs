@@ -162,7 +162,7 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                 {
                     command.Connection = connection;
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "dbo.UpdatePurchaseOrderDetail";
+                    command.CommandText = "dbo.usp_UpdatePurchaseOrderDetail";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = purchaseOrderDetail.PurchaseOrderID;
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = purchaseOrderDetail.ProductID;
                     command.Parameters.Add("@Quantity", SqlDbType.Int).Value = purchaseOrderDetail.Quantity;

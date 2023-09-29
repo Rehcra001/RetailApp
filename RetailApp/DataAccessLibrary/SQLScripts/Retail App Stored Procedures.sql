@@ -1073,7 +1073,7 @@ GO
 --Update
 --Return 'No Error' on success
 --or an error message on failure
-CREATE PROCEDURE dbo.UpdatePurchaseOrderDetail
+CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderDetail
 (
 	@PurchaseOrderID BIGINT,
 	@ProductID INT,
