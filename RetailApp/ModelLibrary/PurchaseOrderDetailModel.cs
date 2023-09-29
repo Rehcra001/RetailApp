@@ -11,7 +11,7 @@ namespace ModelsLibrary
         /// <summary>
         /// purchase order ID links to the purchase order header
         /// </summary>
-        public int PurchaseOrderID { get; set; }
+        public long PurchaseOrderID { get; set; }
 
         /// <summary>
         /// prouct ID links to the product ordered
