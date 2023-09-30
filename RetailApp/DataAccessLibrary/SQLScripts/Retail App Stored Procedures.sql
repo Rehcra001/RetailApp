@@ -620,6 +620,34 @@ BEGIN
 END;
 GO
 
+--Updates the specified product with the current number on order
+CREATE PROCEDURE dbo.usp_UpdateProductOnOrder
+(
+	@ProductID INT
+)AS
+BEGIN
+	;WITH QtyReceipted AS
+	(
+		SELECT ISNULL(SUM(QuantityReceipted), 0) AS TotalQtyReceipted
+		FROM Receipts
+		WHERE ProductID = @ProductID AND 
+			  PurchaseOrderID IN (SELECT PurchaseOrderID
+								  FROM PurchaseOrderDetail
+								  WHERE ProductID = @ProductID AND LineFilled = 0)
+	),
+	QtyOnOrder AS
+	(
+		SELECT ISNULL(SUM(pd.Quantity),0) AS QtyOrdered
+		FROM dbo.PurchaseOrderDetail AS pd
+		WHERE ProductID = @ProductID AND LineFilled = 0
+	)
+	UPDATE dbo.Products
+	SET OnOrder = (QtyOrdered - TotalQtyReceipted)
+	FROM QtyOnOrder
+	CROSS JOIN QtyReceipted
+	WHERE ProductID = @ProductID;
+END;
+
 --**********Units**********
 
 --Returns the UnitPer ID on success
@@ -1044,6 +1072,9 @@ BEGIN
 			);
 
 			SELECT 'No Error' AS Message;
+
+			--Update the number of this product on order
+			EXECUTE dbo.usp_UpdateProductOnOrder @ProductID;
 		COMMIT TRAN;
 	END TRY
 
