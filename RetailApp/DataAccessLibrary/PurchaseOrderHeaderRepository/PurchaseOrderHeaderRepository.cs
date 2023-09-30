@@ -52,6 +52,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                                     purchaseOrderHeader.TotalAmount = Convert.ToDecimal(reader["TotalAmount"]);
                                     purchaseOrderHeader.RequiredDate = (DateOnly)reader["RequiredDate"];
                                     purchaseOrderHeader.OrderStatusID = Convert.ToInt32(reader["OrderStatusID"]);
+                                    purchaseOrderHeader.IsImport = Convert.ToBoolean(reader["IsImport"]);
 
                                     purchaseOrderHeaders.Add(purchaseOrderHeader);
                                 }
@@ -108,6 +109,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                                 purchaseOrderHeader.TotalAmount = Convert.ToDecimal(reader["TotalAmount"]);
                                 purchaseOrderHeader.RequiredDate = (DateOnly)reader["RequiredDate"];
                                 purchaseOrderHeader.OrderStatusID = Convert.ToInt32(reader["OrderStatusID"]);
+                                purchaseOrderHeader.IsImport = Convert.ToBoolean(reader["IsImport"]);
                             }
                         }
                         else
@@ -143,6 +145,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                     command.Parameters.Add("@TotalAmount", SqlDbType.Money).Value = purchaseOrderHeader.TotalAmount;
                     command.Parameters.Add("@RequiredDate", SqlDbType.Date).Value = purchaseOrderHeader.RequiredDate;
                     command.Parameters.Add("@OrderStatusID", SqlDbType.Int).Value = purchaseOrderHeader.OrderStatusID;
+                    command.Parameters.Add("@IsImport", SqlDbType.Bit).Value = purchaseOrderHeader.IsImport;
                     connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
@@ -183,6 +186,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                     command.Parameters.Add("@TotalAmount", SqlDbType.Money).Value = purchaseOrderHeader.TotalAmount;
                     command.Parameters.Add("@RequiredDate", SqlDbType.Date).Value = purchaseOrderHeader.RequiredDate;
                     command.Parameters.Add("@OrderStatusID", SqlDbType.Int).Value = purchaseOrderHeader.OrderStatusID;
+                    command.Parameters.Add("@IsImport", SqlDbType.Bit).Value = purchaseOrderHeader.IsImport;
                     connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
