@@ -144,7 +144,6 @@ BEGIN
 		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Vendors
-		WITH (NOLOCK)
 		ORDER BY CompanyName;
 	END TRY
 
@@ -165,7 +164,6 @@ BEGIN
 		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Vendors
-		WITH (NOLOCK)
 		WHERE VendorID = @VendorID;
 	END TRY
 
@@ -318,7 +316,6 @@ BEGIN
 		SELECT CustomerID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
 			   City, Province, PostalCode, EMailAddress, PhoneNumber
 		FROM dbo.Customers
-		WITH (NOLOCK)
 		ORDER BY CompanyName;
 	END TRY
 
@@ -465,8 +462,7 @@ BEGIN
 	BEGIN TRY
 		SELECT TOP(1) CompanyID, CompanyName, VatRegistrationNumber, AddressLine1, AddressLine2, City,
 				      Province, PostalCode, FirstName, LastName, EMailAddress, PhoneNumber
-		FROM dbo.CompanyDetail
-		WITH (NOLOCK);
+		FROM dbo.CompanyDetail;
 	END TRY
 
 	BEGIN CATCH
@@ -594,8 +590,7 @@ BEGIN
 		SELECT ProductID, ProductName, ProductDescription, VendorID, VendorProductName,
 			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
 			   UnitPerID, UnitWeight, Obsolete, CategoryID
-		FROM dbo.Products
-		WITH (NOLOCK);
+		FROM dbo.Products;
 	END TRY
 
 	BEGIN CATCH
@@ -616,7 +611,6 @@ BEGIN
 			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
 			   UnitPerID, UnitWeight, Obsolete, CategoryID
 		FROM dbo.Products
-		WITH (NOLOCK)
 		WHERE ProductID = @ProductID;
 	END TRY
 
@@ -705,8 +699,7 @@ BEGIN
 		SET NOCOUNT ON;
 
 		SELECT UnitPerID, UnitPer, UnitPerDescription
-		FROM dbo.Units
-		WITH (NOLOCK);
+		FROM dbo.Units;
 	END TRY
 
 	BEGIN CATCH
@@ -725,7 +718,6 @@ BEGIN
 	BEGIN TRY
 		SELECT UnitPerID, UnitPer, UnitPerDescription
 		FROM dbo.Units
-		WITH (NOLOCK)
 		WHERE UnitPerID = @UnitPerID;
 	END TRY
 
@@ -803,7 +795,6 @@ BEGIN
 
 		SELECT CategoryID, CategoryName
 		FROM dbo.Category
-		WITH (NOLOCK)
 		ORDER BY CategoryName;
 	END TRY
 
@@ -825,7 +816,6 @@ BEGIN
 
 		SELECT CategoryID, CategoryName
 		FROM dbo.Category
-		WITH (NOLOCK)
 		WHERE CategoryID = @CategoryID;
 	END TRY
 
@@ -850,7 +840,6 @@ BEGIN
 		SELECT TransactionID, TransactionType, TransactionDate,
 			   ProductID, OrderID, Quantity
 		FROM InventoryTransactions
-		WITH (NOLOCK)
 		WHERE ProductID = @ProductID;
 	END TRY
 
@@ -984,8 +973,7 @@ BEGIN
 		SELECT PurchaseOrderID, VendorID, VendorReference, OrderDate,
 			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
 			   RequiredDate, OrderStatusID, IsImport
-		FROM dbo.PurchaseOrderHeader
-		WITH (NOLOCK);
+		FROM dbo.PurchaseOrderHeader;
 	END TRY
 
 	BEGIN CATCH
@@ -1009,7 +997,6 @@ BEGIN
 			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
 			   RequiredDate, OrderStatusID, IsImport
 		FROM dbo.PurchaseOrderHeader
-		WITH (NOLOCK)
 		WHERE PurchaseOrderID = @PurchaseOrderID;
 	END TRY
 
