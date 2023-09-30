@@ -237,7 +237,7 @@ CREATE TABLE dbo.PurchaseOrderHeader
 	VendorReference NVARCHAR(20), --Vendor quote number or sales order number
 	OrderDate DATETIME NOT NULL,
 	OrderAmount MONEY DEFAULT(0) NOT NULL,
-	VATPercentage DECIMAL DEFAULT(0) NOT NULL,
+	VATPercentage DECIMAL(5,4) DEFAULT(0.0000) NOT NULL,
 	VATAmount MONEY DEFAULT(0) NOT NULL,
 	TotalAmount MONEY DEFAULT(0) NOT NULL,
 	RequiredDate DATE NOT NULL,
@@ -303,7 +303,7 @@ CREATE TABLE dbo.InventoryTransactions
 --The VAT field to be updated if VAT changes
 CREATE TABLE dbo.VAT
 (
-	VAT DECIMAL,
+	VAT DECIMAL(5,2),
 	VATDecimal AS VAT / 100
 );
 GO
