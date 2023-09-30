@@ -17,7 +17,5 @@ namespace ModelsLibrary
         /// Holds the Order status Lookup Values 
         /// </summary>
         public string? OrderStatus { get; set; }
-
-
     }
 }
