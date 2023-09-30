@@ -1148,3 +1148,44 @@ BEGIN
 	END CATCH;
 END;
 GO
+
+--**********Order Status Look up**********
+--GetAll
+--Returns a list of Order status
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetAllOrderStatus AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT OrderStatusID, OrderStatus
+		FROM OrderStatusLK;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--GetByID
+--Returns an order status
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetOrderStatusByID
+(
+	@OrderStatusID INT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT OrderStatusID, OrderStatus
+		FROM OrderStatusLK
+		WHERE OrderStatusID = @OrderStatusID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
