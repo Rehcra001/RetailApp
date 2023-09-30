@@ -55,7 +55,7 @@ namespace ModelsLibrary
         /// <returns>
         /// Returns false if any validation errors found
         /// </returns>
-        public bool Validate()
+        public bool ValidateAll()
         {
             ValidationMessage = "";
             bool isValid = true;
@@ -70,6 +70,53 @@ namespace ModelsLibrary
                 ValidationMessage += "Purchase Order ID must be positive\r\n";
                 isValid = false;
             }
+
+            if (ProductID == 0)
+            {
+                ValidationMessage += "Product ID is required.\r\n";
+                isValid = false;
+            }
+            else if (ProductID < 0)
+            {
+                ValidationMessage += "Product ID must be positive\r\n";
+                isValid = false;
+            }
+
+            if (Quantity == 0)
+            {
+                ValidationMessage += "Quantity is required\r\n";
+                isValid = false;
+            }
+            else if (Quantity < 0)
+            {
+                ValidationMessage += "Quantity must be positive\r\n";
+                isValid = false;
+            }
+
+            if (UnitCost == 0)
+            {
+                ValidationMessage += "Unit cost is required.\r\n";
+                isValid = false;
+            }
+            else if (UnitCost < 0)
+            {
+                ValidationMessage += "Unit cost must be positive.\r\n";
+                isValid = false;
+            }
+
+            if (UnitFreightcost < 0)
+            {
+                ValidationMessage += "Unit freight cost must be positive.\r\n";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        public bool ValidateExcludePurchaseOrderID()
+        {
+            ValidationMessage = "";
+            bool isValid = true;
 
             if (ProductID == 0)
             {
