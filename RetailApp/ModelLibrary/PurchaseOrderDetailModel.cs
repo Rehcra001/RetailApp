@@ -31,7 +31,7 @@ namespace ModelsLibrary
         /// <summary>
         /// Freight cost per unit
         /// </summary>
-        public decimal UnitFreightcost { get; set; }
+        public decimal UnitFreightCost { get; set; }
 
         /// <summary>
         /// Indicates if this line is complete
@@ -104,7 +104,7 @@ namespace ModelsLibrary
                 isValid = false;
             }
 
-            if (UnitFreightcost < 0)
+            if (UnitFreightCost < 0)
             {
                 ValidationMessage += "Unit freight cost must be positive.\r\n";
                 isValid = false;
@@ -151,7 +151,7 @@ namespace ModelsLibrary
                 isValid = false;
             }
 
-            if (UnitFreightcost < 0)
+            if (UnitFreightCost < 0)
             {
                 ValidationMessage += "Unit freight cost must be positive.\r\n";
                 isValid = false;

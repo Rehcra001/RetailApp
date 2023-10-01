@@ -35,6 +35,26 @@ namespace BussinessLogicLibrary.Products
             return _products;
         }
 
+        public IEnumerable<ProductModel> GetByVendorID(int id)
+        {
+            Tuple<IEnumerable<ProductModel>, string> products = new ProductRepository(_connectionString).GetByVendorID(id).ToTuple();
+
+
+            //Check for errors
+            if (products.Item2 == null)
+            {
+                //No errors
+                _products = products.Item1;
+            }
+            else
+            {
+                //Error with Products
+                throw new Exception(products.Item2);
+            }
+
+            return _products;
+        }
+
         private void GetCategories()
         {
             Tuple<IEnumerable<CategoryModel>, string> categories = new CategoryRepository(_connectionString).GetAll().ToTuple();

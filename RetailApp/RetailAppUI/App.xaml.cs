@@ -3,6 +3,7 @@ using RetailAppUI.Services;
 using RetailAppUI.ViewModels;
 using RetailAppUI.ViewModels.Adminstration;
 using RetailAppUI.ViewModels.Products;
+using RetailAppUI.ViewModels.Purchases;
 using RetailAppUI.Views;
 using System;
 using System.Windows;
@@ -36,6 +37,7 @@ namespace RetailAppUI
             services.AddTransient<AdministrativeSwitchboardViewModel>();
             services.AddTransient<ProductCategoryViewModel>();
             services.AddTransient<ProductUnitPerViewModel>();
+            services.AddTransient<AddNewPurchaseOrderViewModel>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

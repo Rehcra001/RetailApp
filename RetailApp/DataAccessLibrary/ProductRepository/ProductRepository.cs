@@ -206,5 +206,66 @@ namespace DataAccessLibrary.ProductRepository
 
             return (errorMessage);//errorMessage is null if no error raised by database
         }
+
+        public (IEnumerable<ProductModel>, string) GetByVendorID(int id)
+        {
+            string? errorMessage = null;
+            List<ProductModel> products = new List<ProductModel>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_GetProductsByVendorID";
+                    command.Parameters.Add("VendorID", SqlDbType.Int).Value = id;
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        //No error raised if more than one column returned
+                        if (reader.FieldCount > 1)
+                        {
+                            //Check if any rows returned.
+                            //Will not have any rows if no products exist yet
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    ProductModel product = new ProductModel();
+
+                                    product.ProductID = Convert.ToInt32(reader["ProductID"]);
+                                    product.ProductName = reader["ProductName"].ToString();
+                                    product.ProductDescription = reader["ProductDescription"].ToString();
+                                    product.VendorID = Convert.ToInt32(reader["VendorID"]);
+                                    product.VendorProductName = reader["VendorProductName"].ToString();
+                                    product.UnitPrice = Convert.ToDecimal(reader["UnitPrice"]);
+                                    product.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
+                                    product.OnHand = Convert.ToInt32(reader["OnHand"]);
+                                    product.OnOrder = Convert.ToInt32(reader["OnOrder"]);
+                                    product.SalesDemand = Convert.ToInt32(reader["SalesDemand"]);
+                                    product.ReorderPoint = Convert.ToInt32(reader["ReorderPoint"]);
+                                    product.UnitPerID = Convert.ToInt32(reader["UnitPerID"]);
+                                    product.UnitWeight = Convert.ToSingle(reader["UnitWeight"]);
+                                    product.Obsolete = Convert.ToBoolean(reader["Obsolete"]);
+                                    product.CategoryID = Convert.ToInt32(reader["CategoryID"]);
+                                    products.Add(product);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //error raised
+                            reader.Read();
+                            errorMessage = reader["Message"].ToString();
+                        }
+                    }
+                }
+            }
+
+            return (products, errorMessage);//errorMessage is null if no error raised by database
+        }
+
     }
 }

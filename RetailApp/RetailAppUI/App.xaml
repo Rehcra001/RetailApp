@@ -6,7 +6,9 @@
              xmlns:adminViewModel="clr-namespace:RetailAppUI.ViewModels.Adminstration"
              xmlns:adminView="clr-namespace:RetailAppUI.Views.Administration"
              xmlns:ProductViewModel="clr-namespace:RetailAppUI.ViewModels.Products"
-             xmlns:ProductView="clr-namespace:RetailAppUI.Views.Products">
+             xmlns:ProductView="clr-namespace:RetailAppUI.Views.Products"
+             xmlns:PurchaseViewModel="clr-namespace:RetailAppUI.ViewModels.Purchases"
+             xmlns:PurchaseView="clr-namespace:RetailAppUI.Views.Purchases">
     <Application.Resources>
         <ResourceDictionary>
             
@@ -52,6 +54,10 @@
 
             <DataTemplate DataType="{x:Type TypeName=ProductViewModel:ProductViewModel}">
                 <ProductView:ProductView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type TypeName=PurchaseViewModel:AddNewPurchaseOrderViewModel}">
+                <PurchaseView:AddNewPurchaseOrderView/>
             </DataTemplate>
 
             <ResourceDictionary.MergedDictionaries>

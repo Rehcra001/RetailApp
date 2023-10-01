@@ -49,7 +49,7 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                                     purchaseOrderDetail.ProductID = Convert.ToInt32(reader["ProductID"]);
                                     purchaseOrderDetail.Quantity = Convert.ToInt32(reader["Quantity"]);
                                     purchaseOrderDetail.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
-                                    purchaseOrderDetail.UnitFreightcost = Convert.ToDecimal(reader["UnitFreightCost"]);
+                                    purchaseOrderDetail.UnitFreightCost = Convert.ToDecimal(reader["UnitFreightCost"]);
                                     purchaseOrderDetail.LineFilled = Convert.ToBoolean(reader["LineFilled"]);
 
                                     purchaseOrderDetails.Add(purchaseOrderDetail);
@@ -100,7 +100,7 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                                     purchaseOrderDetail.ProductID = Convert.ToInt32(reader["ProductID"]);
                                     purchaseOrderDetail.Quantity = Convert.ToInt32(reader["Quantity"]);
                                     purchaseOrderDetail.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
-                                    purchaseOrderDetail.UnitFreightcost = Convert.ToDecimal(reader["UnitFreightCost"]);
+                                    purchaseOrderDetail.UnitFreightCost = Convert.ToDecimal(reader["UnitFreightCost"]);
                                     purchaseOrderDetail.LineFilled = Convert.ToBoolean(reader["LineFilled"]);
 
                                     purchaseOrderDetails.Add(purchaseOrderDetail);
@@ -135,7 +135,7 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = purchaseOrderDetail.ProductID;
                     command.Parameters.Add("@Quantity", SqlDbType.Int).Value = purchaseOrderDetail.Quantity;
                     command.Parameters.Add("@UnitCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitCost;
-                    command.Parameters.Add("@UnitFreightCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitFreightcost;
+                    command.Parameters.Add("@UnitFreightCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitFreightCost;
                     command.Parameters.Add("@LineFilled", SqlDbType.Bit).Value = purchaseOrderDetail.LineFilled;
                     connection.Open();
 
@@ -167,7 +167,7 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = purchaseOrderDetail.ProductID;
                     command.Parameters.Add("@Quantity", SqlDbType.Int).Value = purchaseOrderDetail.Quantity;
                     command.Parameters.Add("@UnitCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitCost;
-                    command.Parameters.Add("@UnitFreightCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitFreightcost;
+                    command.Parameters.Add("@UnitFreightCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitFreightCost;
                     command.Parameters.Add("@LineFilled", SqlDbType.Bit).Value = purchaseOrderDetail.LineFilled;
                     connection.Open();
 

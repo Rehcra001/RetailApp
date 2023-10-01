@@ -3,6 +3,7 @@ using RetailAppUI.Services;
 using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Adminstration;
 using System;
+using RetailAppUI.ViewModels.Purchases;
 
 namespace RetailAppUI.ViewModels
 {
@@ -26,6 +27,7 @@ namespace RetailAppUI.ViewModels
         
         public RelayCommand NavigateToProductsSwithboardViewCommand { get; set; }
         public RelayCommand NavigateToAdministrationSwitchboardViewCommand { get; set; }
+        public RelayCommand NavigateToAddNewPurchaseOrderViewCommand { get; set; }
 
         public MainViewModel(INavigationService navigation, ICurrentViewService currentView)
         {
@@ -36,6 +38,17 @@ namespace RetailAppUI.ViewModels
             
             NavigateToProductsSwithboardViewCommand = new RelayCommand(NavigateToProductsSwithboardView, CanNavigateToProductsSwithboardView);
             NavigateToAdministrationSwitchboardViewCommand = new RelayCommand(NavigateToAdministrationSwitchboardView, CanNavigateToAdministrationSwitchboardView);
+            NavigateToAddNewPurchaseOrderViewCommand = new RelayCommand(NavigateToAddNewPurchaseOrderView, CanNavigateToAddNewPurchaseOrderView);
+        }
+
+        private bool CanNavigateToAddNewPurchaseOrderView(object obj)
+        {
+            return true;
+        }
+
+        private void NavigateToAddNewPurchaseOrderView(object obj)
+        {
+            Navigation.NavigateTo<AddNewPurchaseOrderViewModel>();
         }
 
         private bool CanNavigateToAdministrationSwitchboardView(object obj)

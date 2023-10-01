@@ -12,5 +12,6 @@ namespace ModelsLibrary.RepositoryInterfaces
         string Update(ProductModel product);
         (IEnumerable<ProductModel>, string) GetAll();
         (ProductModel, string) GetByID(int id);
+        (IEnumerable<ProductModel>, string) GetByVendorID(int id);
     }
 }

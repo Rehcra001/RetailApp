@@ -599,6 +599,27 @@ BEGIN
 END;
 GO
 
+--Returns a list of all products on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetProductsByVendorID 
+(
+	@VendorID INT
+)AS
+BEGIN
+	BEGIN TRY
+		SELECT ProductID, ProductName, ProductDescription, VendorID, VendorProductName,
+			   UnitPrice, UnitCost, OnHand, OnOrder, SalesDemand, ReorderPoint,
+			   UnitPerID, UnitWeight, Obsolete, CategoryID
+		FROM dbo.Products
+		WHERE VendorID = @VendorID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
 --Returns a product on success
 --or an error message on failure
 CREATE PROCEDURE dbo.usp_GetProductByID
