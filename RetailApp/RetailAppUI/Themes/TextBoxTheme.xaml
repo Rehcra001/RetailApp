@@ -24,6 +24,10 @@
                         <Trigger Property="IsReadOnly" Value="True">
                             <Setter TargetName="border" Property="Background" Value="Gray"/>
                         </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter  TargetName="border" Property="BorderBrush" Value="#FF7EB4EA"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="2"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
