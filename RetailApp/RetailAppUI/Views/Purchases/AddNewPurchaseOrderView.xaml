@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RetailAppUI.Views.Purchases"
              mc:Ignorable="d" 
-             d:DesignHeight="740" d:DesignWidth="830"
-             x:Name="newOrder">
+             d:DesignHeight="740" d:DesignWidth="830">
 
     <Grid Margin="20">
         <Grid>
@@ -246,7 +245,8 @@
                               ItemsSource="{Binding PurchaseOrderLines}"
                               CanUserAddRows="False"
                               AutoGenerateColumns="False"
-                              >
+                              SelectionMode="Single"
+                              FontSize="14">
 
                         <DataGrid.Columns >
                             <DataGridTemplateColumn Header="Product" MinWidth="150">
