@@ -95,17 +95,51 @@ namespace RetailAppUI.ViewModels.Purchases
 		}
 
 		private ObservableCollection<ProductModel> _products;
-		public ObservableCollection<ProductModel> Products
+        private string _state;
+
+        public ObservableCollection<ProductModel> Products
 		{
 			get { return _products; }
 			set { _products = value; OnPropertyChanged(); }
 		}
+
+		private bool _textReadOnly;
+		public bool TextReadOnly
+		{
+			get { return _textReadOnly; }
+			set { _textReadOnly = value; OnPropertyChanged(); }
+		}
+
+		private bool _dateEnabled;
+		public bool DateEnabled
+		{
+			get { return _dateEnabled; }
+			set { _dateEnabled = value; OnPropertyChanged(); }
+		}
+
+		private bool _vendorEnabled;
+
+		public bool VendorEnabled
+		{
+			get { return _vendorEnabled; }
+			set { _vendorEnabled = value; OnPropertyChanged(); }
+		}
+
+		private bool _OrderStatusEnabled;
+
+		public bool OrderStatusEnabled
+		{
+			get { return _OrderStatusEnabled; }
+			set { _OrderStatusEnabled = value; OnPropertyChanged(); }
+		}
+
 
 		//Commands
 		public RelayCommand	CloseViewCommand { get; set; }
         public RelayCommand AddNewLineCommand { get; set; }
         public RelayCommand RemoveLineCommand { get; set; }
 		public RelayCommand SaveCommand { get; set; }
+		public RelayCommand EditCommand { get; set; }
 
         //Constructor
         public AddNewPurchaseOrderViewModel(INavigationService navigation, ICurrentViewService currentView, IConnectionStringService connectionString)
@@ -135,26 +169,73 @@ namespace RetailAppUI.ViewModels.Purchases
 			RemoveLineCommand = new RelayCommand(RemoveLine, CanRemoveLine);
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
 			SaveCommand = new RelayCommand(SavePurchaseOrder, CanSavePurchaseOrder);
+			EditCommand = new RelayCommand(EditPurchaseOrder, CanEditPurchaseOrder);
 
 
+            SetState("Add");
         }
+        private void SetState(string state)
+        {
+            _state = state;
+
+			switch (_state)
+			{
+				case "View":
+					TextReadOnly = true;
+					DateEnabled = false;
+					VendorEnabled = false;
+					OrderStatusEnabled = false;
+                    break;
+				default:
+					TextReadOnly = false;
+					DateEnabled = true;
+                    OrderStatusEnabled = true;
+                    if (_state.Equals("Edit"))
+					{
+						VendorEnabled = false;						
+                    }
+					else
+					{
+						VendorEnabled = true;
+                    }
+					break;
+			}
+        }
+
+        private bool CanEditPurchaseOrder(object obj)
+        {
+			return _state.Equals("View");
+        }
+
+        private void EditPurchaseOrder(object obj)
+        {
+            throw new NotImplementedException();
+        }        
 
         private bool CanSavePurchaseOrder(object obj)
         {
-			return true;
+			return !_state.Equals("View");
         }
 
         private void SavePurchaseOrder(object obj)
         {
-			try
+			if (_state.Equals("Add"))
 			{
-				_purchaseOrderManager.Insert();
-				PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
+                try
+                {
+                    _purchaseOrderManager.Insert();
+                    PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error Saving Purchase Order", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-			catch (Exception ex)
+			else if (_state.Equals("Edit"))
 			{
-				MessageBox.Show(ex.Message, "Error Saving Purchase Order", MessageBoxButton.OK, MessageBoxImage.Error);
+
 			}
+			SetState("View");			
         }
 
         #region Close View
@@ -172,7 +253,9 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private bool CanRemoveLine(object obj)
         {
-			return PurchaseOrder.PurchaseOrderDetails.Count > 0 && SelectedIndex >= 0;
+			return PurchaseOrder.PurchaseOrderDetails.Count > 0 && 
+				SelectedIndex >= 0 && 
+				!_state.Equals("View");
         }
 
         private void RemoveLine(object obj)
@@ -225,7 +308,8 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private bool CanAddNewLine(object obj)
         {
-			return Products != null && Products.Count > 0;
+			return Products != null && Products.Count > 0 && 
+				!_state.Equals("View");
         }
 
         private void AddNewLine(object obj)

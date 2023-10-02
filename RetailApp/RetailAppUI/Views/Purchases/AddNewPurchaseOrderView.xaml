@@ -63,17 +63,20 @@
                                HorizontalAlignment="Left"
                                FontSize="14"
                                Margin="20,0,10,0"/>
-                    <TextBox x:Name="orderDate"
-                             Text="{Binding PurchaseOrder.OrderDate, ConverterCulture=en-za}"
+                    <TextBox Text="{Binding ElementName=orderDate, Path=SelectedDate, UpdateSourceTrigger=PropertyChanged, ConverterCulture=en-za}"
                              Width="82"
                              FontSize="14"
                              Style="{StaticResource TextBoxTheme}"
                              IsReadOnly="True"
                              ToolTip="Select the date from the datepicker on the right"/>
-                    <DatePicker SelectedDate="{Binding ElementName=orderDate, Path=Text,  ConverterCulture=en-za}"
+                    <DatePicker x:Name="orderDate"
+                                SelectedDate="{Binding PurchaseOrder.OrderDate, 
+                                UpdateSourceTrigger=PropertyChanged,
+                                ConverterCulture=en-za}"
                                 Width="30"
                                 FontSize="14"
-                                SelectedDateFormat="Short">
+                                SelectedDateFormat="Short"
+                                IsEnabled="{Binding DateEnabled}">
                     </DatePicker>
 
                     <!--Required Date-->
@@ -93,9 +96,9 @@
                                 SelectedDate="{Binding PurchaseOrder.RequiredDate, 
                                 UpdateSourceTrigger=PropertyChanged,
                                 ConverterCulture=en-za}"
-                                Width="30"
-                                
-                                SelectedDateFormat="Short"/>
+                                Width="30"                                
+                                SelectedDateFormat="Short"
+                                IsEnabled="{Binding DateEnabled}"/>
                 </StackPanel>
 
                 <!--Vendor-->
@@ -112,7 +115,8 @@
                               ItemsSource="{Binding Vendors}"
                               SelectedItem="{Binding SelectedVendor, UpdateSourceTrigger=LostFocus}"
                               ToolTip="Select a vendor from the drop down list"
-                              Foreground="White">
+                              Foreground="White"
+                              IsEnabled="{Binding VendorEnabled}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding CompanyName}"/>
@@ -130,7 +134,7 @@
                              Width="150"
                              FontSize="14"
                              Style="{StaticResource TextBoxTheme}"
-                             IsReadOnly="{Binding TextReadyOnly}"
+                             IsReadOnly="{Binding TextReadOnly}"
                              ToolTip="Reference from Vendor. Usually a quote or sales order reference"/>
                 </StackPanel>
 
@@ -143,7 +147,7 @@
                                HorizontalAlignment="Left"
                                FontSize="14"
                                Width="150"/>
-                    <TextBox Text="{Binding PurchaseOrder.OrderAmount}"
+                    <TextBox Text="{Binding PurchaseOrder.OrderAmount, StringFormat=N2}"
                              Width="100"
                              FontSize="14"
                              Style="{StaticResource NumericTextBoxTheme}"
@@ -160,7 +164,7 @@
                                HorizontalAlignment="Left"
                                FontSize="14"
                                Width="150"/>
-                    <TextBox Text="{Binding PurchaseOrder.VATAmount}"
+                    <TextBox Text="{Binding PurchaseOrder.VATAmount, StringFormat=N2}"
                              Width="100"
                              FontSize="14"
                              Style="{StaticResource NumericTextBoxTheme}"
@@ -177,7 +181,7 @@
                                HorizontalAlignment="Left"
                                FontSize="14"
                                Width="150"/>
-                    <TextBox Text="{Binding PurchaseOrder.TotalAmount}"
+                    <TextBox Text="{Binding PurchaseOrder.TotalAmount, StringFormat=N2}"
                              Width="100"
                              FontSize="14"
                              Style="{StaticResource NumericTextBoxTheme}"
@@ -206,7 +210,8 @@
                               ItemsSource="{Binding OrderStatuses}"
                               SelectedItem="{Binding PurchaseOrder.OrderStatus}"
                               ToolTip="Select a status from the drop down list."
-                              Foreground="White">
+                              Foreground="White"
+                              IsEnabled="{Binding OrderStatusEnabled}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding OrderStatus}"/>
@@ -270,7 +275,8 @@
                               FontSize="14"
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Auto"
-                              MinRowHeight="25">
+                              MinRowHeight="25"
+                              IsReadOnly="{Binding TextReadOnly}">
 
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="Product" MinWidth="150">
