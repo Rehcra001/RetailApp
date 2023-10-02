@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,15 +65,15 @@ namespace RetailAppUI.ViewModels.Purchases
 
                     //Change the vendor on PurchaseOrder
                     PurchaseOrder.Vendor = _vendor;
-                    
+                    //Retrieve the list of products related to this vendor
+                    GetVendorProducts(value.VendorID);
                 }
-				OnPropertyChanged();
-                
+				OnPropertyChanged();                
             }
 		}
 
-		private int? _selectedIndex = null;
-		public int? SelectedIndex
+		private int _selectedIndex = -1;
+		public int SelectedIndex
 		{
 			get { return _selectedIndex; }
 			set { _selectedIndex = value; OnPropertyChanged(); }
@@ -103,6 +104,8 @@ namespace RetailAppUI.ViewModels.Purchases
 		//Commands
 		public RelayCommand	CloseViewCommand { get; set; }
         public RelayCommand AddNewLineCommand { get; set; }
+        public RelayCommand RemoveLineCommand { get; set; }
+		public RelayCommand SaveCommand { get; set; }
 
         //Constructor
         public AddNewPurchaseOrderViewModel(INavigationService navigation, ICurrentViewService currentView, IConnectionStringService connectionString)
@@ -123,17 +126,106 @@ namespace RetailAppUI.ViewModels.Purchases
 			//Set Order status to open
 			PurchaseOrder.OrderStatus = OrderStatuses.FirstOrDefault(x => x.OrderStatus == "Open")!;
 			//Set Order date
-			PurchaseOrder.OrderDate = DateTime.Now.Date;
+			PurchaseOrder.OrderDate = DateTime.Now;
 
 			PurchaseOrderLines = CollectionViewSource.GetDefaultView(PurchaseOrder.PurchaseOrderDetails);
 
             //Instantiate commands
             AddNewLineCommand = new RelayCommand(AddNewLine, CanAddNewLine);
+			RemoveLineCommand = new RelayCommand(RemoveLine, CanRemoveLine);
+			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
+			SaveCommand = new RelayCommand(SavePurchaseOrder, CanSavePurchaseOrder);
+
+
+        }
+
+        private bool CanSavePurchaseOrder(object obj)
+        {
+			return true;
+        }
+
+        private void SavePurchaseOrder(object obj)
+        {
+			try
+			{
+				_purchaseOrderManager.Insert();
+				PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
+            }
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, "Error Saving Purchase Order", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+        }
+
+        #region Close View
+        private bool CanCloseView(object obj)
+        {
+            return true;
+        }
+
+        private void CloseView(object obj)
+        {
+            CurrentView.CurrentView = "HomeView";
+            Navigation.NavigateTo<HomeViewModel>();
+        }
+        #endregion Close View
+
+        private bool CanRemoveLine(object obj)
+        {
+			return PurchaseOrder.PurchaseOrderDetails.Count > 0 && SelectedIndex >= 0;
+        }
+
+        private void RemoveLine(object obj)
+        {
+			string message = $"Line {SelectedIndex + 1} is about to be removed. \r\nAre you sure you want to remove this line?";
+			MessageBoxResult result = MessageBox.Show(message, "Remove Line", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+
+			if (result == MessageBoxResult.Yes)
+			{
+				//Check if purchase order line product is empty
+				//if yes remove line
+				//if not then
+				//Check if purchase order line exists in Products
+				//If yes then just remove line
+				//if not then add purchase order line product to Products and remove the line
+
+				ProductModel product = PurchaseOrder.PurchaseOrderDetails[SelectedIndex].Product;
+
+                if (product.ProductID == 0)
+				{
+					//No product added to purchase order line - just remove the line
+					PurchaseOrder.PurchaseOrderDetails.RemoveAt(SelectedIndex);
+                }
+				else
+				{
+					//A product has been added to the purchase order line
+					//check if this product exists in Products property
+					if (Products.Contains(product))
+					{
+                        //It is already in Products - just remove the line
+                        PurchaseOrder.PurchaseOrderDetails.RemoveAt(SelectedIndex);
+                    }
+					else
+					{
+						//The product is not in Products property
+						Products.Add(product);
+                        //Remove the purchase order line
+                        PurchaseOrder.PurchaseOrderDetails.RemoveAt(SelectedIndex);
+                    }
+				}
+				//Refresh the collection view source
+				PurchaseOrderLines.Refresh();
+                Debug.Print(SelectedIndex.ToString());
+            }
+			else
+			{
+				return;
+			}
         }
 
         private bool CanAddNewLine(object obj)
         {
-			return true;
+			return Products != null && Products.Count > 0;
         }
 
         private void AddNewLine(object obj)
@@ -147,22 +239,86 @@ namespace RetailAppUI.ViewModels.Purchases
 			//Check if PurchaseOrderDetails is null
 			else if (PurchaseOrder.PurchaseOrderDetails.Count == 0)
 			{
-                //Get list of vendor products
-
-                PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
-                GetVendorProducts(PurchaseOrder.Vendor.VendorID);
-
-				
+                //Add a purchase order line
+                PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());				
 			}
 			else
 			{
-				//check that the last order line is completed before adding another
-
-
-				PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
+				//Check data before adding a new line
+				ValidateLine();				
 			}
 			PurchaseOrderLines.Refresh();
 		}
+
+		private void ProductsLeftToOrder()
+		{
+            //check if any vendor products are left in Products to order
+            string message = "";
+            bool isValid = true;
+            if (Products.Count == 0)
+            {
+                message += "All vendor products have been added to the order.\r\n";
+                isValid = false;
+            }
+            if (isValid)
+            {
+                //Add another purchase order line
+                PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
+            }
+            else
+            {
+                //Missing data
+                MessageBox.Show(message, "Missing Data", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+        }
+
+		private void ValidateLine()
+		{
+            //check that the last order line is completed before adding another
+            //Product selected
+            int index = PurchaseOrder.PurchaseOrderDetails.Count - 1;
+            bool isValid = true;
+            string message = "";
+            if (PurchaseOrder.PurchaseOrderDetails[index].Product.ProductID == 0)
+            {
+                message += "Please select a vendor before adding a new line.\r\n";
+                isValid = false;
+            }
+            //Quantity added
+            if (PurchaseOrder.PurchaseOrderDetails[index].Quantity <= 0)
+            {
+                message += "Please enter the order quantity before adding a new line.\r\n";
+                isValid = false;
+            }
+            //Unit cost added
+            if (PurchaseOrder.PurchaseOrderDetails[index].UnitCost <= 0)
+            {
+                message += "Please enter the unit cost before adding a new line.\r\n";
+                isValid = false;
+            }
+
+            if (isValid)
+            {
+                //Remove the any selected product from the list of products as one product type is allowed per purchase order
+                for (int i = 0; i < PurchaseOrder.PurchaseOrderDetails.Count; i++)
+                {
+                    if (Products.Contains(PurchaseOrder.PurchaseOrderDetails[i].Product))
+                    {
+                        Products.Remove(PurchaseOrder.PurchaseOrderDetails[i].Product);
+                    }
+                }
+            }
+            else
+            {
+                //Missing data
+                MessageBox.Show(message, "Missing Data", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            //Make sure there are products left to order
+            ProductsLeftToOrder();
+        }
 
         private bool VendorChanged(int vendorID)
         {
@@ -187,8 +343,7 @@ namespace RetailAppUI.ViewModels.Purchases
 						PurchaseOrder.PurchaseOrderDetails.Clear();
 						PurchaseOrderLines.Refresh();
 
-						//Retrieve the list of products related to this vendor
-						GetVendorProducts(vendorID);
+						
 
 						changeVendor = true;
 					}
@@ -228,7 +383,8 @@ namespace RetailAppUI.ViewModels.Purchases
 			if (orderStatuses.Item2 == null)
 			{
 				//No errors
-				OrderStatuses = new ObservableCollection<OrderStatusModel>(orderStatuses.Item1);
+				//Only allow an order status of 'Open' when creating a new purchase order
+				OrderStatuses = new ObservableCollection<OrderStatusModel>(orderStatuses.Item1.Where(x => x.OrderStatus!.Equals("Open")));
 			}
 			else
 			{

@@ -45,7 +45,7 @@
         /// <summary>
         /// The date the products purchased are expected
         /// </summary>
-        public DateOnly RequiredDate { get; set; }
+        public DateTime? RequiredDate { get; set; } = null;
 
         /// <summary>
         /// Holds the status ID of this order

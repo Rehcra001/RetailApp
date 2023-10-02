@@ -668,7 +668,7 @@ BEGIN
 	CROSS JOIN QtyReceipted
 	WHERE ProductID = @ProductID;
 END;
-
+GO
 --**********Units**********
 
 --Returns the UnitPer ID on success
@@ -908,7 +908,7 @@ CREATE PROCEDURE dbo.usp_InsertPurchaseOrderHeader
 	@VendorReference NVARCHAR(20),
 	@OrderDate DATETIME,
 	@OrderAmount MONEY,
-	@VATPercentage DECIMAL,
+	@VATPercentage DECIMAL(5,4),
 	@VATAmount MONEY,
 	@TotalAmount MONEY,
 	@RequiredDate DATE,
@@ -971,7 +971,7 @@ CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderHeader
 	@VendorReference NVARCHAR(20),
 	@OrderDate DATETIME,
 	@OrderAmount MONEY,
-	@VATPercentage DECIMAL,
+	@VATPercentage DECIMAL(5,4),
 	@VATAmount MONEY,
 	@TotalAmount MONEY,
 	@RequiredDate DATE,

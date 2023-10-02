@@ -50,7 +50,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                                     purchaseOrderHeader.VATPercentage = Convert.ToDecimal(reader["VATPercentage"]);
                                     purchaseOrderHeader.VATAmount = Convert.ToDecimal(reader["VATAmount"]);
                                     purchaseOrderHeader.TotalAmount = Convert.ToDecimal(reader["TotalAmount"]);
-                                    purchaseOrderHeader.RequiredDate = (DateOnly)reader["RequiredDate"];
+                                    purchaseOrderHeader.RequiredDate = (DateTime)reader["RequiredDate"];
                                     purchaseOrderHeader.OrderStatusID = Convert.ToInt32(reader["OrderStatusID"]);
                                     purchaseOrderHeader.IsImport = Convert.ToBoolean(reader["IsImport"]);
 
@@ -107,7 +107,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                                 purchaseOrderHeader.VATPercentage = Convert.ToDecimal(reader["VATPercentage"]);
                                 purchaseOrderHeader.VATAmount = Convert.ToDecimal(reader["VATAmount"]);
                                 purchaseOrderHeader.TotalAmount = Convert.ToDecimal(reader["TotalAmount"]);
-                                purchaseOrderHeader.RequiredDate = (DateOnly)reader["RequiredDate"];
+                                purchaseOrderHeader.RequiredDate = (DateTime)reader["RequiredDate"];
                                 purchaseOrderHeader.OrderStatusID = Convert.ToInt32(reader["OrderStatusID"]);
                                 purchaseOrderHeader.IsImport = Convert.ToBoolean(reader["IsImport"]);
                             }

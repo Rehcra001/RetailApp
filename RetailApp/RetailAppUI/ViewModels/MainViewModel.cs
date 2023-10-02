@@ -43,11 +43,12 @@ namespace RetailAppUI.ViewModels
 
         private bool CanNavigateToAddNewPurchaseOrderView(object obj)
         {
-            return true;
+            return !CurrentView.CurrentView!.Equals("PurchaseOrders");
         }
 
         private void NavigateToAddNewPurchaseOrderView(object obj)
         {
+            CurrentView.CurrentView = "PurchaseOrders";
             Navigation.NavigateTo<AddNewPurchaseOrderViewModel>();
         }
 
