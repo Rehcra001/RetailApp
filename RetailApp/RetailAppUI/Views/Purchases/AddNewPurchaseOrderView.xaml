@@ -292,7 +292,8 @@
                                                                 AncestorType={x:Type UserControl}},
                                                                 Path=DataContext.Products}"
                                                   SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                  IsReadOnly="True">
+                                                  IsReadOnly="True"
+                                                   IsEnabled="{Binding CanChangeProduct}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding ProductName}"/>

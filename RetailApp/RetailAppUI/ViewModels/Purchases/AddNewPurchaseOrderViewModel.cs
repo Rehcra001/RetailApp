@@ -76,7 +76,23 @@ namespace RetailAppUI.ViewModels.Purchases
 		public int SelectedIndex
 		{
 			get { return _selectedIndex; }
-			set { _selectedIndex = value; OnPropertyChanged(); }
+			set 
+			{ 
+				_selectedIndex = value;
+				if (_selectedIndex >= 0)
+				{
+					//Once saved the product on an existing line cannot be changed
+					if (!PurchaseOrder.PurchaseOrderDetails[SelectedIndex].CanChangeProduct)
+					{
+						CanChangeProduct = false;
+					}
+					else
+					{
+						CanChangeProduct = true;
+					}
+				}
+				OnPropertyChanged(); 
+			}
 		}
 
 
@@ -132,6 +148,14 @@ namespace RetailAppUI.ViewModels.Purchases
 			get { return _OrderStatusEnabled; }
 			set { _OrderStatusEnabled = value; OnPropertyChanged(); }
 		}
+
+		private bool _canChangeProduct;
+		public bool CanChangeProduct
+		{
+			get { return _canChangeProduct; }
+			set { _canChangeProduct = value; OnPropertyChanged(); }
+		}
+
 
 
 		//Commands
@@ -209,7 +233,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void EditPurchaseOrder(object obj)
         {
-            throw new NotImplementedException();
+			SetState("Edit");
         }        
 
         private bool CanSavePurchaseOrder(object obj)
@@ -219,7 +243,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void SavePurchaseOrder(object obj)
         {
-			if (_state.Equals("Add"))
+            if (_state.Equals("Add"))
 			{
                 try
                 {
@@ -229,13 +253,16 @@ namespace RetailAppUI.ViewModels.Purchases
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error Saving Purchase Order", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
                 }
             }
 			else if (_state.Equals("Edit"))
 			{
 
 			}
-			SetState("View");			
+			SetState("View");
+			//Force index change
+			SelectedIndex = -1;
         }
 
         #region Close View
@@ -255,7 +282,8 @@ namespace RetailAppUI.ViewModels.Purchases
         {
 			return PurchaseOrder.PurchaseOrderDetails.Count > 0 && 
 				SelectedIndex >= 0 && 
-				!_state.Equals("View");
+				!_state.Equals("View") 
+				&& CanChangeProduct == true;
         }
 
         private void RemoveLine(object obj)
@@ -329,16 +357,19 @@ namespace RetailAppUI.ViewModels.Purchases
 			else
 			{
 				//Check data before adding a new line
-				ValidateLine();				
-			}
+				ValidateLine();
+                ProductsLeftToOrder();
+            }
 			PurchaseOrderLines.Refresh();
-		}
+            
+        }
 
 		private void ProductsLeftToOrder()
 		{
             //check if any vendor products are left in Products to order
             string message = "";
             bool isValid = true;
+			
             if (Products.Count == 0)
             {
                 message += "All vendor products have been added to the order.\r\n";
@@ -398,10 +429,7 @@ namespace RetailAppUI.ViewModels.Purchases
                 //Missing data
                 MessageBox.Show(message, "Missing Data", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
-            }
-
-            //Make sure there are products left to order
-            ProductsLeftToOrder();
+            }         
         }
 
         private bool VendorChanged(int vendorID)

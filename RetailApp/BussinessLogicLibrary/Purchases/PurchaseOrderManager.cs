@@ -144,6 +144,7 @@ namespace BussinessLogicLibrary.Purchases
                 foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
                 {
                     orderLine.PurchaseOrderID = PurchaseOrder.PurchaseOrderID;
+                    
                     //Validate and save order line
                     if (orderLine.ValidateAll())
                     {
@@ -154,6 +155,8 @@ namespace BussinessLogicLibrary.Purchases
                             //error raised
                             throw new Exception(errorMessage);
                         }
+                        //Set CanProductChange to false as once saved it cannot be changed
+                        orderLine.CanChangeProduct = false;
                     }
                     else
                     {
