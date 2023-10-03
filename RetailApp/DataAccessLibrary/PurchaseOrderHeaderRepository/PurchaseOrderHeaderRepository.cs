@@ -177,7 +177,64 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                             errorMessage = reader["Message"].ToString();
                         }
                     }
+                }
+            }
 
+            return (purchaseOrderHeaders, errorMessage); //Error message will be null if no error raised by database
+        }
+
+        public (IEnumerable<PurchaseOrderHeaderModel>, string) GetByVendorID(int id)
+        {
+            List<PurchaseOrderHeaderModel> purchaseOrderHeaders = new List<PurchaseOrderHeaderModel>();
+            string? errorMessage = null;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_GetPurchaseOrderHeaderVendorID";
+                    command.Parameters.Add("@VendorID", SqlDbType.Int).Value = id;
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        //Check for errors
+                        //Expecting more than one column on no error
+                        if (reader.FieldCount > 1)
+                        {
+                            //no error
+                            //check for data
+                            if (reader.HasRows)
+                            {
+                                //Contains data
+                                while (reader.Read())
+                                {
+                                    PurchaseOrderHeaderModel purchaseOrderHeader = new PurchaseOrderHeaderModel();
+                                    purchaseOrderHeader.PurchaseOrderID = Convert.ToInt64(reader["PurchaseOrderID"]);
+                                    purchaseOrderHeader.VendorID = Convert.ToInt32(reader["VendorID"]);
+                                    purchaseOrderHeader.VendorReference = reader["VendorReference"].ToString();
+                                    purchaseOrderHeader.OrderDate = Convert.ToDateTime(reader["OrderDate"]);
+                                    purchaseOrderHeader.OrderAmount = Convert.ToDecimal(reader["OrderAmount"]);
+                                    purchaseOrderHeader.VATPercentage = Convert.ToDecimal(reader["VATPercentage"]);
+                                    purchaseOrderHeader.VATAmount = Convert.ToDecimal(reader["VATAmount"]);
+                                    purchaseOrderHeader.TotalAmount = Convert.ToDecimal(reader["TotalAmount"]);
+                                    purchaseOrderHeader.RequiredDate = (DateTime)reader["RequiredDate"];
+                                    purchaseOrderHeader.OrderStatusID = Convert.ToInt32(reader["OrderStatusID"]);
+                                    purchaseOrderHeader.IsImport = Convert.ToBoolean(reader["IsImport"]);
+
+                                    purchaseOrderHeaders.Add(purchaseOrderHeader);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //error raised
+                            reader.Read();
+                            errorMessage = reader["Message"].ToString();
+                        }
+                    }
                 }
             }
 

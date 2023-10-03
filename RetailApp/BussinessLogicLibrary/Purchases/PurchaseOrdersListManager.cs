@@ -49,9 +49,35 @@ namespace BussinessLogicLibrary.Purchases
         /// Populates the PurchaseOrders List by order status
         /// </summary>
         /// <param name="orderStatus"></param>
-        public void GetByOrderStatus(string orderStatus)
+        public void GetByOrderStatusID(int id)
         {
-            Tuple<IEnumerable<PurchaseOrderHeaderModel>, string> purchaseOrders = _purchaseOrderHeaderRepository.GetByOrderStatus(orderStatus).ToTuple();
+            Tuple<IEnumerable<PurchaseOrderHeaderModel>, string> purchaseOrders = _purchaseOrderHeaderRepository.GetByOrderStatusID(id).ToTuple();
+
+            //Check for errors
+            if (purchaseOrders.Item2 == null)
+            {
+                //No error retrieving
+                PurchaseOrders = purchaseOrders.Item1;
+                //Add vendor to each order
+                GetVendors();
+                //Add OrderStatus to each order
+                GetOrderStatus();
+            }
+            else
+            {
+                //Error retrieving
+                throw new Exception(purchaseOrders.Item2);
+            }
+        }
+
+        /// <summary>
+        /// Populates the PurchaseOrders list by vendor
+        /// </summary>
+        /// <param name="id"></param>
+        /// <exception cref="Exception"></exception>
+        public void GetByVendorID(int id)
+        {
+            Tuple<IEnumerable<PurchaseOrderHeaderModel>, string> purchaseOrders = _purchaseOrderHeaderRepository.GetByVendorID(id).ToTuple();
 
             //Check for errors
             if (purchaseOrders.Item2 == null)

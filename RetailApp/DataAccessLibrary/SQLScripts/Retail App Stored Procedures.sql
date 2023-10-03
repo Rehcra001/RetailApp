@@ -1079,6 +1079,30 @@ BEGIN
 END;
 GO
 
+--GetByOrderStatus
+--Returns a list of purchase orders with specific vendor
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetPurchaseOrderHeaderVendorID
+(
+	@VendorID INT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT PurchaseOrderID, VendorID, VendorReference, OrderDate,
+			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
+			   RequiredDate, OrderStatusID, IsImport
+		FROM dbo.PurchaseOrderHeader
+		WHERE VendorID = @VendorID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
 --**********Purchase Order Details**********
 --Insert
 --Return 'No Error' on success

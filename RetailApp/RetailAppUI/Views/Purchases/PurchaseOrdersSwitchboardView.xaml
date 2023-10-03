@@ -1,0 +1,242 @@
+﻿<UserControl x:Class="RetailAppUI.Views.Purchases.PurchaseOrdersSwitchboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RetailAppUI.Views.Purchases"
+             mc:Ignorable="d" 
+             d:DesignHeight="740" d:DesignWidth="830">
+    <Grid Margin="20">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="625"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="100"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Purchase Orders Switchboard"
+                       FontSize="25"
+                       Foreground="White"
+                       Grid.Column="0"
+                       Grid.Row="0"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"/>
+            <Button Grid.Column="1"                    
+                    Content="X"
+                    Width="30"
+                    Margin="5,0,5,0"
+                    HorizontalAlignment="Right"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Style="{StaticResource ButtonTheme}"
+                    Command="{Binding CloseViewCommand}"/>
+
+            <StackPanel Orientation="Vertical"
+                    Grid.Column="0"
+                    Grid.Row="1">
+
+                <!--Retrieve lists of purchase orders-->
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,20">
+
+                    <Button Content="Get All Orders"
+                            Command="{Binding GetAllPurchaseOrdersCommand}"
+                            Style="{StaticResource ButtonTheme}"
+                            Width="145"
+                            Margin="5,0,5,0"
+                            VerticalAlignment="Bottom"/>
+
+                    <StackPanel>
+                        <TextBlock Text="Select Order Status"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"/>
+                        <ComboBox x:Name="orderStatus"
+                                  Style="{StaticResource ComboBoxTheme}"
+                                  Width="145"
+                                  Margin="0,0,0,10"
+                                  ItemsSource="{Binding OrderStatuses}"
+                                  SelectedValue="{Binding OrderStatusID}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding OrderStatus}" Foreground="White"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+
+                        </ComboBox>
+
+                        <Button Content="Get Orders by Status"
+                                Command="{Binding GetPurchaseOrderByOrderStatusCommand}"
+                                CommandParameter="{Binding ElementName=orderStatus, Path=SelectedValue.OrderStatusID}"
+                                Style="{StaticResource ButtonTheme}"
+                                Width="145"
+                                Margin="5,0,5,0"/>
+                    </StackPanel>
+
+                    <!--Get purchase orders by Vendor-->
+                    <StackPanel>
+                        <TextBlock Text="Select Vendor"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"/>
+                        <ComboBox x:Name="vendor"
+                                  Style="{StaticResource ComboBoxTheme}"
+                                  Width="200"
+                                  Margin="0,0,0,10"
+                                  ItemsSource="{Binding Vendors}"
+                                  SelectedValue="{Binding VendorID}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding CompanyName}" Foreground="White"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+
+                        </ComboBox>
+
+                        <Button Content="Get Orders by Vedor"
+                                Command="{Binding GetPurchaseOrderByVendorCommand}"
+                                CommandParameter="{Binding ElementName=vendor, Path=SelectedValue.VendorID}"
+                                Style="{StaticResource ButtonTheme}"
+                                Width="145"
+                                Margin="5,0,5,0"/>
+                    </StackPanel>
+
+                </StackPanel>
+                
+                <!--Filter for Order-->
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom">
+                    <TextBlock Text="Filter for Order #"
+                               Foreground="White"
+                               Margin="5"
+                               FontSize="14"
+                               VerticalAlignment="Center"/>
+                    <TextBox FontSize="14"
+                             Width="145"
+                             Text="{Binding PurchaseOrderFilter, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource TextBoxTheme}"/>
+                </StackPanel>
+
+
+                <DataGrid Margin="5" 
+                      ItemsSource="{Binding PurchaseOrders, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      SelectedItem="{Binding SelectedPurchaseOrder}"
+                      HorizontalAlignment="Center"
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False"
+                      HorizontalScrollBarVisibility="Visible"
+                      CanUserSortColumns="True"
+                      Padding="5,0,0,0"
+                      FontSize="12"
+                      SelectionMode="Single">
+                    <DataGrid.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <StackPanel>
+                                                    <TextBlock FontSize="12"/>
+                                                    <StackPanel Orientation="Horizontal" Background="#555555">
+                                                        <TextBlock Text="{Binding Name}" 
+                                                               Margin="5,0,0,5" 
+                                                               FontSize="14"
+                                                               Foreground="White"/>
+
+                                                        <TextBlock Text="{Binding Path=ItemCount, StringFormat=Number of Orders: {0}}"
+                                                               Margin="30,0,0,0"
+                                                               FontSize="14"
+                                                               Foreground="White"/>
+                                                    </StackPanel>
+                                                    <ItemsPresenter/>
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </DataGrid.GroupStyle>
+
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Purchase Order" Binding="{Binding Path=PurchaseOrderID}"/>
+                        <DataGridTextColumn Header="Order Status" Binding="{Binding Path=OrderStatus.OrderStatus}"/>
+                        <DataGridTextColumn Header="Vendor" Binding="{Binding Path=Vendor.CompanyName}"/>
+                        <DataGridTextColumn Header="Vendor Reference" Binding="{Binding Path=VendorReference}"/>
+                        <DataGridTextColumn Header="OrderDate" Binding="{Binding Path=OrderDate}"/>
+                        <DataGridTextColumn Header="Required Date" Binding="{Binding Path=RequiredDate}"/>
+                        <DataGridTextColumn Header="Order Amount" Binding="{Binding Path=OrderAmount}"/>
+                        <DataGridTextColumn Header="VAT Percentage" Binding="{Binding Path=VATPercentage}"/>
+                        <DataGridTextColumn Header="VAT Amount" Binding="{Binding Path=VATAmount}"/>
+                        <DataGridTextColumn Header="Total Amount" Binding="{Binding Path=TotalAmount}"/>
+                        <DataGridCheckBoxColumn Header="Imported" Binding="{Binding Path=IsImport}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+
+            <!--Create or open selected purchase order-->
+            <StackPanel Grid.Column="1"
+                    Grid.Row="1"
+                    Orientation="Vertical"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Button Content="Add New Order"
+                    Command="{Binding NavigateToAddNewPurchaseOrdertViewCommand}"
+                    Style="{StaticResource ButtonTheme}"
+                    Width="155"
+                    Margin="0,10"/>
+
+                <Button Content="Open Selected Order"
+                    Command="{Binding NavigateToPurchaseOrderViewCommand}"
+                    Style="{StaticResource ButtonTheme}"
+                    Width="155"
+                    Margin="0,10"/>
+            </StackPanel>
+
+
+            <StackPanel Orientation="Vertical"
+                        Grid.Column="0"
+                        Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="0,0,0,0">
+
+
+                <TextBlock Text="Group List By"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           FontSize="14"
+                           Margin="5"/>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="5">
+                    <Button Content="Order Status"
+                            Style="{StaticResource ButtonTheme}"
+                            Margin="5"
+                            Width="100"
+                            Command="{Binding GroupByOrderStatusCommand}"/>
+                    <Button Content="Vendor"
+                            Style="{StaticResource ButtonTheme}"
+                            Margin="5"
+                            Width="100"
+                            Command="{Binding GroupByVendorCommand}"/>
+                    <Button Content="Clear"
+                            Style="{StaticResource ButtonTheme}"
+                            Margin="5"
+                            Width="100"
+                            Command="{Binding ClearGroupByCommand}"/>
+                </StackPanel>
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+</UserControl>
