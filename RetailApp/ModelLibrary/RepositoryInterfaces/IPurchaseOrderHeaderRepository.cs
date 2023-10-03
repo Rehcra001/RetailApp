@@ -5,7 +5,7 @@
         (PurchaseOrderHeaderModel, string) Insert(PurchaseOrderHeaderModel purchaseOrderHeader);
         string Update(PurchaseOrderHeaderModel purchaseOrderHeader);
         (IEnumerable<PurchaseOrderHeaderModel>, string) GetALL();
-        (IEnumerable<PurchaseOrderHeaderModel>, string) GetByOrderStatus(string orderStatus);
+        (IEnumerable<PurchaseOrderHeaderModel>, string) GetByOrderStatusID(int id);
         (PurchaseOrderHeaderModel, string) GetByID(long id);
     }
 }
