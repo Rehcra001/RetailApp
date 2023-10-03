@@ -60,6 +60,10 @@
                 <PurchaseView:AddNewPurchaseOrderView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type TypeName=PurchaseViewModel:PurchaseOrdersSwitchboardViewModel}">
+                <PurchaseView:PurchaseOrdersSwitchboardView/>
+            </DataTemplate>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/ButtonTheme.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxTheme.xaml"/>

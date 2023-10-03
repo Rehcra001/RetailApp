@@ -83,7 +83,7 @@
                 <Button Content="Purchase Orders"
                         Margin="10"
                         Style="{StaticResource ButtonTheme}"
-                        Command="{Binding NavigateToAddNewPurchaseOrderViewCommand}"/>
+                        Command="{Binding NavigateToPurchaseOrderSwitchboardViewCommand}"/>
 
                 <Button Content="Products"
                         Margin="10"
