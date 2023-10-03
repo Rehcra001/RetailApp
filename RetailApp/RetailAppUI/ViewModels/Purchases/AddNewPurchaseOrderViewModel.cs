@@ -20,7 +20,7 @@ namespace RetailAppUI.ViewModels.Purchases
 {
     public class AddNewPurchaseOrderViewModel : BaseViewModel
     {
-        private PurchaseOrderManager _purchaseOrderManager;
+        private AddNewPurchaseOrderManager _purchaseOrderManager;
         public ICollectionView PurchaseOrderLines { get; set; }
 
         private INavigationService _navigation;
@@ -28,13 +28,6 @@ namespace RetailAppUI.ViewModels.Purchases
 		{
 			get { return _navigation; }
 			set { _navigation = value; OnPropertyChanged(); }
-		}
-
-		private ICurrentViewService _currentView;
-		public ICurrentViewService CurrentView
-		{
-			get { return _currentView; }
-			set { _currentView = value; }
 		}
 
 		private IConnectionStringService _connectionString;
@@ -142,13 +135,11 @@ namespace RetailAppUI.ViewModels.Purchases
         public RelayCommand AddNewLineCommand { get; set; }
         public RelayCommand RemoveLineCommand { get; set; }
 		public RelayCommand SaveCommand { get; set; }
-		public RelayCommand EditCommand { get; set; }
 
         //Constructor
-        public AddNewPurchaseOrderViewModel(INavigationService navigation, ICurrentViewService currentView, IConnectionStringService connectionString)
+        public AddNewPurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString)
         {
 			Navigation = navigation;
-			CurrentView = currentView;
 			ConnectionString = connectionString;
 
             //Retrieve a list of Vendors
@@ -158,13 +149,13 @@ namespace RetailAppUI.ViewModels.Purchases
             GetOrderStatuses();
 
             //Purchase order
-            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString());
+            _purchaseOrderManager = new AddNewPurchaseOrderManager(ConnectionString.GetConnectionString());
 			PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
 			//Set Order status to open
 			PurchaseOrder.OrderStatus = OrderStatuses.FirstOrDefault(x => x.OrderStatus == "Open")!;
 			//Set Order date
 			PurchaseOrder.OrderDate = DateTime.Now;
-
+			//Add the purchase order lines to a collection view
 			PurchaseOrderLines = CollectionViewSource.GetDefaultView(PurchaseOrder.PurchaseOrderDetails);
 
             //Instantiate commands
@@ -172,9 +163,8 @@ namespace RetailAppUI.ViewModels.Purchases
 			RemoveLineCommand = new RelayCommand(RemoveLine, CanRemoveLine);
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
 			SaveCommand = new RelayCommand(SavePurchaseOrder, CanSavePurchaseOrder);
-			EditCommand = new RelayCommand(EditPurchaseOrder, CanEditPurchaseOrder);
 
-
+			//Set the view state
             SetState("Add");
         }
         private void SetState(string state)
@@ -203,17 +193,7 @@ namespace RetailAppUI.ViewModels.Purchases
                     }
 					break;
 			}
-        }
-
-        private bool CanEditPurchaseOrder(object obj)
-        {
-			return _state.Equals("View");
-        }
-
-        private void EditPurchaseOrder(object obj)
-        {
-			SetState("Edit");
-        }        
+        }     
 
         private bool CanSavePurchaseOrder(object obj)
         {
@@ -235,10 +215,6 @@ namespace RetailAppUI.ViewModels.Purchases
 					return;
                 }
             }
-			else if (_state.Equals("Edit"))
-			{
-
-			}
 			SetState("View");
 			//Force index change
 			SelectedIndex = -1;
@@ -252,8 +228,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void CloseView(object obj)
         {
-            CurrentView.CurrentView = "HomeView";
-            Navigation.NavigateTo<HomeViewModel>();
+            Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
         }
         #endregion Close View
 
@@ -373,7 +348,8 @@ namespace RetailAppUI.ViewModels.Purchases
             int index = PurchaseOrder.PurchaseOrderDetails.Count - 1;
             bool isValid = true;
             string message = "";
-            if (PurchaseOrder.PurchaseOrderDetails[index].Product.ProductID == 0)
+
+			if(	PurchaseOrder.PurchaseOrderDetails[index].Product.ProductID == 0)
             {
                 message += "Please select a vendor before adding a new line.\r\n";
                 isValid = false;
@@ -393,7 +369,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
             if (isValid)
             {
-                //Remove the any selected product from the list of products as one product type is allowed per purchase order
+                //Remove the any selected product from the list of products as only one product type is allowed per purchase order
                 for (int i = 0; i < PurchaseOrder.PurchaseOrderDetails.Count; i++)
                 {
                     if (Products.Contains(PurchaseOrder.PurchaseOrderDetails[i].Product))

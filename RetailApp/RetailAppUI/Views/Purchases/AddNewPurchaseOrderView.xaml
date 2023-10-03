@@ -321,24 +321,11 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
 
-                <Button Content="Edit"
-                        Width="75"
-                        Style="{StaticResource ButtonTheme}"
-                        Margin="5"
-                        Command="{Binding EditCommand}"/>
-
                 <Button Content="Save"
                         Width="75"
                         Style="{StaticResource ButtonTheme}"
                         Margin="5"
                         Command="{Binding SaveCommand}"/>
-
-                <Button Content="Cancel"
-                        Width="75"
-                        Style="{StaticResource ButtonTheme}"
-                        Margin="5"
-                        Command="{Binding CancelActionCommand}"/>
-
             </StackPanel>
         </Grid>
 
