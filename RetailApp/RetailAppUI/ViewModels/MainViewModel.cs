@@ -27,7 +27,7 @@ namespace RetailAppUI.ViewModels
         
         public RelayCommand NavigateToProductsSwithboardViewCommand { get; set; }
         public RelayCommand NavigateToAdministrationSwitchboardViewCommand { get; set; }
-        public RelayCommand NavigateToAddNewPurchaseOrderViewCommand { get; set; }
+        public RelayCommand NavigateToPurchaseOrderSwitchboardViewCommand { get; set; }
 
         public MainViewModel(INavigationService navigation, ICurrentViewService currentView)
         {
@@ -38,18 +38,18 @@ namespace RetailAppUI.ViewModels
             
             NavigateToProductsSwithboardViewCommand = new RelayCommand(NavigateToProductsSwithboardView, CanNavigateToProductsSwithboardView);
             NavigateToAdministrationSwitchboardViewCommand = new RelayCommand(NavigateToAdministrationSwitchboardView, CanNavigateToAdministrationSwitchboardView);
-            NavigateToAddNewPurchaseOrderViewCommand = new RelayCommand(NavigateToAddNewPurchaseOrderView, CanNavigateToAddNewPurchaseOrderView);
+            NavigateToPurchaseOrderSwitchboardViewCommand = new RelayCommand(NavigateToPurchaseOrderSwitchboardView, CanNavigateToPurchaseOrderSwitchboardView);
         }
 
-        private bool CanNavigateToAddNewPurchaseOrderView(object obj)
+        private bool CanNavigateToPurchaseOrderSwitchboardView(object obj)
         {
             return !CurrentView.CurrentView!.Equals("PurchaseOrders");
         }
 
-        private void NavigateToAddNewPurchaseOrderView(object obj)
+        private void NavigateToPurchaseOrderSwitchboardView(object obj)
         {
             CurrentView.CurrentView = "PurchaseOrders";
-            Navigation.NavigateTo<AddNewPurchaseOrderViewModel>();
+            Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
         }
 
         private bool CanNavigateToAdministrationSwitchboardView(object obj)
