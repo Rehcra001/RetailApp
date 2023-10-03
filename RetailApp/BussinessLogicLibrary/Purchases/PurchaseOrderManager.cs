@@ -155,8 +155,6 @@ namespace BussinessLogicLibrary.Purchases
                             //error raised
                             throw new Exception(errorMessage);
                         }
-                        //Set CanProductChange to false as once saved it cannot be changed
-                        orderLine.CanChangeProduct = false;
                     }
                     else
                     {

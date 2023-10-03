@@ -39,11 +39,6 @@ namespace ModelsLibrary
         public bool LineFilled { get; set; }
 
         /// <summary>
-        /// Indicates if the product for this line can be altered
-        /// </summary>
-        public bool CanChangeProduct { get; set; } = true;
-
-        /// <summary>
         /// Holds the product detail for this purchase order detail
         /// </summary>
         public ProductModel Product { get; set; } = new ProductModel();

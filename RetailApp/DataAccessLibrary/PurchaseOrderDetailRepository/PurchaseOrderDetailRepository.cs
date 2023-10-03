@@ -51,8 +51,6 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                                     purchaseOrderDetail.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
                                     purchaseOrderDetail.UnitFreightCost = Convert.ToDecimal(reader["UnitFreightCost"]);
                                     purchaseOrderDetail.LineFilled = Convert.ToBoolean(reader["LineFilled"]);
-                                    //Change CanChangeProduct to false to prevent product being changed
-                                    purchaseOrderDetail.CanChangeProduct = false;
 
                                     purchaseOrderDetails.Add(purchaseOrderDetail);
                                 }
@@ -104,8 +102,6 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                                     purchaseOrderDetail.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
                                     purchaseOrderDetail.UnitFreightCost = Convert.ToDecimal(reader["UnitFreightCost"]);
                                     purchaseOrderDetail.LineFilled = Convert.ToBoolean(reader["LineFilled"]);
-                                    //Change CanChangeProduct to false to prevent product being changed
-                                    purchaseOrderDetail.CanChangeProduct = false;
 
                                     purchaseOrderDetails.Add(purchaseOrderDetail);
                                 }

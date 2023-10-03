@@ -79,18 +79,6 @@ namespace RetailAppUI.ViewModels.Purchases
 			set 
 			{ 
 				_selectedIndex = value;
-				if (_selectedIndex >= 0)
-				{
-					//Once saved the product on an existing line cannot be changed
-					if (!PurchaseOrder.PurchaseOrderDetails[SelectedIndex].CanChangeProduct)
-					{
-						CanChangeProduct = false;
-					}
-					else
-					{
-						CanChangeProduct = true;
-					}
-				}
 				OnPropertyChanged(); 
 			}
 		}
@@ -148,15 +136,6 @@ namespace RetailAppUI.ViewModels.Purchases
 			get { return _OrderStatusEnabled; }
 			set { _OrderStatusEnabled = value; OnPropertyChanged(); }
 		}
-
-		private bool _canChangeProduct;
-		public bool CanChangeProduct
-		{
-			get { return _canChangeProduct; }
-			set { _canChangeProduct = value; OnPropertyChanged(); }
-		}
-
-
 
 		//Commands
 		public RelayCommand	CloseViewCommand { get; set; }
@@ -282,8 +261,7 @@ namespace RetailAppUI.ViewModels.Purchases
         {
 			return PurchaseOrder.PurchaseOrderDetails.Count > 0 && 
 				SelectedIndex >= 0 && 
-				!_state.Equals("View") 
-				&& CanChangeProduct == true;
+				!_state.Equals("View");
         }
 
         private void RemoveLine(object obj)
