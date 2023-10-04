@@ -276,7 +276,8 @@
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Auto"
                               MinRowHeight="25"
-                              IsReadOnly="{Binding TextReadOnly}">
+                              IsReadOnly="{Binding TextReadOnly}"
+                              MaxHeight="300">
 
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="Product" MinWidth="150">

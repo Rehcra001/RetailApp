@@ -1,0 +1,640 @@
+﻿<UserControl x:Class="RetailAppUI.Views.Purchases.PurchaseOrderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RetailAppUI.Views.Purchases"
+             mc:Ignorable="d" 
+             d:DesignHeight="740" d:DesignWidth="830">
+    <Grid Margin="20">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Purchase Order Management"
+           FontSize="25"
+           Foreground="White"
+           Grid.Column="0"
+           Grid.Row="0"
+           Grid.ColumnSpan="2"
+           HorizontalAlignment="Center"/>
+            <Button Grid.Column="1"                    
+        Content="X"
+        Width="30"
+        Margin="5,0,5,0"
+        HorizontalAlignment="Right"
+        VerticalContentAlignment="Center"
+        HorizontalContentAlignment="Center"
+        Style="{StaticResource ButtonTheme}"
+        Command="{Binding CloseViewCommand}"/>
+
+            <TabControl Grid.Column="1"
+                    Grid.Row="1"
+                    Margin="5"
+                    Background="Transparent"
+                    BorderThickness="0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border Name="border"
+                                        CornerRadius="5"
+                                        Margin="0,0,5,0"
+                                        Padding="5">
+                                        <ContentPresenter x:Name="contentSite"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center"
+                                                      ContentSource="Header">
+                                        </ContentPresenter>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+
+                                        <Trigger  Property="IsSelected" Value="True">
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter TargetName="border" Property="Background" Value="#FF4C70"/>
+                                        </Trigger>
+
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="False"/>
+                                                <Condition Property="IsMouseOver" Value="False"/>
+                                            </MultiTrigger.Conditions>
+                                            <MultiTrigger.Setters>
+                                                <Setter  TargetName="border"  Property="Background" Value="Transparent"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </MultiTrigger.Setters>
+                                        </MultiTrigger>
+
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="False"/>
+                                                <Condition Property="IsMouseOver" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <MultiTrigger.Setters>
+                                                <Setter  TargetName="border"  Property="Background" Value="LightPink"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </MultiTrigger.Setters>
+                                        </MultiTrigger>
+
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+
+                <!--Purchase Order Detail-->
+                <TabItem Header="Purchase Order Detail"
+                     FontSize="14">
+                    <!--Purchase order header-->
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="1">
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,20,0,0">
+
+                            <!--Purchase Order ID-->
+                            <TextBlock Text="Purchase Order #:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding PurchaseOrder.PurchaseOrderID}"
+                                     Width="100"
+                                     FontSize="14"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"
+                                     ToolTip="Automatically generated by the system on save"/>
+
+                            <!--Order Date-->
+                            <TextBlock Text="Order Date:"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="20,0,10,0"/>
+                            <TextBox Text="{Binding ElementName=orderDate, Path=SelectedDate, UpdateSourceTrigger=PropertyChanged, ConverterCulture=en-za}"
+                                     Width="82"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"
+                                     ToolTip="Select the date from the datepicker on the right"/>
+                            <DatePicker x:Name="orderDate"
+                                        SelectedDate="{Binding PurchaseOrder.OrderDate, 
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ConverterCulture=en-za}"
+                                        Width="30"
+                                        FontSize="14"
+                                        SelectedDateFormat="Short"
+                                        IsEnabled="{Binding DateEnabled}">
+                            </DatePicker>
+
+                            <!--Required Date-->
+                            <TextBlock Text="Required Date:"
+                                        Foreground="White"
+                                        HorizontalAlignment="Left"
+                                        FontSize="14"
+                                        Margin="20,0,10,0"/>
+                            <TextBox 
+                                     Text="{Binding ElementName=requiredDate, Path=SelectedDate, UpdateSourceTrigger=PropertyChanged, ConverterCulture=en-za}"
+                                     Width="82"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"
+                                     ToolTip="Select the date from the datepicker on the right"/>
+                            <DatePicker x:Name="requiredDate"
+                                        SelectedDate="{Binding PurchaseOrder.RequiredDate, 
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ConverterCulture=en-za}"
+                                        Width="30"                                
+                                        SelectedDateFormat="Short"
+                                        IsEnabled="{Binding DateEnabled}"/>
+                        </StackPanel>
+
+                        <!--Vendor-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,10,0,0">
+                            <TextBlock Text="Vendor:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <ComboBox Width="285"
+                                      FontSize="14"
+                                      Style="{StaticResource ComboBoxTheme}"
+                                      ItemsSource="{Binding Vendors}"
+                                      SelectedItem="{Binding SelectedVendor, UpdateSourceTrigger=LostFocus}"
+                                      ToolTip="Select a vendor from the drop down list"
+                                      Foreground="White"
+                                      IsEnabled="{Binding VendorEnabled}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding CompanyName}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <!--Vendor Reference Number-->
+                            <TextBlock Text="Vendor Reference:"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="26,0,12,0"/>
+                            <TextBox Text="{Binding PurchaseOrder.VendorReference}"
+                                     Width="150"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="{Binding TextReadOnly}"
+                                     ToolTip="Reference from Vendor. Usually a quote or sales order reference"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,10,0,0">
+
+                            <!--Order Amount-->
+                            <TextBlock Text="Order Amount:"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Width="150"/>
+                            <TextBox Text="{Binding PurchaseOrder.OrderAmount, StringFormat=N2}"
+                                     Width="100"
+                                     FontSize="14"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"
+                                     ToolTip="Total value of the order excluding VAT"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,10,0,0">
+
+                            <!--Vat Amount-->
+                            <TextBlock Text="VAT Amount:"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Width="150"/>
+                            <TextBox Text="{Binding PurchaseOrder.VATAmount, StringFormat=N2}"
+                                     Width="100"
+                                     FontSize="14"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"
+                                     ToolTip="VAT Amount. Zero if this is imported."/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,10,0,0">
+
+                            <!--Total Amount-->
+                            <TextBlock Text="Total Amount:"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Width="150"/>
+                            <TextBox Text="{Binding PurchaseOrder.TotalAmount, StringFormat=N2}"
+                                     Width="100"
+                                     FontSize="14"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"
+                                     ToolTip="Order amount plus VAT amount."/>
+
+                            <!--Imported-->
+                            <TextBlock Text="Imported:"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="100,0,10,0"/>
+                            <CheckBox IsChecked="{Binding PurchaseOrder.IsImport}"
+                                      ToolTip="Check the box if the order is an import"/>
+
+                            <!--Order Status-->
+                            <TextBlock Text="Order Status:"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="57,0,10,0"/>
+
+                            <ComboBox Width="90"
+                                      FontSize="14"
+                                      Style="{StaticResource ComboBoxTheme}"
+                                      ItemsSource="{Binding OrderStatuses}"
+                                      SelectedItem="{Binding PurchaseOrder.OrderStatus}"
+                                      ToolTip="Select a status from the drop down list."
+                                      Foreground="White"
+                                      IsEnabled="{Binding OrderStatusEnabled}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding OrderStatus}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+
+
+                        <!--Purchase order lines-->
+
+                        <Grid Width="735"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              Margin="0,50,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Purchase Order Lines"
+                                        Foreground="White"
+                                        FontSize="14"
+                                        VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal"
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Right">
+
+                                <Button Content="Add New Line"
+                                        Width="145"
+                                        Style="{StaticResource ButtonTheme}"
+                                        Margin="5"
+                                        Command="{Binding AddNewLineCommand}"
+                                        HorizontalAlignment="Right"/>
+
+                                <Button Content="Remove Selected Line"
+                                        Width="145"
+                                        Style="{StaticResource ButtonTheme}"
+                                        Margin="5"
+                                        Command="{Binding RemoveLineCommand}"
+                                        HorizontalAlignment="Right"/>
+                            </StackPanel>
+
+                        </Grid>
+
+                        <StackPanel>
+                            <DataGrid Grid.Column="1"
+                                      Grid.Row="1"
+                                      Margin="0,5,0,0"
+                                      Width="735"
+                                      HorizontalAlignment="Left"
+                                      ItemsSource="{Binding PurchaseOrderLines}"
+                                      SelectedIndex="{Binding SelectedIndex}"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      CanUserReorderColumns="False"
+                                      CanUserSortColumns="False"
+                                      AutoGenerateColumns="False"
+                                      SelectionMode="Single"
+                                      FontSize="14"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto"
+                                      MinRowHeight="25"
+                                      IsReadOnly="{Binding TextReadOnly}"
+                                      MaxHeight="280">
+
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Product" MinWidth="150">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Product.ProductName}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox  ItemsSource="{Binding RelativeSource={RelativeSource 
+                                                            Mode=FindAncestor,
+                                                            AncestorType={x:Type UserControl}},
+                                                            Path=DataContext.Products}"
+                                                          SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                          IsReadOnly="True">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding ProductName}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" MinWidth="100"/>
+                                    <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}" MinWidth="100"/>
+                                    <DataGridTextColumn Header="Unit Freight Cost" Binding="{Binding UnitFreightCost}" MinWidth="100"/>
+                                    <DataGridCheckBoxColumn Header="Line Filled" Binding="{Binding LineFilled}"/>
+                                    <DataGridTextColumn Header="On Order" Binding="{Binding Product.OnOrder}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="On Hand" Binding="{Binding Product.OnHand}" IsReadOnly="True"/>
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+                        </StackPanel>
+                    </StackPanel >
+                </TabItem>
+                <!--Purchase Order Receipts-->
+                <TabItem Header="Purchase Order Receipts"
+                     FontSize="14">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <DataGrid Margin="5" 
+                                  HorizontalAlignment="Center"
+                                  IsReadOnly="True"
+                                  AutoGenerateColumns="False"
+                                  CanUserSortColumns="False"
+                                  Padding="5,0,0,0"
+                                  FontSize="12"
+                                  SelectionMode="Single"
+                                  ItemsSource="{Binding PurchaseOrder}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding InventoryTransactions.TransactionID}"/>
+                                <DataGridTextColumn Header="Type" Binding="{Binding InventoryTransactions.TransactionType}"/>
+                                <DataGridTextColumn Header="Date" Binding="{Binding InventoryTransactions.TransactionDate}"/>
+                                <DataGridTextColumn Header="Product ID" Binding="{Binding InventoryTransactions.ProductID}"/>
+                                <DataGridTextColumn Header="Order ID" Binding="{Binding InventoryTransactions.OrderID}"/>
+                                <DataGridTextColumn Header="Quantity" Binding="{Binding InventoryTransactions.Quantity}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+
+                </TabItem>
+
+                <!--Vendor Detatil-->
+                <TabItem Header="Vendor Detail"
+                         FontSize="14">
+                    <StackPanel Orientation="Vertical"
+                                Grid.Column="1"
+                                Grid.Row="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+
+                        <!--Company Name-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Company Name:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.CompanyName}"
+                                     Width="350"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--Vat Registration Number-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Vat Number:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.VatRegistrationNumber}"
+                                        Width="100"
+                                        FontSize="14"
+                                        Style="{StaticResource NumericTextBoxTheme}"
+                                        IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--Address Line 1-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Address Line 1:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.AddressLine1}"
+                                     Width="350"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--Address Line 2-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Address Line 2:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.AddressLine2}"
+                                     Width="350"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--City-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="City:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.City}"
+                                     Width="200"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--Province-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Province:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.Province}"
+                                     Width="200"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--Postal Code-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Postal Code:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.PostalCode}"
+                                     Width="100"
+                                     FontSize="14"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Contact Details:"
+                                   Width="150"
+                                   Foreground="White"
+                                   HorizontalAlignment="Left"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,10"/>
+
+                        <!--First Name-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="First Name:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.FirstName}"
+                                     Width="350"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--Last Name-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Last Name:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.LastName}"
+                                     Width="350"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--EMail Address-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="EMail Address:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding Product.Vendor.EmailAddress}"
+                                     Width="350"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
+                        <!--Phone Number-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Phone Number:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox x:Name="txtPhoneAreaCode"
+                                     Text="{Binding Product.Vendor.PhoneAreaCode}"
+                                     Width="30"
+                                     FontSize="14"
+                                     HorizontalContentAlignment="Center"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+
+                            <TextBox x:Name="txtPhonePrefix"
+                                     Text="{Binding Product.Vendor.PhonePrefix}"
+                                     Width="30"
+                                     FontSize="14"
+                                     Margin="10,0,0,0"
+                                     HorizontalContentAlignment="Center"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+
+                            <TextBox x:Name="txtPhoneSuffix"
+                                     Text="{Binding Product.Vendor.PhoneSuffix}"
+                                     Width="40"
+                                     FontSize="14"
+                                     Margin="5,0,0,0"
+                                     HorizontalAlignment="Center"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+
+            </TabControl>
+
+
+
+            <!--Command Buttons-->
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="1"
+                        Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                <Button Content="Edit"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding EditCommand}"/>
+
+                <Button Content="Save"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding SaveCommand}"/>
+
+                <Button Content="Cancel"
+                        Width="75"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding CancelActionCommand}"/>
+
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</UserControl>

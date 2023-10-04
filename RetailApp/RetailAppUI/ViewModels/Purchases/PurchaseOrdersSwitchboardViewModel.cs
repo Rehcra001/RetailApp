@@ -137,7 +137,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void NavigateToPurchaseOrderView(object obj)
         {
-            throw new NotImplementedException();
+            Navigation.NavigateTo<PurchaseOrderViewModel>();
         }
 
         private bool CanClearGroupBy(object obj)
