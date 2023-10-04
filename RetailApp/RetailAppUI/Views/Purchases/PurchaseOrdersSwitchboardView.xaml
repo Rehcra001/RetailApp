@@ -97,7 +97,7 @@
 
                         </ComboBox>
 
-                        <Button Content="Get Orders by Vedor"
+                        <Button Content="Get Orders by Vendor"
                                 Command="{Binding GetPurchaseOrderByVendorCommand}"
                                 CommandParameter="{Binding ElementName=vendor, Path=SelectedValue.VendorID}"
                                 Style="{StaticResource ButtonTheme}"
@@ -118,22 +118,24 @@
                                VerticalAlignment="Center"/>
                     <TextBox FontSize="14"
                              Width="145"
-                             Text="{Binding PurchaseOrderFilter, UpdateSourceTrigger=PropertyChanged}"
+                             Text="{Binding PurchaseOrderIDFilter, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource TextBoxTheme}"/>
                 </StackPanel>
 
 
                 <DataGrid Margin="5" 
-                      ItemsSource="{Binding PurchaseOrders, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                      SelectedItem="{Binding SelectedPurchaseOrder}"
-                      HorizontalAlignment="Center"
-                      IsReadOnly="True"
-                      AutoGenerateColumns="False"
-                      HorizontalScrollBarVisibility="Visible"
-                      CanUserSortColumns="True"
-                      Padding="5,0,0,0"
-                      FontSize="12"
-                      SelectionMode="Single">
+                          ItemsSource="{Binding PurchaseOrderCollectionView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          SelectedItem="{Binding SelectedPurchaseOrder}"
+                          HorizontalAlignment="Center"
+                          IsReadOnly="True"
+                          AutoGenerateColumns="False"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          CanUserSortColumns="True"
+                          Padding="5,0,0,0"
+                          FontSize="12"
+                          SelectionMode="Single"
+                          MaxHeight="410">
                     <DataGrid.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.ContainerStyle>

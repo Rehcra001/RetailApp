@@ -6,14 +6,18 @@ using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 
 namespace RetailAppUI.ViewModels.Purchases
 {
     public class PurchaseOrdersSwitchboardViewModel : BaseViewModel
     {
         private PurchaseOrdersListManager _ordersListManager;
+        private string _groupByState = string.Empty;
 
         private INavigationService _navigation;
         public INavigationService Navigation
@@ -29,8 +33,17 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _connectionString = value; }
         }
 
-        private IEnumerable<PurchaseOrderHeaderModel> _purchaseOrders;
-        public IEnumerable<PurchaseOrderHeaderModel> PurchaseOrders
+        private ICurrentViewService _currentView;
+
+        public ICurrentViewService CurrentView
+        {
+            get { return _currentView; }
+            set { _currentView = value; }
+        }
+
+
+        private ObservableCollection<PurchaseOrderHeaderModel> _purchaseOrders;
+        public ObservableCollection<PurchaseOrderHeaderModel> PurchaseOrders
         {
             get { return _purchaseOrders; }
             set { _purchaseOrders = value; OnPropertyChanged(); }
@@ -57,21 +70,47 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _vendors = value; OnPropertyChanged(); }
         }
 
+        private ICollectionView _PurchaseOrderCollectionView;
+        public ICollectionView PurchaseOrderCollectionView
+        {
+            get { return _PurchaseOrderCollectionView; }
+            set { _PurchaseOrderCollectionView = value; }
+        }
+
+        private string _purchaseOrderIDFilter = string.Empty;     
+        public string PurchaseOrderIDFilter
+        {
+            get { return _purchaseOrderIDFilter; }
+            set { _purchaseOrderIDFilter = value; PurchaseOrderCollectionView.Refresh(); OnPropertyChanged(); }
+        }
+
 
         //commands
         public RelayCommand NavigateToAddNewPurchaseOrdertViewCommand { get; set; }
         public RelayCommand GetAllPurchaseOrdersCommand { get; set; }
         public RelayCommand GetPurchaseOrderByOrderStatusCommand { get; set; }
         public RelayCommand GetPurchaseOrderByVendorCommand { get; set; }
+        public RelayCommand CloseViewCommand { get; set; }
+        public RelayCommand GroupByOrderStatusCommand { get; set; }
+        public RelayCommand GroupByVendorCommand { get; set; }
+        public RelayCommand ClearGroupByCommand { get; set; }
+        public RelayCommand NavigateToPurchaseOrderViewCommand { get; set; }
 
 
-        public PurchaseOrdersSwitchboardViewModel(INavigationService navigation, IConnectionStringService connectionString)
+        public PurchaseOrdersSwitchboardViewModel(INavigationService navigation, IConnectionStringService connectionString, ICurrentViewService currentView)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
+            CurrentView = currentView;
 
             //Instantiate orders list manager
             _ordersListManager = new PurchaseOrdersListManager(ConnectionString.GetConnectionString());
+            //Instantiate PurchaseOrders
+            PurchaseOrders = new ObservableCollection<PurchaseOrderHeaderModel>();
+            //Add to collection view
+            PurchaseOrderCollectionView = CollectionViewSource.GetDefaultView(PurchaseOrders);
+            //Add filter on Purchase order ID
+            PurchaseOrderCollectionView.Filter = FilterPurchaseOrderID;
 
             //Retrieve Order status list
             GetOrderStatuses();
@@ -81,10 +120,88 @@ namespace RetailAppUI.ViewModels.Purchases
 
             //Instantiate commands
             NavigateToAddNewPurchaseOrdertViewCommand = new RelayCommand(NavigateToAddNewPurchaseOrdertView, CanNavigateToAddNewPurchaseOrdertView);
+            NavigateToPurchaseOrderViewCommand = new RelayCommand(NavigateToPurchaseOrderView, CanNavigateToPurchaseOrderView);
             GetAllPurchaseOrdersCommand = new RelayCommand(GetAllPurchaseOrders, CanGetAllPurchaseOrders);
             GetPurchaseOrderByOrderStatusCommand = new RelayCommand(GetPurchaseOrderByOrderStatus, CanGetPurchaseOrderByOrderStatus);
             GetPurchaseOrderByVendorCommand = new RelayCommand(GetPurchaseOrderByVendor, CanGetPurchaseOrderByVendor);
+            CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
+            GroupByOrderStatusCommand = new RelayCommand(GroupByOrderStatus, CanGroupByOrderStatus);
+            GroupByVendorCommand = new RelayCommand(GroupByVendor, CanGroupByVendor);
+            ClearGroupByCommand = new RelayCommand(ClearGroupBy, CanClearGroupBy);
+        }
 
+        private bool CanNavigateToPurchaseOrderView(object obj)
+        {
+            return SelectedPurchaseOrder != null;
+        }
+
+        private void NavigateToPurchaseOrderView(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool CanClearGroupBy(object obj)
+        {
+            return !_groupByState.Equals("Clear") && PurchaseOrders.Count > 0;
+        }
+
+        private void ClearGroupBy(object obj)
+        {
+            SetGroupByState("Clear");
+        }
+
+        private bool CanGroupByVendor(object obj)
+        {
+            return !_groupByState.Equals("Vendor") && PurchaseOrders.Count > 0;
+        }
+
+        private void GroupByVendor(object obj)
+        {
+            SetGroupByState("Vendor");
+        }
+
+        private bool CanGroupByOrderStatus(object obj)
+        {
+            return !_groupByState.Equals("OrderStatus") && PurchaseOrders.Count > 0;
+        }
+
+        private void GroupByOrderStatus(object obj)
+        {
+            SetGroupByState("OrderStatus");
+        }
+
+        private void SetGroupByState(string state)
+        {
+            _groupByState = state;
+
+            //Three states - Clear, OrderStatus, Vendor
+            //Clear - clear all groupings
+            //OrderStatus - group by order status
+            //Vendor - group by vendor
+
+            //Remove and groups added
+            if (PurchaseOrderCollectionView.GroupDescriptions.Count > 0)
+            {
+                PurchaseOrderCollectionView.GroupDescriptions.Clear();
+            }
+            switch (_groupByState)
+            {
+                case "OrderStatus":
+                    PurchaseOrderCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("OrderStatus.OrderStatus"));
+                    break;
+                case "Vendor":
+                    PurchaseOrderCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Vendor.CompanyName"));
+                    break;
+            }
+        }
+
+        private bool FilterPurchaseOrderID(object obj)
+        {
+            if (obj is PurchaseOrderHeaderModel purchaseOrder)
+            {
+                return purchaseOrder.PurchaseOrderID.ToString().Contains(PurchaseOrderIDFilter, StringComparison.InvariantCultureIgnoreCase);
+            }
+            return false;
         }
 
         private void GetVendors()
@@ -137,8 +254,9 @@ namespace RetailAppUI.ViewModels.Purchases
                 int id = (int)obj;
                 try
                 {
+                    SetGroupByState("OrderStatus");
                     _ordersListManager.GetByVendorID(id);
-                    PurchaseOrders = _ordersListManager.PurchaseOrders;
+                    GetOrders();
                 }
                 catch (Exception ex)
                 {
@@ -165,8 +283,9 @@ namespace RetailAppUI.ViewModels.Purchases
                 int id = (int)obj;
                 try
                 {
+                    SetGroupByState("Vendor");
                     _ordersListManager.GetByOrderStatusID(id);
-                    PurchaseOrders = _ordersListManager.PurchaseOrders;
+                    GetOrders();
                 }
                 catch (Exception ex)
                 {
@@ -185,8 +304,9 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             try
             {
+                SetGroupByState("OrderStatus");
                 _ordersListManager.GetAll();
-                PurchaseOrders = _ordersListManager.PurchaseOrders;
+                GetOrders();
             }
             catch (Exception ex)
             {
@@ -195,6 +315,14 @@ namespace RetailAppUI.ViewModels.Purchases
             }
         }
 
+        private void GetOrders()
+        {
+            PurchaseOrders.Clear();
+            foreach (PurchaseOrderHeaderModel order in _ordersListManager.PurchaseOrders)
+            {
+                PurchaseOrders.Add(order);
+            }
+        }
         private bool CanNavigateToAddNewPurchaseOrdertView(object obj)
         {
             return true;
@@ -204,5 +332,18 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             Navigation.NavigateTo<AddNewPurchaseOrderViewModel>();
         }
+
+        #region Close View
+        private bool CanCloseView(object obj)
+        {
+            return true;
+        }
+
+        private void CloseView(object obj)
+        {
+            CurrentView.CurrentView = "HomeView";
+            Navigation.NavigateTo<HomeViewModel>();
+        }
+        #endregion Close View
     }
 }
