@@ -874,6 +874,29 @@ BEGIN
 END;
 GO
 
+--**********Receipts**********
+--Returns a list of receipts per PurchaseOrderID
+--or an error message on failure
+CREATE PROCEDURE dbo.ups_GetReceiptsByPurchaseOrderID
+(
+	@PurchaseOrderID BIGINT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT ReceiptID, PurchaseOrderID, ProductID,
+			   ReceiptDate, QuantityReceipted, UnitCost
+		FROM Receipts
+		WHERE PurchaseOrderID = @PurchaseOrderID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
 --**********Inventory Transactions**********
 
 --Returns a list of inventory transactions per ProductID

@@ -264,7 +264,7 @@ CREATE TABLE dbo.Receipts
 	ReceiptID INT IDENTITY(1,1) PRIMARY KEY,
 	PurchaseOrderID BIGINT NOT NULL,
 	ProductID INT NOT NULL,
-	ReceiptDate DATETIME DEFAULT(GETDATE()) NOT NULL, --No need to insert date
+	ReceiptDate DATETIME DEFAULT(GETDATE()) NOT NULL, --No need to insert date but is allowed
 	QuantityReceipted INT NOT NULL,
 	UnitCost MONEY NOT NULL
 );
