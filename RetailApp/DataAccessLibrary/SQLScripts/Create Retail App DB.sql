@@ -284,7 +284,8 @@ CREATE TABLE dbo.Vendors
 	FirstName NVARCHAR(100) NOT NULL,
 	LastName NVARCHAR(100) NOT NULL,	
 	EMailAddress NVARCHAR(255) NOT NULL,
-	PhoneNumber NVARCHAR (10) NOT NULL
+	PhoneNumber NVARCHAR (10) NOT NULL,
+	InternationalVendor BIT DEFAULT(0) NOT NULL
 );
 GO
 

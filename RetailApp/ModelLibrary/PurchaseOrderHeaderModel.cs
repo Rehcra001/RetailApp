@@ -73,6 +73,11 @@
         public OrderStatusModel OrderStatus { get; set; } = new OrderStatusModel();
 
         /// <summary>
+        /// Holds the list of Receipts associated with this purchase order
+        /// </summary>
+        public IEnumerable<ReceiptModel> Receipts { get; set; } = new List<ReceiptModel>();
+
+        /// <summary>
         /// Holds Validation error strings
         /// </summary>
         public string? ValidationMessage { get; set; }

@@ -1,15 +1,17 @@
-﻿using DataAccessLibrary.PurchaseOrderDetailRepository;
-using DataAccessLibrary.PurchaseOrderHeaderRepository;
-using DataAccessLibrary.VATRepository;
-using ModelsLibrary;
+﻿using ModelsLibrary;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BussinessLogicLibrary.Purchases
 {
     public class PurchaseOrderManager
     {
-        private string _connectionString;
+        public PurchaseOrderHeaderModel PurchaseOrder { get; private set; } = new PurchaseOrderHeaderModel();
 
-        public PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
+        private string _connectionString;
 
         public PurchaseOrderManager(string connectionString)
         {
@@ -17,173 +19,167 @@ namespace BussinessLogicLibrary.Purchases
         }
 
         /// <summary>
-        /// Inserts this PurchaseOrder property into the database
-        /// </summary>
-        public void Insert()
-        {
-            //Check each purchase order detail in the list of purchase order details
-            if (PurchaseOrder.PurchaseOrderDetails.Count == 0)
-            {
-                //no order details exist
-                throw new Exception("A purchase order must contain at least one order line.");
-            }
-            else
-            {
-                //Does contain at least one order line
-                //Validate each order line
-                foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
-                {
-                    //check if the product in the order is not null
-                    if (orderLine.Product != default)
-                    {
-                        //not null
-                        //Set productID of OrderLine
-                        orderLine.ProductID = orderLine.Product.ProductID;
-                    }
-                    else
-                    {
-                        //Throw error
-                        throw new Exception("A product is missing from the order line");
-                    }
-
-                    //No purchase order ID yet
-                    //Validation to exclude purchase order ID                    
-                    if (!orderLine.ValidateExcludePurchaseOrderID())
-                    {
-                        //Validation error
-                        throw new Exception(orderLine.ValidationMessage);
-                    }
-                }
-
-                //no validation errors on order lines
-                //update purchase order header
-
-                //Check Vendor
-                if (PurchaseOrder.Vendor != default)
-                {
-                    //Vendor not null
-                    PurchaseOrder.VendorID = PurchaseOrder.Vendor.VendorID;
-                }
-                else
-                {
-                    throw new Exception("Vendor is missing. Please add a vendor.");
-                }
-
-                //Check Order status
-                if (PurchaseOrder.OrderStatus != default)
-                {
-                    //Order status not null
-                    PurchaseOrder.OrderStatusID = PurchaseOrder.OrderStatus.OrderStatusID;
-                }
-                else
-                {
-                    //throw error
-                    throw new Exception("Order Status is missing. Please add an order status.");
-                }
-
-                //Add total order amount excluding VAT
-                PurchaseOrder.OrderAmount = PurchaseOrder.PurchaseOrderDetails.Sum(x => x.Quantity * (x.UnitCost + x.UnitFreightCost));
-
-                //Check if import
-                if (!PurchaseOrder.IsImport)
-                {
-                    //Calculate Vat amount
-                    if (PurchaseOrder.VATPercentage != default)
-                    {
-                        PurchaseOrder.VATAmount = PurchaseOrder.OrderAmount * PurchaseOrder.VATPercentage;
-                    }
-                    else
-                    {
-                        //Add VAT Percentage
-                        Tuple<VatModel, string> vat = new VATRepository(_connectionString).Get().ToTuple();
-                        if (vat.Item2 == null)
-                        {
-                            //No errors
-                            PurchaseOrder.VATPercentage = vat.Item1.VatDecimal;
-                            PurchaseOrder.VATAmount = PurchaseOrder.OrderAmount * PurchaseOrder.VATPercentage;
-                        }
-                        else
-                        {
-                            throw new Exception(vat.Item2);
-                        }
-                    }
-
-                    //Add Total Amount
-                    PurchaseOrder.TotalAmount = PurchaseOrder.OrderAmount + PurchaseOrder.VATAmount; 
-                }
-                else
-                {
-                    //No vat if imported
-                    PurchaseOrder.TotalAmount = PurchaseOrder.OrderAmount;
-                }
-
-                //Validate purchase order header before saving to database
-                if (PurchaseOrder.Validate())
-                {
-                    Tuple<PurchaseOrderHeaderModel, string> purchaseHeader = new PurchaseOrderHeaderRepository(_connectionString).Insert(PurchaseOrder).ToTuple();
-                    //Check for errors
-                    if (purchaseHeader.Item2 == null)
-                    {
-                        //no errors
-                        //add purchase order id
-                        PurchaseOrder.PurchaseOrderID = purchaseHeader.Item1.PurchaseOrderID;
-                    }
-                    else
-                    {
-                        //error saving purchase order header
-                        throw new Exception(purchaseHeader.Item2);
-                    }
-                }
-                else
-                {
-                    //Validation errors
-                    throw new Exception(PurchaseOrder.ValidationMessage);
-                }
-
-                //Update each order line with the purchase order ID and save
-                foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
-                {
-                    orderLine.PurchaseOrderID = PurchaseOrder.PurchaseOrderID;
-                    
-                    //Validate and save order line
-                    if (orderLine.ValidateAll())
-                    {
-                        string errorMessage = new PurchaseOrderDetailRepository(_connectionString).Insert(orderLine);
-                        //Check for errors
-                        if (errorMessage != null)
-                        {
-                            //error raised
-                            throw new Exception(errorMessage);
-                        }
-                    }
-                    else
-                    {
-                        //Validation errors
-                        throw new Exception(orderLine.ValidationMessage);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Will use this PurchaseOrder property to update the 
-        /// corresponding data in the data base
-        /// </summary>
-        public void Update()
-        {
-
-        }
-
-        /// <summary>
-        /// Will set this PurchaseOrder property to the one 
-        /// retrieved from the database with the id passed in
+        /// Popluates this PurchaseOrder property
         /// </summary>
         /// <param name="id">
-        /// The purchase order ID of an existing purchase order
+        /// Takes in a purchase order ID of type long
         /// </param>
         public void GetByID(long id)
         {
-
+            PurchaseOrder = new GetPurchaseOrderManager(_connectionString).GetByID(id);
         }
+
+        public void SaveChanges()
+        {
+            // TODO - Add a UpdatePurchaseOrderManager
+        }
+
+        private void ChangeOrderStatus(OrderStatusModel that)
+        {
+            PurchaseOrder.OrderStatus = that;
+            PurchaseOrder.OrderStatusID = that.OrderStatusID;
+        }
+
+        /// <summary>
+        /// Checks if the current purcase order status may be changed
+        /// </summary>
+        /// <param name="that">
+        /// The order status to be changed to
+        /// </param>
+        /// <returns>
+        /// True: if status may change
+        /// False: if status may not change
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Throws an exception of type string if change is not allowed
+        /// </exception>
+        public bool CanChangeOrderStatus(OrderStatusModel that)
+        {
+            bool CanChange = false;
+            string message = "";
+
+            // TODO - Add logic to check if order status may be changed
+
+            switch (that.OrderStatus)
+            {
+                case "Open": //Changing to open
+                    if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Filled"))
+                    {
+                        message += "All order lines have been filled.\r\nIf a new order line is required,\r\n then please create a new purchase order";
+                        throw new Exception(message);
+                    }
+                    else
+                    {
+                        CanChange = true;
+                    }
+                    break;
+                case "Filled": //Changing to filled
+
+                    if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Completed") || PurchaseOrder.OrderStatus.OrderStatus!.Equals("Cancelled"))
+                    {
+                        message += "The order status must first be altered to open and fully receipted before changing the status to Filled";
+                        throw new Exception(message);
+                    }
+                    else if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+                    {
+                        //Check that all order lines have been fully receipted
+                        foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
+                        {
+                            //Try to find the corresponding receipt
+                            //if found then compare the quantities between each
+                            if (PurchaseOrder.Receipts.FirstOrDefault(x => x.ProductID == orderLine.ProductID) != default)
+                            {
+                                //Compare quantities
+                                ReceiptModel receipt = PurchaseOrder.Receipts.FirstOrDefault(x => x.ProductID == orderLine.ProductID)!;
+                                if (receipt.QuantityReceipted != orderLine.Quantity)
+                                {
+                                    message += "All order lines must be fully receipted before the order status can be changed to Filled";
+                                    throw new Exception(message);
+                                }
+                            }
+                            else
+                            {
+                                message += "All order lines must be fully receipted before the order status can be marked as Filled";
+                                throw new Exception(message);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Already marked as filled if this stage is reached
+                        //So no need to change
+                        CanChange = false;
+                    }
+                    break;
+                case "Completed": //Changing to completed
+                    //Only open orders can be changed to completed
+                    if (!PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+                    {
+                        message += "Only open purchase orders may be marked as completed";
+                        throw new Exception(message);
+                    }
+                    else
+                    {
+                        CanChange = true;
+                    }
+                        break;
+                case "Cancelled": //Changing to Cancelled
+                    //Only open orders can be changed to cancelled
+                    if (!PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+                    {
+                        message += "Only open purchase orders may be marked as completed";
+                        throw new Exception(message);
+                    }
+                    else
+                    {
+                        CanChange = true;
+                    }
+                    break;
+            }
+
+            if (CanChange)
+            {
+                //Update the order status
+                ChangeOrderStatus(that);
+            }
+
+            return CanChange;
+        }
+
+        public void AddOrderLine()
+        {
+            if (CanAddOrderLine())
+            {
+                PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
+            }
+            
+        }
+
+        private bool CanAddOrderLine()
+        {
+            bool CanAddLine = true;
+
+            // TODO - Add logic to check if a new order line may be added
+            //Check if the order status is open
+            if (!PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+            {
+                throw new Exception("Can only add a line if the order status is open.");
+            }
+
+            return CanAddLine;
+        }
+
+        public bool CanEditOrderLines()
+        {
+            if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

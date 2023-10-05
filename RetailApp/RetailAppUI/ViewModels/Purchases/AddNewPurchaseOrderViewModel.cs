@@ -279,7 +279,6 @@ namespace RetailAppUI.ViewModels.Purchases
 				}
 				//Refresh the collection view source
 				PurchaseOrderLines.Refresh();
-                Debug.Print(SelectedIndex.ToString());
             }
 			else
 			{
@@ -311,7 +310,7 @@ namespace RetailAppUI.ViewModels.Purchases
 			{
 				//Check data before adding a new line
 				ValidateLine();
-                ProductsLeftToOrder();
+                
             }
 			PurchaseOrderLines.Refresh();
             
@@ -369,7 +368,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
             if (isValid)
             {
-                //Remove the any selected product from the list of products as only one product type is allowed per purchase order
+                //Remove the selected product from the list of products as only one product type is allowed per purchase order
                 for (int i = 0; i < PurchaseOrder.PurchaseOrderDetails.Count; i++)
                 {
                     if (Products.Contains(PurchaseOrder.PurchaseOrderDetails[i].Product))
@@ -377,6 +376,7 @@ namespace RetailAppUI.ViewModels.Purchases
                         Products.Remove(PurchaseOrder.PurchaseOrderDetails[i].Product);
                     }
                 }
+                ProductsLeftToOrder();
             }
             else
             {

@@ -343,14 +343,14 @@
                                   Padding="5,0,0,0"
                                   FontSize="12"
                                   SelectionMode="Single"
-                                  ItemsSource="{Binding Product}">
+                                  ItemsSource="{Binding Product.InventoryTransactions}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding InventoryTransactions.TransactionID}"/>
-                                <DataGridTextColumn Header="Type" Binding="{Binding InventoryTransactions.TransactionType}"/>
-                                <DataGridTextColumn Header="Date" Binding="{Binding InventoryTransactions.TransactionDate}"/>
-                                <DataGridTextColumn Header="Product ID" Binding="{Binding InventoryTransactions.ProductID}"/>
-                                <DataGridTextColumn Header="Order ID" Binding="{Binding InventoryTransactions.OrderID}"/>
-                                <DataGridTextColumn Header="Quantity" Binding="{Binding InventoryTransactions.Quantity}"/>
+                                <DataGridTextColumn Header="ID" Binding="{Binding TransactionID}"/>
+                                <DataGridTextColumn Header="Type" Binding="{Binding TransactionType}"/>
+                                <DataGridTextColumn Header="Date" Binding="{Binding TransactionDate}"/>
+                                <DataGridTextColumn Header="Product ID" Binding="{Binding ProductID}"/>
+                                <DataGridTextColumn Header="Order ID" Binding="{Binding OrderID}"/>
+                                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>

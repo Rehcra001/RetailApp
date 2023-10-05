@@ -34,12 +34,19 @@ namespace RetailAppUI.ViewModels.Purchases
         }
 
         private ICurrentViewService _currentView;
-
         public ICurrentViewService CurrentView
         {
             get { return _currentView; }
             set { _currentView = value; }
         }
+
+        private ISharedDataService _sharedData;
+        public ISharedDataService SharedData
+        {
+            get { return _sharedData; }
+            set { _sharedData = value; }
+        }
+
 
 
         private ObservableCollection<PurchaseOrderHeaderModel> _purchaseOrders;
@@ -97,11 +104,13 @@ namespace RetailAppUI.ViewModels.Purchases
         public RelayCommand NavigateToPurchaseOrderViewCommand { get; set; }
 
 
-        public PurchaseOrdersSwitchboardViewModel(INavigationService navigation, IConnectionStringService connectionString, ICurrentViewService currentView)
+        public PurchaseOrdersSwitchboardViewModel(INavigationService navigation, IConnectionStringService connectionString, 
+                                                  ICurrentViewService currentView, ISharedDataService sharedData)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
             CurrentView = currentView;
+            SharedData = sharedData;
 
             //Instantiate orders list manager
             _ordersListManager = new PurchaseOrdersListManager(ConnectionString.GetConnectionString());
@@ -137,6 +146,8 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void NavigateToPurchaseOrderView(object obj)
         {
+            //Purchase order id to be passed to PurchaseOrderView
+            SharedData.SharedData = SelectedPurchaseOrder.PurchaseOrderID;
             Navigation.NavigateTo<PurchaseOrderViewModel>();
         }
 
