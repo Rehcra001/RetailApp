@@ -101,7 +101,7 @@ namespace RetailAppUI.ViewModels.Products
                 //error retrieving vendors
                 MessageBox.Show("Unable to retrieve the vendors.\r\n" + vendors.Item2, "Vendors Errror",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
-                // TODO - Add return to products switch board on error
+                Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
 
             //Add list of unit pers to UnitPers
@@ -116,7 +116,7 @@ namespace RetailAppUI.ViewModels.Products
                 //error retrieving unit pers
                 MessageBox.Show("Unable to retrieve the Units.\r\n" + unitPers.Item2, "Units Errror",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
-                // TODO - Add return to products switch board on error
+                Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
 
             //Add list of categories to Categories
@@ -131,7 +131,7 @@ namespace RetailAppUI.ViewModels.Products
                 //error retrieving Categories
                 MessageBox.Show("Unable to retrieve the categories.\r\n" + categories.Item2, "Categories Errror",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
-                // TODO - Add return to products switch board on error
+                Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
 
             //Instantiate commands

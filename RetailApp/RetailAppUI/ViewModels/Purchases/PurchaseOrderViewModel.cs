@@ -95,7 +95,6 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _selectPurchaseOrderLineIndex = value; OnPropertyChanged(); }
         }
 
-
         private bool _textReadOnly;
         public bool TextReadOnly
         {
@@ -201,7 +200,8 @@ namespace RetailAppUI.ViewModels.Purchases
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Cancel Changes", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message + "\r\nGoing back to Purchase Order Switchboard.", "Cancel Changes", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
                 }
             }            
         }
@@ -439,7 +439,16 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString());
             //fill _purchaseOrderManager PurchaseOrder property
-            _purchaseOrderManager.GetByID((long)SharedData.SharedData);
+            try
+            {
+                _purchaseOrderManager.GetByID((long)SharedData.SharedData);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error Retrieving Purchase Order", MessageBoxButton.OK, MessageBoxImage.Error);
+                Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
+            }
+            
             //Set PurchaseOrder = _purchaseOrderManager.PurchaseOrder property
             PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
             //Add order lines to a collection view
@@ -485,7 +494,7 @@ namespace RetailAppUI.ViewModels.Purchases
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Vendors Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
             }
 
         }

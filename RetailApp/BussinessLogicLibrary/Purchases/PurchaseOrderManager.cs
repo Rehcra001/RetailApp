@@ -58,8 +58,6 @@ namespace BussinessLogicLibrary.Purchases
             bool CanChange = false;
             string message = "";
 
-            // TODO - Add logic to check if order status may be changed
-
             switch (that.OrderStatus)
             {
                 case "Open": //Changing to open
@@ -159,7 +157,6 @@ namespace BussinessLogicLibrary.Purchases
         {
             bool CanAddLine = true;
 
-            // TODO - Add logic to check if a new order line may be added
             //Check if the order status is open
             if (!PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
             {

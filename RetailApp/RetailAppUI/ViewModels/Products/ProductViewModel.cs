@@ -285,7 +285,7 @@ namespace RetailAppUI.ViewModels.Products
             {
                 //Error retrieving categories
                 MessageBox.Show(categories.Item2, "Categories Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                // TODO - add return to products switch board on error
+                Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
         }
         #endregion Get Categories
@@ -306,7 +306,7 @@ namespace RetailAppUI.ViewModels.Products
             {
                 //error with unitPers
                 MessageBox.Show(unitPers.Item2, "UnitPer Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                // TODO - add return to products switch board on error
+                Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
         }
         #endregion Get Unit Pers
@@ -328,7 +328,7 @@ namespace RetailAppUI.ViewModels.Products
             {
 				//Error with vendors
 				MessageBox.Show(vendors.Item2, "Vendors Error", MessageBoxButton.OK, MessageBoxImage.Error);
-				// TODO - add return to products switch board on error
+                Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
         }
         #endregion Get Vendors

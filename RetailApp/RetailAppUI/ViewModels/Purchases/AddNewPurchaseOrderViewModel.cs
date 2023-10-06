@@ -5,6 +5,7 @@ using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
+using RetailAppUI.ViewModels.Products;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -438,8 +439,8 @@ namespace RetailAppUI.ViewModels.Purchases
 			{
 				//Error raised
 				MessageBox.Show(vendors.Item2, "Error retrieving vendors.", MessageBoxButton.OK, MessageBoxImage.Error);
-				// TODO - Add return to Purchase Order Switchboard
-			}
+                Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
+            }
         }
 
 		private void GetOrderStatuses()
@@ -456,7 +457,7 @@ namespace RetailAppUI.ViewModels.Purchases
 			{
                 //Error raised
                 MessageBox.Show(orderStatuses.Item2, "Error retrieving order statuses.", MessageBoxButton.OK, MessageBoxImage.Error);
-                // TODO - Add return to Purchase Order Switchboard
+                Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
             }
         }
 
@@ -469,8 +470,8 @@ namespace RetailAppUI.ViewModels.Purchases
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.Message, "Vendors Error", MessageBoxButton.OK, MessageBoxImage.Error);
-				return;
-			}
+                Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
+            }
 			
 		}
 
