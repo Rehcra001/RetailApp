@@ -92,11 +92,11 @@ namespace DataAccessLibrary.VendorRepository
                                 vendor.AddressLine2 = reader["AddressLine2"].ToString();
                                 vendor.City = reader["City"].ToString();
                                 vendor.Province = reader["Province"].ToString();
+                                vendor.Country = reader["Country"].ToString();
                                 vendor.PostalCode = reader["PostalCode"].ToString();
                                 vendor.EmailAddress = reader["EMailAddress"].ToString();
-                                vendor.PhoneAreaCode = reader["PhoneNumber"].ToString().Substring(0, 3);
-                                vendor.PhonePrefix = reader["PhoneNumber"].ToString().Substring(3, 3);
-                                vendor.PhoneSuffix = reader["PhoneNumber"].ToString().Substring(6, 4);
+                                vendor.PhoneNumber = reader["PhoneNumber"].ToString();
+                                vendor.InternationalVendor = Convert.ToBoolean(reader["InternationalVendor"]);
                                 vendors.Add(vendor);
                             }
                         }
@@ -144,11 +144,11 @@ namespace DataAccessLibrary.VendorRepository
                             vendor.AddressLine2 = reader["AddressLine2"].ToString();
                             vendor.City = reader["City"].ToString();
                             vendor.Province = reader["Province"].ToString();
+                            vendor.Country = reader["Country"].ToString();
                             vendor.PostalCode = reader["PostalCode"].ToString();
                             vendor.EmailAddress = reader["EMailAddress"].ToString();
-                            vendor.PhoneAreaCode = reader["PhoneNumber"].ToString().Substring(0, 3);
-                            vendor.PhonePrefix = reader["PhoneNumber"].ToString().Substring(3, 3);
-                            vendor.PhoneSuffix = reader["PhoneNumber"].ToString().Substring(6, 4);
+                            vendor.PhoneNumber = reader["PhoneNumber"].ToString();
+                            vendor.InternationalVendor = Convert.ToBoolean(reader["InternationalVendor"]);
                         }
                         else
                         {
@@ -188,8 +188,25 @@ namespace DataAccessLibrary.VendorRepository
                     command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = vendor.FirstName;
                     command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = vendor.LastName;
                     command.Parameters.Add("@CompanyName", SqlDbType.NVarChar).Value = vendor.CompanyName;
-                    command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = vendor.VatRegistrationNumber;
-                    command.Parameters.Add("AddressLine1", SqlDbType.NVarChar).Value = vendor.AddressLine1;
+
+                    if (string.IsNullOrWhiteSpace(vendor.VatRegistrationNumber))
+                    {
+                        command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = vendor.VatRegistrationNumber;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.AddressLine1))
+                    {
+                        command.Parameters.Add("@AddressLine1", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@AddressLine1", SqlDbType.NVarChar).Value = vendor.AddressLine1;
+                    }
+
                     if (string.IsNullOrWhiteSpace(vendor.AddressLine2))
                     {
                         command.Parameters.Add("@AddressLine2", SqlDbType.NVarChar).Value = DBNull.Value;
@@ -198,11 +215,55 @@ namespace DataAccessLibrary.VendorRepository
                     {
                         command.Parameters.Add("@AddressLine2", SqlDbType.NVarChar).Value = vendor.AddressLine2;
                     }
-                    command.Parameters.Add("@City", SqlDbType.NVarChar).Value = vendor.City;
-                    command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = vendor.Province;
-                    command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = vendor.PostalCode;
+
+                    if (string.IsNullOrWhiteSpace(vendor.City))
+                    {
+                        command.Parameters.Add("@City", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@City", SqlDbType.NVarChar).Value = vendor.City;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.Province))
+                    {
+                        command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = vendor.Province;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.Country))
+                    {
+                        command.Parameters.Add("@Country", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@Country", SqlDbType.NVarChar).Value = vendor.Country;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.PostalCode))
+                    {
+                        command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = vendor.PostalCode;
+                    }
+
                     command.Parameters.Add("@EMailAddress", SqlDbType.NVarChar).Value = vendor.EmailAddress;
-                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = (vendor.PhoneAreaCode + vendor.PhonePrefix + vendor.PhoneSuffix);
+
+                    if (string.IsNullOrWhiteSpace(vendor.PhoneNumber))
+                    {
+                        command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = vendor.PhoneNumber;
+                    }
+
+                    command.Parameters.Add("@InternationalVendor", SqlDbType.Bit).Value = vendor.InternationalVendor;
                     connection.Open();
 
                     //Database will return an ID if successful otherwise an error message
@@ -248,8 +309,25 @@ namespace DataAccessLibrary.VendorRepository
                     command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = vendor.FirstName;
                     command.Parameters.Add("@LastName", SqlDbType.NVarChar).Value = vendor.LastName;
                     command.Parameters.Add("@CompanyName", SqlDbType.NVarChar).Value = vendor.CompanyName;
-                    command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = vendor.VatRegistrationNumber;
-                    command.Parameters.Add("AddressLine1", SqlDbType.NVarChar).Value = vendor.AddressLine1;
+
+                    if (string.IsNullOrWhiteSpace(vendor.VatRegistrationNumber))
+                    {
+                        command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@VatRegistrationNumber", SqlDbType.NVarChar).Value = vendor.VatRegistrationNumber;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.AddressLine1))
+                    {
+                        command.Parameters.Add("@AddressLine1", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@AddressLine1", SqlDbType.NVarChar).Value = vendor.AddressLine1;
+                    }
+
                     if (string.IsNullOrWhiteSpace(vendor.AddressLine2))
                     {
                         command.Parameters.Add("@AddressLine2", SqlDbType.NVarChar).Value = DBNull.Value;
@@ -258,11 +336,55 @@ namespace DataAccessLibrary.VendorRepository
                     {
                         command.Parameters.Add("@AddressLine2", SqlDbType.NVarChar).Value = vendor.AddressLine2;
                     }
-                    command.Parameters.Add("@City", SqlDbType.NVarChar).Value = vendor.City;
-                    command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = vendor.Province;
-                    command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = vendor.PostalCode;
+
+                    if (string.IsNullOrWhiteSpace(vendor.City))
+                    {
+                        command.Parameters.Add("@City", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@City", SqlDbType.NVarChar).Value = vendor.City;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.Province))
+                    {
+                        command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@Province", SqlDbType.NVarChar).Value = vendor.Province;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.Country))
+                    {
+                        command.Parameters.Add("@Country", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@Country", SqlDbType.NVarChar).Value = vendor.Country;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(vendor.PostalCode))
+                    {
+                        command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = vendor.PostalCode;
+                    }
+
                     command.Parameters.Add("@EMailAddress", SqlDbType.NVarChar).Value = vendor.EmailAddress;
-                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = (vendor.PhoneAreaCode + vendor.PhonePrefix + vendor.PhoneSuffix);
+
+                    if (string.IsNullOrWhiteSpace(vendor.PhoneNumber))
+                    {
+                        command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = vendor.PhoneNumber;
+                    }
+
+                    command.Parameters.Add("@InternationalVendor", SqlDbType.Bit).Value = vendor.InternationalVendor;
                     connection.Open();
 
                     //if not error then "No Error" string is returned

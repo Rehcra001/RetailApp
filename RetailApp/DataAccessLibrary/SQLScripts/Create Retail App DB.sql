@@ -276,15 +276,16 @@ CREATE TABLE dbo.Vendors
 	VendorID INT IDENTITY(20000, 1) PRIMARY KEY,
 	CompanyName NVARCHAR(100) NOT NULL,
 	VatRegistrationNumber NVARCHAR(10),
-	AddressLine1 NVARCHAR(255) NOT NULL,
-	AddressLine2 NVARCHAR(255) NULL,
-	City NVARCHAR(50) NOT NULL,
-	Province NVARCHAR (50) NOT NULL,
-	PostalCode NVARCHAR (4) NOT NULL,
+	AddressLine1 NVARCHAR(255),
+	AddressLine2 NVARCHAR(255),
+	City NVARCHAR(50),
+	Province NVARCHAR (50),
+	Country NVARCHAR (100),
+	PostalCode NVARCHAR (15),
 	FirstName NVARCHAR(100) NOT NULL,
 	LastName NVARCHAR(100) NOT NULL,	
 	EMailAddress NVARCHAR(255) NOT NULL,
-	PhoneNumber NVARCHAR (10) NOT NULL,
+	PhoneNumber NVARCHAR (20),
 	InternationalVendor BIT DEFAULT(0) NOT NULL
 );
 GO

@@ -12,9 +12,11 @@ CREATE PROCEDURE dbo.usp_InsertVendor
 	@AddressLine2 NVARCHAR(255),
 	@City NVARCHAR(50),
 	@Province NVARCHAR(50),
-	@PostalCode NVARCHAR(10),
+	@Country NVARCHAR(100),
+	@PostalCode NVARCHAR(15),	
 	@EMailAddress NVARCHAR(255),
-	@PhoneNumber NVARCHAR(10)
+	@PhoneNumber NVARCHAR(20),
+	@InternationalVendor BIT
 )AS
 BEGIN
 	BEGIN TRY
@@ -31,9 +33,11 @@ BEGIN
 				AddressLine2,
 				City,
 				Province,
+				Country,
 				PostalCode,
 				EMailAddress,
-				PhoneNumber
+				PhoneNumber,
+				InternationalVendor
 			)
 			VALUES
 			(
@@ -45,9 +49,11 @@ BEGIN
 				@AddressLine2,
 				@City,
 				@Province,
+				@Country,
 				@PostalCode,
 				@EMailAddress,
-				@PhoneNumber
+				@PhoneNumber,
+				@InternationalVendor
 			);
 
 			SELECT SCOPE_IDENTITY() AS ID;
@@ -75,9 +81,11 @@ CREATE PROCEDURE dbo.usp_UpdateVendor
 	@AddressLine2 NVARCHAR(255),
 	@City NVARCHAR(50),
 	@Province NVARCHAR(50),
+	@Country NVARCHAR(100),
 	@PostalCode NVARCHAR(10),
 	@EMailAddress NVARCHAR(255),
-	@PhoneNumber NVARCHAR(10)
+	@PhoneNumber NVARCHAR(10),
+	@InternationalVendor BIT
 )AS
 BEGIN
 	BEGIN TRY
@@ -93,9 +101,11 @@ BEGIN
 				AddressLine2 = @AddressLine2,
 				City = @City,
 				Province = @Province,
+				Country = @Country,
 				PostalCode = @PostalCode,
 				EMailAddress = @EMailAddress,
-				PhoneNumber = @PhoneNumber
+				PhoneNumber = @PhoneNumber,
+				InternationalVendor = @InternationalVendor
 			WHERE VendorID	= @VendorID;
 
 			SELECT 'No Error' AS Message;
@@ -142,7 +152,7 @@ BEGIN
 		SET NOCOUNT ON;
 
 		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
-			   City, Province, PostalCode, EMailAddress, PhoneNumber
+			   City, Province, Country, PostalCode, EMailAddress, PhoneNumber, InternationalVendor
 		FROM dbo.Vendors
 		ORDER BY CompanyName;
 	END TRY
@@ -162,7 +172,7 @@ BEGIN
 		SET NOCOUNT ON;
 
 		SELECT VendorID, VatRegistrationNumber, FirstName, LastName, CompanyName, AddressLine1, AddressLine2,
-			   City, Province, PostalCode, EMailAddress, PhoneNumber
+			   City, Province, Country, PostalCode, EMailAddress, PhoneNumber, InternationalVendor
 		FROM dbo.Vendors
 		WHERE VendorID = @VendorID;
 	END TRY

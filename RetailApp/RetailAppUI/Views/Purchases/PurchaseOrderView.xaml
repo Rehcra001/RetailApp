@@ -400,8 +400,9 @@
                     <StackPanel Orientation="Vertical"
                                 Grid.Column="1"
                                 Grid.Row="1"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
+                                Margin="10,5,5,5"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
 
                         <!--Company Name-->
                         <StackPanel Orientation="Horizontal"
@@ -427,10 +428,20 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
                             <TextBox Text="{Binding PurchaseOrder.Vendor.VatRegistrationNumber}"
-                                        Width="100"
-                                        FontSize="14"
-                                        Style="{StaticResource NumericTextBoxTheme}"
-                                        IsReadOnly="True"/>
+                                     Width="100"
+                                     FontSize="14"
+                                     Style="{StaticResource NumericTextBoxTheme}"
+                                     IsReadOnly="True"/>
+
+                            <TextBlock Text="Is International Vendor:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"
+                                       Margin="20,0,0,0"/>
+                            <CheckBox IsChecked="{Binding PurchaseOrder.Vendor.InternationalVendor}"
+                                      IsEnabled="False"/>
+
                         </StackPanel>
 
                         <!--Address Line 1-->
@@ -472,16 +483,16 @@
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
                             <TextBox Text="{Binding PurchaseOrder.Vendor.City}"
-                                     Width="200"
-                                     FontSize="14"
-                                     Style="{StaticResource TextBoxTheme}"
-                                     IsReadOnly="True"/>
+                                        Width="200"
+                                        FontSize="14"
+                                        Style="{StaticResource TextBoxTheme}"
+                                        IsReadOnly="True"/>
                         </StackPanel>
 
                         <!--Province-->
                         <StackPanel Orientation="Horizontal"
                                     Margin="0,0,0,10">
-                            <TextBlock Text="Province:"
+                            <TextBlock Text="Province/State:"
                                        Width="150"
                                        Foreground="White"
                                        HorizontalAlignment="Left"
@@ -493,10 +504,25 @@
                                      IsReadOnly="True"/>
                         </StackPanel>
 
+                        <!--Country-->
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="Country:"
+                                       Width="150"
+                                       Foreground="White"
+                                       HorizontalAlignment="Left"
+                                       FontSize="14"/>
+                            <TextBox Text="{Binding PurchaseOrder.Vendor.Country}"
+                                     Width="250"
+                                     FontSize="14"
+                                     Style="{StaticResource TextBoxTheme}"
+                                     IsReadOnly="True"/>
+                        </StackPanel>
+
                         <!--Postal Code-->
                         <StackPanel Orientation="Horizontal"
                                     Margin="0,0,0,10">
-                            <TextBlock Text="Postal Code:"
+                            <TextBlock Text="Postal/ZIP Code:"
                                        Width="150"
                                        Foreground="White"
                                        HorizontalAlignment="Left"
@@ -569,29 +595,10 @@
                                        Foreground="White"
                                        HorizontalAlignment="Left"
                                        FontSize="14"/>
-                            <TextBox x:Name="txtPhoneAreaCode"
-                                     Text="{Binding PurchaseOrder.Vendor.PhoneAreaCode}"
-                                     Width="30"
+                            <TextBox Text="{Binding PurchaseOrder.Vendor.PhoneNumber}"
+                                     Width="150"
                                      FontSize="14"
                                      HorizontalContentAlignment="Center"
-                                     Style="{StaticResource TextBoxTheme}"
-                                     IsReadOnly="True"/>
-
-                            <TextBox x:Name="txtPhonePrefix"
-                                     Text="{Binding PurchaseOrder.Vendor.PhonePrefix}"
-                                     Width="30"
-                                     FontSize="14"
-                                     Margin="10,0,0,0"
-                                     HorizontalContentAlignment="Center"
-                                     Style="{StaticResource TextBoxTheme}"
-                                     IsReadOnly="True"/>
-
-                            <TextBox x:Name="txtPhoneSuffix"
-                                     Text="{Binding PurchaseOrder.Vendor.PhoneSuffix}"
-                                     Width="40"
-                                     FontSize="14"
-                                     Margin="5,0,0,0"
-                                     HorizontalAlignment="Center"
                                      Style="{StaticResource TextBoxTheme}"
                                      IsReadOnly="True"/>
                         </StackPanel>

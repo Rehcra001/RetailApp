@@ -100,7 +100,17 @@
                          Style="{StaticResource NumericTextBoxTheme}"
                          IsReadOnly="{Binding TextReadOnly}"
                          KeyDown="TxtNumericOnly_KeyDown"/>
-                    </StackPanel>
+
+                    <TextBlock Text="Is International Vendor:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"
+                               Margin="20,0,0,0"/>
+                        <CheckBox IsChecked="{Binding Vendor.InternationalVendor}"
+                                  IsEnabled="{Binding CheckEnabled}"/>
+
+                </StackPanel>
 
                     <!--Address Line 1-->
                     <StackPanel Orientation="Horizontal"
@@ -150,7 +160,7 @@
                     <!--Province-->
                     <StackPanel Orientation="Horizontal"
                         Margin="0,0,0,10">
-                        <TextBlock Text="Province:"
+                        <TextBlock Text="Province/State:"
                            Width="150"
                            Foreground="White"
                            HorizontalAlignment="Left"
@@ -161,11 +171,26 @@
                          Style="{StaticResource TextBoxTheme}"
                          IsReadOnly="{Binding TextReadOnly}"/>
                     </StackPanel>
-
-                    <!--Postal Code-->
+                    
+                    <!--Country-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Country:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
+                    <TextBox Text="{Binding Vendor.Country}"
+                             Width="250"
+                             FontSize="14"
+                             Style="{StaticResource TextBoxTheme}"
+                             IsReadOnly="{Binding TextReadOnly}"/>
+                </StackPanel>
+                    
+                <!--Postal Code-->
                     <StackPanel Orientation="Horizontal"
                         Margin="0,0,0,10">
-                        <TextBlock Text="Postal Code:"
+                        <TextBlock Text="Postal/ZIP Code:"
                            Width="150"
                            Foreground="White"
                            HorizontalAlignment="Left"
@@ -202,74 +227,49 @@
                     </StackPanel>
 
                     <!--Last Name-->
-                    <StackPanel Orientation="Horizontal"
-                        Margin="0,0,0,10">
-                        <TextBlock Text="Last Name:"
-                           Width="150"
-                           Foreground="White"
-                           HorizontalAlignment="Left"
-                           FontSize="14"/>
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Last Name:"
+                               Width="150"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               FontSize="14"/>
                         <TextBox Text="{Binding Vendor.LastName}"
-                         Width="350"
-                         FontSize="14"
-                         Style="{StaticResource TextBoxTheme}"
-                         IsReadOnly="{Binding TextReadOnly}"/>
+                                 Width="350"
+                                 FontSize="14"
+                                 Style="{StaticResource TextBoxTheme}"
+                                 IsReadOnly="{Binding TextReadOnly}"/>
                     </StackPanel>
 
                     <!--EMail Address-->
-                    <StackPanel Orientation="Horizontal"
-                        Margin="0,0,0,10">
-                        <TextBlock Text="EMail Address:"
-                           Width="150"
-                           Foreground="White"
-                           HorizontalAlignment="Left"
-                           FontSize="14"/>
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="EMail Address:"
+                                   Width="150"
+                                   Foreground="White"
+                                   HorizontalAlignment="Left"
+                                   FontSize="14"/>
                         <TextBox Text="{Binding Vendor.EmailAddress}"
-                         Width="350"
-                         FontSize="14"
-                         Style="{StaticResource TextBoxTheme}"
-                         IsReadOnly="{Binding TextReadOnly}"/>
+                                 Width="350"
+                                 FontSize="14"
+                                 Style="{StaticResource TextBoxTheme}"
+                                 IsReadOnly="{Binding TextReadOnly}"/>
                     </StackPanel>
 
                     <!--Phone Number-->
-                    <StackPanel Orientation="Horizontal"
-                        Margin="0,0,0,10">
-                        <TextBlock Text="Phone Number:"
-                           Width="150"
-                           Foreground="White"
-                           HorizontalAlignment="Left"
-                           FontSize="14"/>
-                        <TextBox x:Name="txtPhoneAreaCode"
-                         Text="{Binding Vendor.PhoneAreaCode}"
-                         Width="30"
-                         FontSize="14"
-                         HorizontalContentAlignment="Center"
-                         Style="{StaticResource TextBoxTheme}"
-                         IsReadOnly="{Binding TextReadOnly}"
-                         KeyDown="TxtNumericOnly_KeyDown"
-                         PreviewTextInput="TxtPhone_PreviewTextInput"/>
-
-                        <TextBox x:Name="txtPhonePrefix"
-                         Text="{Binding Vendor.PhonePrefix}"
-                         Width="30"
-                         FontSize="14"
-                         Margin="10,0,0,0"
-                         HorizontalContentAlignment="Center"
-                         Style="{StaticResource TextBoxTheme}"
-                         IsReadOnly="{Binding TextReadOnly}"
-                         KeyDown="TxtNumericOnly_KeyDown"
-                         PreviewTextInput="TxtPhone_PreviewTextInput"/>
-
-                        <TextBox x:Name="txtPhoneSuffix"
-                         Text="{Binding Vendor.PhoneSuffix}"
-                         Width="40"
-                         FontSize="14"
-                         Margin="5,0,0,0"
-                         HorizontalAlignment="Center"
-                         Style="{StaticResource TextBoxTheme}"
-                         IsReadOnly="{Binding TextReadOnly}"
-                         KeyDown="TxtNumericOnly_KeyDown"
-                         PreviewTextInput="TxtPhoneSuffix_PreviewTextInput"/>
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,10">
+                    <TextBlock Text="Phone Number:"
+                                   Width="150"
+                                   Foreground="White"
+                                   HorizontalAlignment="Left"
+                                   FontSize="14"/>
+                        <TextBox Text="{Binding Vendor.PhoneNumber}"
+                                 Width="150"
+                                 FontSize="14"
+                                 HorizontalContentAlignment="Center"
+                                 Style="{StaticResource TextBoxTheme}"
+                                 IsReadOnly="{Binding TextReadOnly}"/>                        
                     </StackPanel>
                 </StackPanel>
 

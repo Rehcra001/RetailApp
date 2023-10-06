@@ -39,6 +39,15 @@ namespace RetailAppUI.ViewModels.Adminstration
             set { _vendorIndex = value; OnPropertyChanged(); }
         }
 
+        private bool _checkEnabled;
+
+        public bool CheckEnabled
+        {
+            get { return _checkEnabled; }
+            set { _checkEnabled = value; OnPropertyChanged(); }
+        }
+
+
         public bool TextReadOnly { get => _textReadOnly; set { _textReadOnly = value; OnPropertyChanged(); }  }
 
         public INavigationService Navigation { get => _navigation; set { _navigation = value; OnPropertyChanged(); } }
@@ -241,9 +250,11 @@ namespace RetailAppUI.ViewModels.Adminstration
             {
                 case "View":
                     TextReadOnly = true;
+                    CheckEnabled = false;
                     break;
                 default:
                     TextReadOnly = false;
+                    CheckEnabled = true;
                     break;
             }
         }
