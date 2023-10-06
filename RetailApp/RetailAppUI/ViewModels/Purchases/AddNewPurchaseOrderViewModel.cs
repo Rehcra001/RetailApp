@@ -5,15 +5,11 @@ using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
-using RetailAppUI.ViewModels.Products;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -59,12 +55,23 @@ namespace RetailAppUI.ViewModels.Purchases
 
                     //Change the vendor on PurchaseOrder
                     PurchaseOrder.Vendor = _vendor;
+					//Set IsImported to Vendor selected
+					IsImported = PurchaseOrder.Vendor.InternationalVendor;
                     //Retrieve the list of products related to this vendor
                     GetVendorProducts(value.VendorID);
                 }
 				OnPropertyChanged();                
             }
 		}
+
+		private bool _isImported;
+
+		public bool IsImported
+		{
+			get { return _isImported; }
+			set { _isImported = value; PurchaseOrder.IsImport = _isImported; OnPropertyChanged(); }
+		}
+
 
 		private int _selectedIndex = -1;
 		public int SelectedIndex
