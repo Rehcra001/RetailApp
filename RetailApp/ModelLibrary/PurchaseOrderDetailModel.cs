@@ -34,14 +34,19 @@ namespace ModelsLibrary
         public decimal UnitFreightCost { get; set; }
 
         /// <summary>
-        /// Indicates if this line is complete
+        /// Holds the id of the order line status
         /// </summary>
-        public bool LineFilled { get; set; }
+        public int OrderLineStatusID { get; set; }
 
         /// <summary>
-        /// Holds the product detail for this purchase order detail
+        /// Holds the product detail for this purchase order line
         /// </summary>
         public ProductModel Product { get; set; } = new ProductModel();
+
+        /// <summary>
+        /// Holds the status detail for this purchase order line
+        /// </summary>
+        public OrderStatusModel OrderLineStatus { get; set; } = new OrderStatusModel();
 
         // TODO - Look at adding an order status line
 
