@@ -92,7 +92,7 @@ namespace RetailAppUI.ViewModels.Purchases
         public int SelectedPurchaseOrderLineIndex
         {
             get { return _selectPurchaseOrderLineIndex; }
-            set { _selectPurchaseOrderLineIndex = value; OnPropertyChanged(); }
+            set { _selectPurchaseOrderLineIndex = value; CanChangeProduct = IsNewLine(); OnPropertyChanged(); }
         }
 
         private bool _textReadOnly;
@@ -133,6 +133,13 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _canEditOderLines = value; OnPropertyChanged(); }
         }
 
+        private bool _canChangeProduct;
+
+        public bool CanChangeProduct
+        {
+            get { return _canChangeProduct; }
+            set { _canChangeProduct = value; OnPropertyChanged(); }
+        }
 
 
         public ICollectionView PurchaseOrderLines { get; set; }
@@ -175,7 +182,15 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void SavePurchaseOrder(object obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _purchaseOrderManager.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error Saving", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
         }
 
         private bool CanCancelAction(object obj)
@@ -208,14 +223,21 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private bool IsNewLine()
         {
-            if (PurchaseOrder.PurchaseOrderDetails[SelectedPurchaseOrderLineIndex].ProductID == 0)
+            if (SelectedPurchaseOrderLineIndex != -1)
             {
-                return true;
+                if (PurchaseOrder.PurchaseOrderDetails[SelectedPurchaseOrderLineIndex].ProductID == 0)
+                {
+                    //CanChangeProduct = true;
+                    return true;
+                }
+                else
+                {
+                    //CanChangeProduct = false;
+                    return false;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
+            
         }
         private bool CanRemoveLine(object obj)
         {

@@ -29,9 +29,12 @@ namespace BussinessLogicLibrary.Purchases
             PurchaseOrder = new GetPurchaseOrderManager(_connectionString).GetByID(id);
         }
 
+        /// <summary>
+        /// Saves any valid changes made to the purchase order
+        /// </summary>
         public void SaveChanges()
         {
-            // TODO - Add a UpdatePurchaseOrderManager
+            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder);
         }
 
         private void ChangeOrderStatus(OrderStatusModel that)
@@ -139,6 +142,7 @@ namespace BussinessLogicLibrary.Purchases
             {
                 //Update the order status
                 ChangeOrderStatus(that);
+                CanChange = true;
             }
 
             return CanChange;

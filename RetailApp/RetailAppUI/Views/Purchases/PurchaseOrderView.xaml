@@ -332,7 +332,7 @@
                                       IsEnabled="{Binding CanEditOrderLines}">
 
                                 <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="Product" MinWidth="150">
+                                    <DataGridTemplateColumn Header="Product" MinWidth="150" >
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding Product.ProductName}"/>
@@ -345,7 +345,11 @@
                                                             AncestorType={x:Type UserControl}},
                                                             Path=DataContext.Products}"
                                                           SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                          IsReadOnly="True">
+                                                          IsReadOnly="True"
+                                                          IsEnabled="{Binding RelativeSource={RelativeSource 
+                                                            Mode=FindAncestor,
+                                                            AncestorType={x:Type UserControl}},
+                                                            Path=DataContext.CanChangeProduct}">
                                                     <ComboBox.ItemTemplate>
                                                         <DataTemplate>
                                                             <TextBlock Text="{Binding ProductName}"/>

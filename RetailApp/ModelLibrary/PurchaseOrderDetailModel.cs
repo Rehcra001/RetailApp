@@ -43,6 +43,8 @@ namespace ModelsLibrary
         /// </summary>
         public ProductModel Product { get; set; } = new ProductModel();
 
+        // TODO - Look at adding an order status line
+
         /// <summary>
         /// Holds the Validation errors if any for this purchase order detail
         /// </summary>
