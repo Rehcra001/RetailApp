@@ -78,9 +78,9 @@ DECLARE @ID BIGINT;
 SELECT @ID = MAX(PurchaseOrderID) FROM dbo.PurchaseOrderHeader;
   --Insert Order lines
 INSERT INTO dbo.PurchaseOrderDetail
-(PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost)
+(PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID)
 VALUES
-(@ID, 10000, 5, 80, 0);
+(@ID, 10000, 5, 80, 0, 1);
 GO
 
 --Insert Purchase orders
@@ -95,9 +95,9 @@ DECLARE @ID BIGINT;
 SELECT @ID = MAX(PurchaseOrderID) FROM dbo.PurchaseOrderHeader;
   --Insert Order lines
 INSERT INTO dbo.PurchaseOrderDetail
-(PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost)
+(PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID)
 VALUES
-(@ID, 10000, 5, 80, 0);
+(@ID, 10000, 5, 80, 0, 1);
 GO
 
 --Receipt
@@ -107,11 +107,6 @@ VALUES
 (450000000, 10000, 3, 80);
 GO
 
---Mark line as complete
-UPDATE dbo.PurchaseOrderDetail
-SET LineFilled = 1
-WHERE PurchaseOrderID = 450000000 AND ProductID = 10000;
-GO
 
 --Insert another purchase order to test the stored Procedure used to update OnOrder quantity
 INSERT INTO dbo.PurchaseOrderHeader
@@ -128,9 +123,9 @@ DECLARE @ProductID INT = 10000;
 DECLARE @Quantity INT = 5;
 DECLARE @UnitCost MONEY = 80;
 DECLARE @UnitFreightCost MONEY = 0;
-DECLARE @LineFilled BIT = 0;
+DECLARE @OrderLineStatusID INT = 1;
 
 
-EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @LineFilled
+EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
   --Insert Order lines
 --****************************************************************************************************************

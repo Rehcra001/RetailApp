@@ -254,7 +254,7 @@ CREATE TABLE dbo.PurchaseOrderDetail
 	Quantity INT NOT NULL,
 	UnitCost MONEY NOT NULL,
 	UnitFreightCost MONEY DEFAULT(0) NOT NULL,
-	LineFilled BIT DEFAULT(0) NOT NULL
+	OrderLineStatusID INT NOT NULL
 );
 GO
 

@@ -664,13 +664,13 @@ BEGIN
 		WHERE ProductID = @ProductID AND 
 			  PurchaseOrderID IN (SELECT PurchaseOrderID
 								  FROM PurchaseOrderDetail
-								  WHERE ProductID = @ProductID AND LineFilled = 0)
+								  WHERE ProductID = @ProductID AND OrderLineStatusID = 1)--Open
 	),
 	QtyOnOrder AS
 	(
 		SELECT ISNULL(SUM(pd.Quantity),0) AS QtyOrdered
 		FROM dbo.PurchaseOrderDetail AS pd
-		WHERE ProductID = @ProductID AND LineFilled = 0
+		WHERE ProductID = @ProductID AND OrderLineStatusID = 1--Open
 	)
 	UPDATE dbo.Products
 	SET OnOrder = (QtyOrdered - TotalQtyReceipted)
@@ -1147,7 +1147,7 @@ CREATE PROCEDURE dbo.usp_InsertPurchaseOrderDetail
 	@Quantity INT,
 	@UnitCost MONEY,
 	@UnitFreightCost MONEY,
-	@LineFilled BIT
+	@OrderLineStatusID INT
 )AS
 BEGIN
 	BEGIN TRY
@@ -1161,7 +1161,7 @@ BEGIN
 				Quantity,
 				UnitCost,
 				UnitFreightCost,
-				LineFilled
+				OrderLineStatusID
 			)
 			VALUES
 			(
@@ -1170,7 +1170,7 @@ BEGIN
 				@Quantity,
 				@UnitCost,
 				@UnitFreightCost,
-				@LineFilled
+				@OrderLineStatusID
 			);
 
 			SELECT 'No Error' AS Message;
@@ -1200,7 +1200,7 @@ CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderDetail
 	@Quantity INT,
 	@UnitCost MONEY,
 	@UnitFreightCost MONEY,
-	@LineFilled BIT
+	@OrderLineStatusID INT
 )AS
 BEGIN
 	BEGIN TRY
@@ -1211,7 +1211,7 @@ BEGIN
 			SET Quantity = @Quantity,
 				UnitCost = @UnitCost,
 				UnitFreightCost = @UnitFreightCost,
-				LineFilled = @LineFilled
+				OrderLineStatusID = @OrderLineStatusID
 			WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
 
 			SELECT 'No Error' AS Message;
@@ -1236,7 +1236,7 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 
-		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, LineFilled
+		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID
 		FROM dbo.PurchaseOrderDetail;
 	END TRY
 
@@ -1254,7 +1254,7 @@ CREATE PROCEDURE dbo.usp_GetPurchaseOrderDetailByPurchaseOrderID
 )AS
 BEGIN
 	BEGIN TRY
-		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, LineFilled
+		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID
 		FROM dbo.PurchaseOrderDetail
 		WHERE PurchaseOrderID = @PurchaseOrderID;
 	END TRY
