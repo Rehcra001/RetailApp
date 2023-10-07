@@ -907,6 +907,8 @@ BEGIN
 END;
 GO
 
+
+
 --**********Inventory Transactions**********
 
 --Returns a list of inventory transactions per ProductID
@@ -1236,7 +1238,7 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 
-		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID
+		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, QuantityReceipted, OrderLineStatusID
 		FROM dbo.PurchaseOrderDetail;
 	END TRY
 
@@ -1254,7 +1256,7 @@ CREATE PROCEDURE dbo.usp_GetPurchaseOrderDetailByPurchaseOrderID
 )AS
 BEGIN
 	BEGIN TRY
-		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID
+		SELECT PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, QuantityReceipted, OrderLineStatusID
 		FROM dbo.PurchaseOrderDetail
 		WHERE PurchaseOrderID = @PurchaseOrderID;
 	END TRY
@@ -1264,6 +1266,27 @@ BEGIN
 	END CATCH;
 END;
 GO
+
+--Update a specific purchase order detail of ProductID with qty receipted
+CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted
+(
+	@PurchaseOrderID BIGINT,
+	@ProductID INT
+)AS
+BEGIN
+	--First sum the amount receipt so far
+	;WITH QtyReceipted AS(
+		SELECT ISNULL(SUM(QuantityReceipted), 0) AS QtyReceipted
+		FROM Receipts
+		WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID)
+
+	--Update the purchase order detail
+	UPDATE dbo.PurchaseOrderDetail
+	SET QuantityReceipted = (SELECT QtyReceipted FROM QtyReceipted)
+	WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
+END;
+GO
+
 
 --**********VAT**********
 --Get VAT
@@ -1286,13 +1309,13 @@ GO
 --GetAll
 --Returns a list of Order status
 --or an error message on failure
-CREATE PROCEDURE dbo.usp_GetAllOrderStatus AS
+CREATE PROCEDURE dbo.usp_GetAllStatus AS
 BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 
-		SELECT OrderStatusID, OrderStatus
-		FROM OrderStatusLK;
+		SELECT StatusID, [Status]
+		FROM StatusLK;
 	END TRY
 
 	BEGIN CATCH
@@ -1304,17 +1327,17 @@ GO
 --GetByID
 --Returns an order status
 --or an error message on failure
-CREATE PROCEDURE dbo.usp_GetOrderStatusByID
+CREATE PROCEDURE dbo.usp_GetStatusByID
 (
-	@OrderStatusID INT
+	@StatusID INT
 )AS
 BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 
-		SELECT OrderStatusID, OrderStatus
-		FROM OrderStatusLK
-		WHERE OrderStatusID = @OrderStatusID;
+		SELECT StatusID, Status
+		FROM StatusLK
+		WHERE StatusID = @StatusID;
 	END TRY
 
 	BEGIN CATCH

@@ -1,4 +1,5 @@
-﻿using ModelsLibrary;
+﻿using DataAccessLibrary.StatusRepository;
+using ModelsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,7 +93,7 @@ namespace BussinessLogicLibrary.Purchases
                             {
                                 //Compare quantities
                                 ReceiptModel receipt = PurchaseOrder.Receipts.FirstOrDefault(x => x.ProductID == orderLine.ProductID)!;
-                                if (receipt.QuantityReceipted != orderLine.Quantity)
+                                if (receipt.QuantityReceipted != orderLine.QuantityOrdered)
                                 {
                                     message += "All order lines must be fully receipted before the order status can be changed to Filled";
                                     throw new Exception(message);
@@ -123,7 +124,7 @@ namespace BussinessLogicLibrary.Purchases
                     {
                         CanChange = true;
                     }
-                        break;
+                    break;
                 case "Cancelled": //Changing to Cancelled
                     //Only open orders can be changed to cancelled
                     if (!PurchaseOrder.OrderStatus.Status!.Equals("Open"))
@@ -148,13 +149,32 @@ namespace BussinessLogicLibrary.Purchases
             return CanChange;
         }
 
+        private void GetOrderLineStatus(PurchaseOrderDetailModel orderLine)
+        {
+            Tuple<IEnumerable<StatusModel>, string> lineStatuses = new StatusRepository(_connectionString).GetAll().ToTuple();
+            //Check for errors
+            if (lineStatuses.Item2 == null)
+            {
+                //no errors
+                orderLine.OrderLineStatus = lineStatuses.Item1.First(x => x.Status!.Equals("Open"));
+                orderLine.OrderLineStatusID = orderLine.OrderLineStatus.StatusID;
+            }
+            else
+            {
+                throw new Exception(lineStatuses.Item2);
+            }
+        }
+
         public void AddOrderLine()
         {
             if (CanAddOrderLine())
             {
                 PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
+                int index = PurchaseOrder.PurchaseOrderDetails.Count - 1;
+                //Add order line status of open
+                GetOrderLineStatus(PurchaseOrder.PurchaseOrderDetails[index]);
             }
-            
+
         }
 
         private bool CanAddOrderLine()

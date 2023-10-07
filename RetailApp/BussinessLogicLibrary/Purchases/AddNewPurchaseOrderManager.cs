@@ -87,7 +87,7 @@ namespace BussinessLogicLibrary.Purchases
                 }
 
                 //Add total order amount excluding VAT
-                PurchaseOrder.OrderAmount = PurchaseOrder.PurchaseOrderDetails.Sum(x => x.Quantity * (x.UnitCost + x.UnitFreightCost));
+                PurchaseOrder.OrderAmount = PurchaseOrder.PurchaseOrderDetails.Sum(x => x.QuantityOrdered * (x.UnitCost + x.UnitFreightCost));
 
                 //Check if import
                 if (!PurchaseOrder.IsImport)

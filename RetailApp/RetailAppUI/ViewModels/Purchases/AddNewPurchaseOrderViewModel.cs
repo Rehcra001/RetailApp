@@ -370,7 +370,7 @@ namespace RetailAppUI.ViewModels.Purchases
                 isValid = false;
             }
             //Quantity added
-            if (PurchaseOrder.PurchaseOrderDetails[index].Quantity <= 0)
+            if (PurchaseOrder.PurchaseOrderDetails[index].QuantityOrdered <= 0)
             {
                 message += "Please enter the order quantity before adding a new line.\r\n";
                 isValid = false;

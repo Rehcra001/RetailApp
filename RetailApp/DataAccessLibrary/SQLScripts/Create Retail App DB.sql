@@ -193,15 +193,15 @@ CREATE TABLE dbo.Units
 GO
 
 --Look up table for order status
-CREATE TABLE dbo.OrderStatusLK
+CREATE TABLE dbo.StatusLK
 (
-	OrderStatusID INT IDENTITY(1,1) PRIMARY KEY,
-	OrderStatus NVARCHAR(10) UNIQUE NOT NULL
+	StatusID INT IDENTITY(1,1) PRIMARY KEY,
+	Status NVARCHAR(10) UNIQUE NOT NULL
 );
 GO
 
 --Fill OrderStatusLK
-INSERT INTO dbo.OrderStatusLK (OrderStatus)
+INSERT INTO dbo.StatusLK (Status)
 VALUES ('Open'), ('Completed'), ('Filled'), ('Cancelled');
 GO
 
@@ -225,7 +225,7 @@ CREATE TABLE dbo.SalesOrderDetail
 	Quantity INT NOT NULL,
 	UnitPrice MONEY NOT NULL,
 	UnitCost MONEY NOT NULL,
-	LineComplete BIT DEFAULT(0) NOT NULL
+	OrderLineStatusID INT DEFAULT(1) NOT NULL
 );
 GO
 
@@ -254,6 +254,7 @@ CREATE TABLE dbo.PurchaseOrderDetail
 	Quantity INT NOT NULL,
 	UnitCost MONEY NOT NULL,
 	UnitFreightCost MONEY DEFAULT(0) NOT NULL,
+	QuantityReceipted INT DEFAULt(0) NOT NULL,
 	OrderLineStatusID INT NOT NULL
 );
 GO
@@ -324,9 +325,9 @@ REFERENCES dbo.Customers(CustomerID)
 GO
 
 ALTER TABLE dbo.SalesOrderHeader
-ADD CONSTRAINT FK_SalesOrderHeader_OrderStatusLK_OrderStatusID
+ADD CONSTRAINT FK_SalesOrderHeader_StatusLK_OrderStatusID
 FOREIGN KEY (OrderStatusID)
-REFERENCES dbo.OrderStatusLK(OrderStatusID);
+REFERENCES dbo.StatusLK(StatusID);
 GO
 
 
@@ -346,6 +347,12 @@ ALTER TABLE dbo.SalesOrderDetail
 ADD CONSTRAINT FK_SalesOrderDetail_Products_ProductID
 FOREIGN KEY (ProductID)
 REFERENCES dbo.Products(ProductID);
+GO
+
+ALTER TABLE dbo.SalesOrderDetail
+ADD CONSTRAINT FK_SalesOrderDetail_StatusLK_OrderLineStatusID
+FOREIGN KEY (OrderLineStatusID)
+REFERENCES dbo.StatusLK(StatusID);
 GO
 
 --Products
@@ -380,9 +387,9 @@ REFERENCES dbo.Vendors(VendorID);
 GO
 
 ALTER TABLE dbo.PurchaseOrderHeader
-ADD CONSTRAINT FK_PurchaseOrderHeader_OrderStatusLK_OrderStatusID
+ADD CONSTRAINT FK_PurchaseOrderHeader_StatusLK_OrderStatusID
 FOREIGN KEY (OrderStatusID)
-REFERENCES dbo.OrderStatusLK(OrderStatusID);
+REFERENCES dbo.StatusLK(StatusID);
 GO
 
 --Purchase Order Detail
@@ -401,6 +408,12 @@ ALTER TABLE dbo.PurchaseOrderDetail
 ADD CONSTRAINT FK_PurchaseOrderDetail_Products_ProductID
 FOREIGN KEY (ProductID)
 REFERENCES dbo.Products(ProductID);
+GO
+
+ALTER TABLE dbo.PurchaseOrderDetail
+ADD CONSTRAINT FK_PurchaseOrderDetail_StatusLK_OrderLineStatusID
+FOREIGN KEY (OrderLineStatusID)
+REFERENCES dbo.StatusLK(StatusID);
 GO
 
 ALTER TABLE dbo.PurchaseOrderDetail

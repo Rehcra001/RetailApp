@@ -107,6 +107,9 @@ VALUES
 (450000000, 10000, 3, 80);
 GO
 
+--Update qty receipted in purchase order detail
+EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID = 450000000, @ProductID = 10000;
+
 
 --Insert another purchase order to test the stored Procedure used to update OnOrder quantity
 INSERT INTO dbo.PurchaseOrderHeader

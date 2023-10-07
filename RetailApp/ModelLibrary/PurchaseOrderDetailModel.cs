@@ -21,7 +21,7 @@ namespace ModelsLibrary
         /// <summary>
         /// Quantity of the product ordered
         /// </summary>
-        public int Quantity { get; set; }
+        public int QuantityOrdered { get; set; }
 
         /// <summary>
         /// Cost per unit of product (kg, meter etc)
@@ -32,6 +32,11 @@ namespace ModelsLibrary
         /// Freight cost per unit
         /// </summary>
         public decimal UnitFreightCost { get; set; }
+
+        /// <summary>
+        /// Holds the quantity receipted for this purchase order line
+        /// </summary>
+        public int QuantityReceipted { get; set; }
 
         /// <summary>
         /// Holds the id of the order line status
@@ -60,7 +65,7 @@ namespace ModelsLibrary
         /// Populates ValidationMessage if any validation errors found
         /// </summary>
         /// <returns>
-        /// Returns false if any validation errors found
+        /// Returns if all validations pass
         /// </returns>
         public bool ValidateAll()
         {
@@ -89,12 +94,12 @@ namespace ModelsLibrary
                 isValid = false;
             }
 
-            if (Quantity == 0)
+            if (QuantityOrdered == 0)
             {
                 ValidationMessage += "Quantity is required\r\n";
                 isValid = false;
             }
-            else if (Quantity < 0)
+            else if (QuantityOrdered < 0)
             {
                 ValidationMessage += "Quantity must be positive\r\n";
                 isValid = false;
@@ -117,9 +122,22 @@ namespace ModelsLibrary
                 isValid = false;
             }
 
+            if (OrderLineStatusID == 0)
+            {
+                ValidationMessage += "Purchase order line must have a status.\r\n";
+                isValid = false;
+            }
+
             return isValid;
         }
 
+        /// <summary>
+        /// Excludes the Purchase order ID when validating, 
+        /// Populates the ValidationMessage property with any validation errors
+        /// </summary>
+        /// <returns>
+        /// Returns true is all validations passed
+        /// </returns>
         public bool ValidateExcludePurchaseOrderID()
         {
             ValidationMessage = "";
@@ -136,12 +154,12 @@ namespace ModelsLibrary
                 isValid = false;
             }
 
-            if (Quantity == 0)
+            if (QuantityOrdered == 0)
             {
                 ValidationMessage += "Quantity is required\r\n";
                 isValid = false;
             }
-            else if (Quantity < 0)
+            else if (QuantityOrdered < 0)
             {
                 ValidationMessage += "Quantity must be positive\r\n";
                 isValid = false;
@@ -161,6 +179,12 @@ namespace ModelsLibrary
             if (UnitFreightCost < 0)
             {
                 ValidationMessage += "Unit freight cost must be positive.\r\n";
+                isValid = false;
+            }
+
+            if (OrderLineStatusID == 0)
+            {
+                ValidationMessage += "Purchase order line must have a status.\r\n";
                 isValid = false;
             }
 

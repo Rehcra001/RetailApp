@@ -5,6 +5,7 @@ using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.ReceiptRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using System.Numerics;
 
 namespace BussinessLogicLibrary.Purchases
 {
@@ -65,18 +66,31 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderLinesStatus()
         {
-            //Tuple<IEnumerable<StatusModel>
+            Tuple<IEnumerable<StatusModel>, string> lineStatuses = new StatusRepository(_connectionString).GetAll().ToTuple();
+            //Check for errors
+            if (lineStatuses.Item2 == null)
+            {
+                //no errors
+                foreach(PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
+                {
+                    orderLine.OrderLineStatus = lineStatuses.Item1.First(x => x.StatusID == orderLine.OrderLineStatusID);
+                }
+            }
+            else
+            {
+                throw new Exception(lineStatuses.Item2);
+            }
         }
 
         private void GetOrderLinesProduct()
         {
-            Tuple<IEnumerable<ProductModel>, string> products = new ProductRepository(_connectionString).GetAll().ToTuple();
+            Tuple<IEnumerable<ProductModel>, string> products = new ProductRepository(_connectionString).GetByVendorID(PurchaseOrder.VendorID).ToTuple();
             //Check for errors
             if (products.Item2 == null)
             {
                 foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
                 {
-                    orderLine.Product = products.Item1.FirstOrDefault(x => x.ProductID == orderLine.ProductID)!;
+                    orderLine.Product = products.Item1.First(x => x.ProductID == orderLine.ProductID);
                 }
             }
             else

@@ -25,7 +25,7 @@ namespace DataAccessLibrary.StatusRepository
                 {
                     command.Connection = connection;
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "dbo.usp_GetAllOrderStatus";
+                    command.CommandText = "dbo.usp_GetAllStatus";
                     connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -40,8 +40,8 @@ namespace DataAccessLibrary.StatusRepository
                                 while (reader.Read())
                                 {
                                     StatusModel status = new StatusModel();
-                                    status.StatusID = Convert.ToInt32(reader["OrderStatusID"]);
-                                    status.Status = reader["OrderStatus"].ToString();
+                                    status.StatusID = Convert.ToInt32(reader["StatusID"]);
+                                    status.Status = reader["Status"].ToString();
 
                                     statuses.Add(status);
                                 }
@@ -72,8 +72,8 @@ namespace DataAccessLibrary.StatusRepository
                 {
                     command.Connection = connection;
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "dbo.usp_GetOrderStatusByID";
-                    command.Parameters.Add("@OrderStatusID", SqlDbType.Int).Value = id;
+                    command.CommandText = "dbo.usp_GetStatusByID";
+                    command.Parameters.Add("@StatusID", SqlDbType.Int).Value = id;
                     connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -86,8 +86,8 @@ namespace DataAccessLibrary.StatusRepository
                             if (reader.HasRows)
                             {
                                 reader.Read();
-                                status.StatusID = Convert.ToInt32(reader["OrderStatusID"]);
-                                status.Status = reader["OrderStatus"].ToString();
+                                status.StatusID = Convert.ToInt32(reader["StatusID"]);
+                                status.Status = reader["Status"].ToString();
                             }
                         }
                         else

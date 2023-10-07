@@ -77,6 +77,13 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _orderStatuses = value; OnPropertyChanged(); }
         }
 
+        private ObservableCollection<StatusModel> _orderLineStatuses;
+        public ObservableCollection<StatusModel> OrderLineStatuses
+        {
+            get { return _orderLineStatuses; }
+            set { _orderLineStatuses = value; OnPropertyChanged(); }
+        }
+
         private ObservableCollection<ProductModel> _products;
         public ObservableCollection<ProductModel> Products
         {
@@ -85,7 +92,6 @@ namespace RetailAppUI.ViewModels.Purchases
         }
 
         private int _selectPurchaseOrderLineIndex = -1;
-
         public int SelectedPurchaseOrderLineIndex
         {
             get { return _selectPurchaseOrderLineIndex; }
@@ -158,7 +164,7 @@ namespace RetailAppUI.ViewModels.Purchases
             SharedData = sharedData;
 
             GetPurchaseOrder();
-            GetOrderStatuses();
+            GetStatuses();
             GetVendorProducts(PurchaseOrder.VendorID);
 
             //Instantiate RelayCommand's
@@ -350,7 +356,7 @@ namespace RetailAppUI.ViewModels.Purchases
                 isValid = false;
             }
             //Quantity added
-            if (PurchaseOrder.PurchaseOrderDetails[index].Quantity <= 0)
+            if (PurchaseOrder.PurchaseOrderDetails[index].QuantityOrdered <= 0)
             {
                 message += "Please enter the order quantity before adding a new line.\r\n";
                 isValid = false;
@@ -474,21 +480,22 @@ namespace RetailAppUI.ViewModels.Purchases
             PurchaseOrderLines = CollectionViewSource.GetDefaultView(PurchaseOrder.PurchaseOrderDetails);
         }
 
-        private void GetOrderStatuses()
+        private void GetStatuses()
         {
-            Tuple<IEnumerable<StatusModel>, string> orderStatuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            Tuple<IEnumerable<StatusModel>, string> statuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
             //check for errors
-            if (orderStatuses.Item2 == null)
+            if (statuses.Item2 == null)
             {
                 //No errors
-                OrderStatuses = new ObservableCollection<StatusModel>(orderStatuses.Item1);
+                OrderStatuses = new ObservableCollection<StatusModel>(statuses.Item1);
+                OrderLineStatuses = new ObservableCollection<StatusModel>(statuses.Item1);
 
                 //Set the selectOrderStatus to the current order status
                 SelectedOrderStatus = OrderStatuses.First(x => x.StatusID == PurchaseOrder.OrderStatusID);
             }
             else
             {
-                throw new Exception(orderStatuses.Item2);
+                throw new Exception(statuses.Item2);
             }
         }
 

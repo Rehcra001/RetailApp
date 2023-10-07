@@ -198,7 +198,7 @@ namespace RetailAppUI.ViewModels.Purchases
             switch (_groupByState)
             {
                 case "OrderStatus":
-                    PurchaseOrderCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("OrderStatus.OrderStatus"));
+                    PurchaseOrderCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("OrderStatus.Status"));
                     break;
                 case "Vendor":
                     PurchaseOrderCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Vendor.CompanyName"));
