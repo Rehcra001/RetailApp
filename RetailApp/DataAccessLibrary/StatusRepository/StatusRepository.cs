@@ -8,20 +8,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLibrary.OrderStatusRepository
+namespace DataAccessLibrary.StatusRepository
 {
-    public class OrderStatusRepository : IOrderStatusRepository
+    public class StatusRepository : IStatusRepository
     {
         private string _connectionString;
 
-        public OrderStatusRepository(string connectionString)
+        public StatusRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public (IEnumerable<OrderStatusModel>, string) GetAll()
+        public (IEnumerable<StatusModel>, string) GetAll()
         {
-            List<OrderStatusModel> orderStatuses = new List<OrderStatusModel>();
+            List<StatusModel> orderStatuses = new List<StatusModel>();
             string? errorMessage = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -44,9 +44,9 @@ namespace DataAccessLibrary.OrderStatusRepository
                             {
                                 while (reader.Read())
                                 {
-                                    OrderStatusModel orderStatus = new OrderStatusModel();
-                                    orderStatus.OrderStatusID = Convert.ToInt32(reader["OrderStatusID"]);
-                                    orderStatus.OrderStatus = reader["OrderStatus"].ToString();
+                                    StatusModel orderStatus = new StatusModel();
+                                    orderStatus.StatusID = Convert.ToInt32(reader["OrderStatusID"]);
+                                    orderStatus.Status = reader["OrderStatus"].ToString();
 
                                     orderStatuses.Add(orderStatus);
                                 }
@@ -66,9 +66,9 @@ namespace DataAccessLibrary.OrderStatusRepository
             return (orderStatuses, errorMessage); //Error message will be null if no error raised by database
         }
 
-        public (OrderStatusModel, string) GetByID(int id)
+        public (StatusModel, string) GetByID(int id)
         {
-            OrderStatusModel orderStatus = new OrderStatusModel();
+            StatusModel orderStatus = new StatusModel();
             string? errorMessage = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -91,8 +91,8 @@ namespace DataAccessLibrary.OrderStatusRepository
                             if (reader.HasRows)
                             {
                                 reader.Read();
-                                orderStatus.OrderStatusID = Convert.ToInt32(reader["OrderStatusID"]);
-                                orderStatus.OrderStatus = reader["OrderStatus"].ToString();
+                                orderStatus.StatusID = Convert.ToInt32(reader["OrderStatusID"]);
+                                orderStatus.Status = reader["OrderStatus"].ToString();
                             }
                         }
                         else

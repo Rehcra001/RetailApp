@@ -37,10 +37,10 @@ namespace BussinessLogicLibrary.Purchases
             new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder);
         }
 
-        private void ChangeOrderStatus(OrderStatusModel that)
+        private void ChangeOrderStatus(StatusModel that)
         {
             PurchaseOrder.OrderStatus = that;
-            PurchaseOrder.OrderStatusID = that.OrderStatusID;
+            PurchaseOrder.OrderStatusID = that.StatusID;
         }
 
         /// <summary>
@@ -56,15 +56,15 @@ namespace BussinessLogicLibrary.Purchases
         /// <exception cref="Exception">
         /// Throws an exception of type string if change is not allowed
         /// </exception>
-        public bool CanChangeOrderStatus(OrderStatusModel that)
+        public bool CanChangeOrderStatus(StatusModel that)
         {
             bool CanChange = false;
             string message = "";
 
-            switch (that.OrderStatus)
+            switch (that.Status)
             {
                 case "Open": //Changing to open
-                    if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Filled"))
+                    if (PurchaseOrder.OrderStatus.Status!.Equals("Filled"))
                     {
                         message += "All order lines have been filled.\r\nIf a new order line is required,\r\n then please create a new purchase order";
                         throw new Exception(message);
@@ -76,12 +76,12 @@ namespace BussinessLogicLibrary.Purchases
                     break;
                 case "Filled": //Changing to filled
 
-                    if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Completed") || PurchaseOrder.OrderStatus.OrderStatus!.Equals("Cancelled"))
+                    if (PurchaseOrder.OrderStatus.Status!.Equals("Completed") || PurchaseOrder.OrderStatus.Status!.Equals("Cancelled"))
                     {
                         message += "The order status must first be altered to open and fully receipted before changing the status to Filled";
                         throw new Exception(message);
                     }
-                    else if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+                    else if (PurchaseOrder.OrderStatus.Status!.Equals("Open"))
                     {
                         //Check that all order lines have been fully receipted
                         foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
@@ -114,7 +114,7 @@ namespace BussinessLogicLibrary.Purchases
                     break;
                 case "Completed": //Changing to completed
                     //Only open orders can be changed to completed
-                    if (!PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+                    if (!PurchaseOrder.OrderStatus.Status!.Equals("Open"))
                     {
                         message += "Only open purchase orders may be marked as completed";
                         throw new Exception(message);
@@ -126,7 +126,7 @@ namespace BussinessLogicLibrary.Purchases
                         break;
                 case "Cancelled": //Changing to Cancelled
                     //Only open orders can be changed to cancelled
-                    if (!PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+                    if (!PurchaseOrder.OrderStatus.Status!.Equals("Open"))
                     {
                         message += "Only open purchase orders may be marked as completed";
                         throw new Exception(message);
@@ -162,7 +162,7 @@ namespace BussinessLogicLibrary.Purchases
             bool CanAddLine = true;
 
             //Check if the order status is open
-            if (!PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+            if (!PurchaseOrder.OrderStatus.Status!.Equals("Open"))
             {
                 throw new Exception("Can only add a line if the order status is open.");
             }
@@ -172,7 +172,7 @@ namespace BussinessLogicLibrary.Purchases
 
         public bool CanEditOrderLines()
         {
-            if (PurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+            if (PurchaseOrder.OrderStatus.Status!.Equals("Open"))
             {
                 return true;
             }

@@ -78,7 +78,7 @@ namespace BussinessLogicLibrary.Purchases
                 if (PurchaseOrder.OrderStatus != default)
                 {
                     //Order status not null
-                    PurchaseOrder.OrderStatusID = PurchaseOrder.OrderStatus.OrderStatusID;
+                    PurchaseOrder.OrderStatusID = PurchaseOrder.OrderStatus.StatusID;
                 }
                 else
                 {

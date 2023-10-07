@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ModelsLibrary.RepositoryInterfaces
 {
-    public interface IOrderStatusRepository
+    public interface IStatusRepository
     {
-        (IEnumerable<OrderStatusModel>, string) GetAll();
-        (OrderStatusModel, string) GetByID(int id);
+        (IEnumerable<StatusModel>, string) GetAll();
+        (StatusModel, string) GetByID(int id);
     }
 }

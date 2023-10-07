@@ -1,4 +1,4 @@
-﻿using DataAccessLibrary.OrderStatusRepository;
+﻿using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
@@ -98,7 +98,7 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderStatus()
         {
-            Tuple<IEnumerable<OrderStatusModel>, string> orderStatuses = new OrderStatusRepository(_connectionString).GetAll().ToTuple();
+            Tuple<IEnumerable<StatusModel>, string> orderStatuses = new StatusRepository(_connectionString).GetAll().ToTuple();
 
             //Check for errors
             if (orderStatuses.Item2 == null)
@@ -113,11 +113,11 @@ namespace BussinessLogicLibrary.Purchases
             }
         }
 
-        private void AddOrderStatus(IEnumerable<OrderStatusModel> orderStatuses)
+        private void AddOrderStatus(IEnumerable<StatusModel> orderStatuses)
         {
             foreach (PurchaseOrderHeaderModel order in PurchaseOrders)
             {
-                order.OrderStatus = orderStatuses.First(x => x.OrderStatusID == order.OrderStatusID);
+                order.OrderStatus = orderStatuses.First(x => x.StatusID == order.OrderStatusID);
             }
         }
 

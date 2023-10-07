@@ -61,10 +61,10 @@
                                   Width="145"
                                   Margin="0,0,0,10"
                                   ItemsSource="{Binding OrderStatuses}"
-                                  SelectedValue="{Binding OrderStatusID}">
+                                  SelectedValue="{Binding StatusID}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding OrderStatus}" Foreground="White"/>
+                                    <TextBlock Text="{Binding Status}" Foreground="White"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
 
@@ -72,7 +72,7 @@
 
                         <Button Content="Get Orders by Status"
                                 Command="{Binding GetPurchaseOrderByOrderStatusCommand}"
-                                CommandParameter="{Binding ElementName=orderStatus, Path=SelectedValue.OrderStatusID}"
+                                CommandParameter="{Binding ElementName=orderStatus, Path=SelectedValue.StatusID}"
                                 Style="{StaticResource ButtonTheme}"
                                 Width="145"
                                 Margin="5,0,5,0"/>
@@ -169,7 +169,7 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Purchase Order" Binding="{Binding Path=PurchaseOrderID}"/>
-                        <DataGridTextColumn Header="Order Status" Binding="{Binding Path=OrderStatus.OrderStatus}"/>
+                        <DataGridTextColumn Header="Order Status" Binding="{Binding Path=OrderStatus.Status}"/>
                         <DataGridTextColumn Header="Vendor" Binding="{Binding Path=Vendor.CompanyName}"/>
                         <DataGridTextColumn Header="Vendor Reference" Binding="{Binding Path=VendorReference}"/>
                         <DataGridTextColumn Header="OrderDate" Binding="{Binding Path=OrderDate}"/>

@@ -46,7 +46,7 @@ namespace ModelsLibrary
         /// <summary>
         /// Holds the status detail for this purchase order line
         /// </summary>
-        public OrderStatusModel OrderLineStatus { get; set; } = new OrderStatusModel();
+        public StatusModel OrderLineStatus { get; set; } = new StatusModel();
 
         // TODO - Look at adding an order status line
 

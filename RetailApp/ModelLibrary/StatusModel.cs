@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace ModelsLibrary
 {
-    public class OrderStatusModel
+    public class StatusModel
     {
         /// <summary>
         /// Holds the unique order status ID
         /// </summary>
-        public int OrderStatusID { get; set; }
+        public int StatusID { get; set; }
 
         /// <summary>
         /// Holds the Order status Lookup Values 
         /// </summary>
-        public string? OrderStatus { get; set; }
+        public string? Status { get; set; }
     }
 }

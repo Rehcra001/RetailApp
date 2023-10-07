@@ -70,7 +70,7 @@
         /// <summary>
         /// Holds the Order status of this purchase order
         /// </summary>
-        public OrderStatusModel OrderStatus { get; set; } = new OrderStatusModel();
+        public StatusModel OrderStatus { get; set; } = new StatusModel();
 
         /// <summary>
         /// Holds the list of Receipts associated with this purchase order

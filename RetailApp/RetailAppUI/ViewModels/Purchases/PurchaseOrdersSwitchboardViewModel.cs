@@ -1,5 +1,5 @@
 ﻿using BussinessLogicLibrary.Purchases;
-using DataAccessLibrary.OrderStatusRepository;
+using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
@@ -63,8 +63,8 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _selectedPurchaseOrder = value; OnPropertyChanged(); }
         }
 
-        private IEnumerable<OrderStatusModel> _orderStatuses;
-        public IEnumerable<OrderStatusModel> OrderStatuses
+        private IEnumerable<StatusModel> _orderStatuses;
+        public IEnumerable<StatusModel> OrderStatuses
         {
             get { return _orderStatuses; }
             set { _orderStatuses = value; OnPropertyChanged(); }
@@ -234,12 +234,12 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetOrderStatuses()
         {
-            Tuple<IEnumerable<OrderStatusModel>, string> orderStatuses = new OrderStatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            Tuple<IEnumerable<StatusModel>, string> orderStatuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
             //Check for errors
             if (orderStatuses.Item2 == null)
             {
                 //No errors
-                OrderStatuses = orderStatuses.Item1.OrderBy(x => x.OrderStatusID);
+                OrderStatuses = orderStatuses.Item1.OrderBy(x => x.StatusID);
             }
             else
             {

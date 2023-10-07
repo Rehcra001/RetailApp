@@ -215,7 +215,7 @@
                               IsEnabled="{Binding OrderStatusEnabled}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding OrderStatus}"/>
+                                <TextBlock Text="{Binding Status}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
@@ -307,7 +307,7 @@
                             <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" MinWidth="100"/>
                             <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}" MinWidth="100"/>
                             <DataGridTextColumn Header="Unit Freight Cost" Binding="{Binding UnitFreightCost}" MinWidth="100"/>
-                            <DataGridCheckBoxColumn Header="Line Filled" Binding="{Binding LineFilled}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Line Status" Binding="{Binding OrderLineStatus.Status}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="On Order" Binding="{Binding Product.OnOrder}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="On Hand" Binding="{Binding Product.OnHand}" IsReadOnly="True"/>
                         </DataGrid.Columns>

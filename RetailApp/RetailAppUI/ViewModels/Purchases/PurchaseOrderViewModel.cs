@@ -1,17 +1,14 @@
 ﻿using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
-using DataAccessLibrary.OrderStatusRepository;
+using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
-using RetailAppUI.ViewModels.Products;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -52,8 +49,8 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _purchaseOrder = value; OnPropertyChanged(); }
         }
 
-        private OrderStatusModel _selectedOrderStatus;
-        public OrderStatusModel SelectedOrderStatus
+        private StatusModel _selectedOrderStatus;
+        public StatusModel SelectedOrderStatus
         {
             get { return _selectedOrderStatus; }
             set
@@ -73,8 +70,8 @@ namespace RetailAppUI.ViewModels.Purchases
             }
         }
 
-        private ObservableCollection<OrderStatusModel> _orderStatuses;
-        public ObservableCollection<OrderStatusModel> OrderStatuses
+        private ObservableCollection<StatusModel> _orderStatuses;
+        public ObservableCollection<StatusModel> OrderStatuses
         {
             get { return _orderStatuses; }
             set { _orderStatuses = value; OnPropertyChanged(); }
@@ -479,15 +476,15 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetOrderStatuses()
         {
-            Tuple<IEnumerable<OrderStatusModel>, string> orderStatuses = new OrderStatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            Tuple<IEnumerable<StatusModel>, string> orderStatuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
             //check for errors
             if (orderStatuses.Item2 == null)
             {
                 //No errors
-                OrderStatuses = new ObservableCollection<OrderStatusModel>(orderStatuses.Item1);
+                OrderStatuses = new ObservableCollection<StatusModel>(orderStatuses.Item1);
 
                 //Set the selectOrderStatus to the current order status
-                SelectedOrderStatus = OrderStatuses.First(x => x.OrderStatusID == PurchaseOrder.OrderStatusID);
+                SelectedOrderStatus = OrderStatuses.First(x => x.StatusID == PurchaseOrder.OrderStatusID);
             }
             else
             {

@@ -59,7 +59,7 @@ namespace BussinessLogicLibrary.Purchases
             if (existingLinesAltered || newLinesAdded)
             {
                 //Check header status - must be open
-                if (!_editedPurchaseOrder.OrderStatus.OrderStatus!.Equals("Open"))
+                if (!_editedPurchaseOrder.OrderStatus.Status!.Equals("Open"))
                 {
 
                 }

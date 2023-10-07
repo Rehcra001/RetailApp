@@ -1,6 +1,6 @@
 ﻿using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
-using DataAccessLibrary.OrderStatusRepository;
+using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
@@ -92,14 +92,15 @@ namespace RetailAppUI.ViewModels.Purchases
 			set { _vendors = value; OnPropertyChanged(); }
 		}
 
-		private ObservableCollection<OrderStatusModel> _orderStatuses;
-		public ObservableCollection<OrderStatusModel> OrderStatuses
+		private ObservableCollection<StatusModel> _orderStatuses;
+		public ObservableCollection<StatusModel> OrderStatuses
 		{
 			get { return _orderStatuses; }
 			set { _orderStatuses = value; OnPropertyChanged(); }
 		}
+		       
 
-		private ObservableCollection<ProductModel> _products;
+        private ObservableCollection<ProductModel> _products;
         private string _state;
 
         public ObservableCollection<ProductModel> Products
@@ -160,7 +161,7 @@ namespace RetailAppUI.ViewModels.Purchases
             _purchaseOrderManager = new AddNewPurchaseOrderManager(ConnectionString.GetConnectionString());
 			PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
 			//Set Order status to open
-			PurchaseOrder.OrderStatus = OrderStatuses.FirstOrDefault(x => x.OrderStatus == "Open")!;
+			PurchaseOrder.OrderStatus = OrderStatuses.FirstOrDefault(x => x.Status == "Open")!;
 			//Set Order date
 			PurchaseOrder.OrderDate = DateTime.Now;
 			//Add the purchase order lines to a collection view
@@ -311,8 +312,11 @@ namespace RetailAppUI.ViewModels.Purchases
 			//Check if PurchaseOrderDetails is null
 			else if (PurchaseOrder.PurchaseOrderDetails.Count == 0)
 			{
-                //Add a purchase order line
-                PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());				
+				//Add the first purchase order line
+				PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
+				//Any new lines added will only have a status of open
+				PurchaseOrder.PurchaseOrderDetails[0].OrderLineStatus = OrderStatuses.First(x => x.Status!.Equals("Open"));
+				PurchaseOrder.PurchaseOrderDetails[0].OrderLineStatusID = PurchaseOrder.PurchaseOrderDetails[0].OrderLineStatus.StatusID;
 			}
 			else
 			{
@@ -339,6 +343,10 @@ namespace RetailAppUI.ViewModels.Purchases
             {
                 //Add another purchase order line
                 PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
+				int index = PurchaseOrder.PurchaseOrderDetails.Count - 1; //find the order just added
+				//Any new lines added will only have a status of open
+				PurchaseOrder.PurchaseOrderDetails[index].OrderLineStatus = OrderStatuses.First(x => x.Status!.Equals("Open"));
+				PurchaseOrder.PurchaseOrderDetails[index].OrderLineStatusID = PurchaseOrder.PurchaseOrderDetails[0].OrderLineStatus.StatusID;
             }
             else
             {
@@ -452,13 +460,13 @@ namespace RetailAppUI.ViewModels.Purchases
 
 		private void GetOrderStatuses()
 		{
-			Tuple < IEnumerable < OrderStatusModel>, string > orderStatuses = new OrderStatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+			Tuple < IEnumerable < StatusModel>, string > orderStatuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
 			//Check for errors
 			if (orderStatuses.Item2 == null)
 			{
 				//No errors
 				//Only allow an order status of 'Open' when creating a new purchase order
-				OrderStatuses = new ObservableCollection<OrderStatusModel>(orderStatuses.Item1.Where(x => x.OrderStatus!.Equals("Open")));
+				OrderStatuses = new ObservableCollection<StatusModel>(orderStatuses.Item1.Where(x => x.Status!.Equals("Open")));
 			}
 			else
 			{
@@ -468,7 +476,7 @@ namespace RetailAppUI.ViewModels.Purchases
             }
         }
 
-		private void GetVendorProducts(int id)
+        private void GetVendorProducts(int id)
 		{
 			try
 			{

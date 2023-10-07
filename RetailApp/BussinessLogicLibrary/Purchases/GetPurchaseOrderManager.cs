@@ -1,4 +1,4 @@
-﻿using DataAccessLibrary.OrderStatusRepository;
+﻿using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
@@ -55,11 +55,17 @@ namespace BussinessLogicLibrary.Purchases
                 //No errors
                 PurchaseOrder.PurchaseOrderDetails = orderLines.Item1.ToList();
                 GetOrderLinesProduct();
+                GetOrderLinesStatus();
             }
             else
             {
                 throw new Exception(orderLines.Item2);
             }
+        }
+
+        private void GetOrderLinesStatus()
+        {
+            //Tuple<IEnumerable<StatusModel>
         }
 
         private void GetOrderLinesProduct()
@@ -96,7 +102,7 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderStatus()
         {
-            Tuple<OrderStatusModel, string> orderStatus = new OrderStatusRepository(_connectionString).GetByID(PurchaseOrder.OrderStatusID).ToTuple();
+            Tuple<StatusModel, string> orderStatus = new StatusRepository(_connectionString).GetByID(PurchaseOrder.OrderStatusID).ToTuple();
             //check for errors
             if (orderStatus.Item2 == null)
             {
