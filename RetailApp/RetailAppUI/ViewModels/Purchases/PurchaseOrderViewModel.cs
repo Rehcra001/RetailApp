@@ -55,18 +55,9 @@ namespace RetailAppUI.ViewModels.Purchases
             get { return _selectedOrderStatus; }
             set
             {
-                try
-                {
-                    if (_purchaseOrderManager.CanChangeOrderStatus(value))
-                    {
-                        _selectedOrderStatus = value;
-                        OnPropertyChanged();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Change Order Status", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                _selectedOrderStatus = value;
+                PurchaseOrder.OrderStatus = _selectedOrderStatus;
+                OnPropertyChanged();
             }
         }
 
@@ -188,6 +179,9 @@ namespace RetailAppUI.ViewModels.Purchases
             try
             {
                 _purchaseOrderManager.SaveChanges();
+                SelectedOrderStatus = OrderStatuses.First(x => x.StatusID == PurchaseOrder.OrderStatusID);
+                SetState("View");
+                PurchaseOrderLines.Refresh();
             }
             catch (Exception ex)
             {
@@ -204,8 +198,8 @@ namespace RetailAppUI.ViewModels.Purchases
         private void CancelAction(object obj)
         {
             MessageBoxResult result = MessageBox.Show("Are you sure you want to cancel these changes?\r\nThis will reloaded the view with the last saved purchase order",
-                                                      "Cancel Changes", MessageBoxButton.YesNo, 
-                                                      MessageBoxImage.Question, 
+                                                      "Cancel Changes", MessageBoxButton.YesNo,
+                                                      MessageBoxImage.Question,
                                                       MessageBoxResult.No);
             if (result == MessageBoxResult.Yes)
             {
@@ -221,7 +215,7 @@ namespace RetailAppUI.ViewModels.Purchases
                     MessageBox.Show(ex.Message + "\r\nGoing back to Purchase Order Switchboard.", "Cancel Changes", MessageBoxButton.OK, MessageBoxImage.Error);
                     Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
                 }
-            }            
+            }
         }
 
         private bool IsNewLine()
@@ -230,21 +224,19 @@ namespace RetailAppUI.ViewModels.Purchases
             {
                 if (PurchaseOrder.PurchaseOrderDetails[SelectedPurchaseOrderLineIndex].ProductID == 0)
                 {
-                    //CanChangeProduct = true;
                     return true;
                 }
                 else
                 {
-                    //CanChangeProduct = false;
                     return false;
                 }
             }
             return false;
-            
+
         }
         private bool CanRemoveLine(object obj)
         {
-            return !_state.Equals("View") && 
+            return !_state.Equals("View") &&
                    SelectedPurchaseOrderLineIndex != -1 &&
                    IsNewLine();
         }
@@ -298,13 +290,13 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private bool CanAddNewLine(object obj)
         {
-            return !_state.Equals("View") && Products != null && Products.Count > 0; 
+            return !_state.Equals("View") && Products != null && Products.Count > 0;
         }
 
         private void AddNewLine(object obj)
         {
             //Check data before adding a new line 
-            ValidateLine();            
+            ValidateLine();
         }
 
         private void ProductsLeftToOrder()
@@ -323,7 +315,7 @@ namespace RetailAppUI.ViewModels.Purchases
                 //Add another purchase order line
                 //check if a new line may be added
                 try
-                {                                       
+                {
                     _purchaseOrderManager.AddOrderLine();
                     PurchaseOrderLines.Refresh();
                 }
@@ -332,7 +324,7 @@ namespace RetailAppUI.ViewModels.Purchases
                     MessageBox.Show(ex.Message, "Add New Line", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                
+
             }
             else
             {
@@ -427,7 +419,7 @@ namespace RetailAppUI.ViewModels.Purchases
                     return;
                 }
             }
-            
+
         }
 
         private void SetState(string state)
@@ -473,7 +465,7 @@ namespace RetailAppUI.ViewModels.Purchases
                 MessageBox.Show(ex.Message, "Error Retrieving Purchase Order", MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
             }
-            
+
             //Set PurchaseOrder = _purchaseOrderManager.PurchaseOrder property
             PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
             //Add order lines to a collection view
@@ -503,8 +495,8 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             try
             {
-                List<ProductModel> products = new ProductsManager(ConnectionString.GetConnectionString()).GetByVendorID(id).ToList();                
-                
+                List<ProductModel> products = new ProductsManager(ConnectionString.GetConnectionString()).GetByVendorID(id).ToList();
+
                 //Remove any products from the list of products if the existing purchase order lines already have that product*
                 for (int i = 0; i < PurchaseOrder.PurchaseOrderDetails.Count; i++)
                 {

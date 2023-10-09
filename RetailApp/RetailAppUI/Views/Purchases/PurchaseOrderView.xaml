@@ -259,7 +259,7 @@
                                       FontSize="14"
                                       Style="{StaticResource ComboBoxTheme}"
                                       ItemsSource="{Binding OrderStatuses}"
-                                      SelectedItem="{Binding SelectedOrderStatus, UpdateSourceTrigger=LostFocus}"
+                                      SelectedItem="{Binding SelectedOrderStatus, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
                                       ToolTip="Select a status from the drop down list."
                                       Foreground="White"
                                       IsEnabled="{Binding OrderStatusEnabled}">
@@ -375,7 +375,7 @@
                                                           SelectedItem="{Binding OrderLineStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                                     <ComboBox.ItemTemplate>
                                                         <DataTemplate>
-                                                            <TextBlock Text="{Binding Status}"/>
+                                                            <TextBlock Text="{Binding Status, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
                                                         </DataTemplate>
                                                     </ComboBox.ItemTemplate>
                                                 </ComboBox>

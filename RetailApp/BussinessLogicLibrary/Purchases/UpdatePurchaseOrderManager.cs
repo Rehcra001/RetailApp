@@ -1,9 +1,11 @@
 ﻿using DataAccessLibrary.ReceiptRepository;
+using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +18,11 @@ namespace BussinessLogicLibrary.Purchases
         private bool existingLinesAltered = false;
         private bool newLinesAdded = false;
         private bool headerDetailsAltered = false;
+
+        private const int OPEN = 1;
+        private const int COMPLETED = 2;
+        private const int FILLED = 3;
+        private const int CANCELLED = 4;
 
         private string _connectionString;
 
@@ -49,33 +56,333 @@ namespace BussinessLogicLibrary.Purchases
 
         }
 
+        // TODO - Add validation to edited Purchase Order header
+
         private void ValidateOrderHeader()
         {
+            //Check all required fields have been completed
+            _editedPurchaseOrder.Validate();
+            if (!string.IsNullOrWhiteSpace(_editedPurchaseOrder.ValidationMessage))
+            {
+                throw new Exception(_editedPurchaseOrder.ValidationMessage);
+            }
 
+            CheckOrderDate();
+            CheckRequiredDate();
+            CheckVendor();
+            CheckVendorReference();
+            CheckImported();
+            CheckOrderAmount();
+            CheckVatAmount();
+            CheckTotalAmount();
+            CheckOrderStatus();
 
-            //Check if the order status has changed
-            //If existing lines have changed or new lines added
-            //then order status must be open
+            //If lines have been altered or added then update the order amount, Vat and Total Amount
             if (existingLinesAltered || newLinesAdded)
             {
-                //Check header status - must be open
-                if (!_editedPurchaseOrder.OrderStatus.Status!.Equals("Open"))
-                {
+               // UpdateHeaderAmounts();
+            }
 
+        }
+        private void UpdateHeaderAmounts()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CheckTotalAmount()
+        {
+            if (_editedPurchaseOrder.TotalAmount != _originalPurchaseOrder.TotalAmount)
+            {
+                string message = "Total amount may not be altered.\r\n";
+                message += "This will be automatically altered if necessary.";
+                throw new Exception(message);
+            }
+        }
+
+        private void CheckVatAmount()
+        {
+            if (_editedPurchaseOrder.VATAmount != _originalPurchaseOrder.VATAmount)
+            {
+                string message = "VAT amount may not be altered.\r\n";
+                message += "This will be automatically adjusted if necessary.";
+                throw new Exception(message);
+            }
+        }
+
+        private void CheckOrderAmount()
+        {
+            if (_editedPurchaseOrder.OrderAmount != _originalPurchaseOrder.OrderAmount)
+            {
+                string message = "Order amount may not be altered.\r\n";
+                message += "This will be automatically adjusted if necessary.";
+                throw new Exception(message);
+            }
+        }
+
+        private void CheckImported()
+        {
+            if (_editedPurchaseOrder.IsImport != _originalPurchaseOrder.IsImport)
+            {
+                string message = "Imported may not be altered, this is vendor dependent.";
+                throw new Exception(message);
+            }
+        }
+
+        private void CheckOrderStatus()
+        {
+            string status = _editedPurchaseOrder.OrderStatus.Status!;
+            //Order status must match all line states
+            switch (status)
+            {
+                case "Open":
+                    ValidateOpenOrderStatus();
+                    break;
+                case "Completed":
+                    ValidateCompletedOrderStatus();
+                    break;
+                case "Filled":
+                    ValidateFilledOrderStatus();
+                    break;
+                case "Cancelled":
+                    ValidateCancelledOrderStatus();
+                    break;
+            }
+        }
+
+        private void ValidateCancelledOrderStatus()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ValidateFilledOrderStatus()
+        {
+            //can only be filled if all lines are fully receipted
+            bool linesFilled = true;
+            foreach (PurchaseOrderDetailModel orderLine in _editedPurchaseOrder.PurchaseOrderDetails)
+            {
+                if (orderLine.QuantityReceipted < orderLine.QuantityOrdered)
+                {
+                    linesFilled = false;
+                }
+                else
+                {
+                    //line is fully receipted check line status must be filled if not change to filled
+                    if (!orderLine.OrderLineStatus.Status!.Equals("Filled"))
+                    {
+                        orderLine.OrderLineStatus = GetStatus(FILLED);
+                        orderLine.OrderLineStatusID = orderLine.OrderLineStatus.StatusID;
+                        
+                    }
                 }
             }
 
-            //validate the data entered into header
-            _editedPurchaseOrder.Validate();
+            if (!linesFilled)
+            {
+                string message = "All lines must be fully receipted before order can be marked as filled";
+                throw new Exception(message);
+            }
+            else
+            {
+                headerDetailsAltered = true;
+                _editedPurchaseOrder.OrderStatusID = _editedPurchaseOrder.OrderStatus.StatusID;
+            }
+
+        }
+
+        private void ValidateCompletedOrderStatus()
+        {
+            //Order Status is Completed here
+            //At least one line should be completed or open with partial receipt
+
+            //if no lines have any thing receipted it cannot be marked as completed
+            bool partialReceipt = false;
+            foreach (PurchaseOrderDetailModel orderLine in _editedPurchaseOrder.PurchaseOrderDetails)
+            {
+                if (orderLine.QuantityReceipted > 0 && orderLine.QuantityReceipted < orderLine.QuantityOrdered)
+                {
+                    //Partial receipted
+                    partialReceipt = true;
+                }
+            }
+
+            if (partialReceipt)
+            {
+                //Changed all open partially receipted lines to completed
+                //and all open lines with no receipts to cancelled
+                foreach (PurchaseOrderDetailModel orderLine in _editedPurchaseOrder.PurchaseOrderDetails)
+                {
+                    if (orderLine.OrderLineStatus.Status!.Equals("Open"))
+                    {
+                        if (orderLine.QuantityReceipted > 0 && orderLine.QuantityReceipted < orderLine.QuantityOrdered)
+                        {
+                            //paritial
+                            orderLine.OrderLineStatus = GetStatus(COMPLETED);
+                            orderLine.OrderLineStatusID = orderLine.OrderLineStatus.StatusID;
+                        }
+                        else
+                        {
+                            orderLine.OrderLineStatus = GetStatus(CANCELLED);
+                            orderLine.OrderLineStatusID = orderLine.OrderLineStatus.StatusID;
+                        }
+                    }
+                }
+                _editedPurchaseOrder.OrderStatusID = _editedPurchaseOrder.OrderStatus.StatusID;
+                headerDetailsAltered = true;
+            }
+            else
+            {
+                string message = "At least one line must be partially receipted to change the order status to completed";
+                throw new Exception(message);
+            }
+
+        }
+
+        private void ValidateOpenOrderStatus()
+        {
+            //Order status is open here
+            //At least one line must be open if not mark as complete or cancelled
+            if (!newLinesAdded || !existingLinesAltered)
+            {
+                bool lineOpen = false;
+                bool lineCompleted = false;
+                bool lineCancelled = false;
+                bool lineFilled = false;
+                foreach (PurchaseOrderDetailModel orderLine in _editedPurchaseOrder.PurchaseOrderDetails)
+                {
+                    if (orderLine.OrderLineStatus.Status!.Equals("Open"))
+                    {
+                        lineOpen = true;
+                    }
+                    else if (orderLine.OrderLineStatus.Status!.Equals("Completed"))
+                    {
+                        lineCompleted = true;
+                    }
+                    else if (orderLine.OrderLineStatus.Status!.Equals("Cancelled"))
+                    {
+                        lineCancelled = true;
+                    }
+                    else if (orderLine.OrderLineStatus.Status!.Equals("Filled"))
+                    {
+                        lineFilled = true;
+                    }
+                }
+                //no lines open 
+                if (!lineOpen)
+                {
+                    if (lineCompleted)
+                    {
+                        //Mark order as completed
+                        _editedPurchaseOrder.OrderStatus = GetStatus(COMPLETED);
+                        _editedPurchaseOrder.OrderStatusID = _editedPurchaseOrder.OrderStatus.StatusID;
+                        headerDetailsAltered = true;
+                    }
+                    else if (!lineCompleted && !lineFilled && lineCancelled)
+                    {
+                        //Mark order as Cancelled
+                        _editedPurchaseOrder.OrderStatus = GetStatus(CANCELLED);
+                        _editedPurchaseOrder.OrderStatusID = _editedPurchaseOrder.OrderStatus.StatusID;
+                        headerDetailsAltered = true;
+                    }
+                }
+                else
+                {
+                    //check if the order quantity was altered to suit a partial receipt
+                    foreach (PurchaseOrderDetailModel orderLine in _editedPurchaseOrder.PurchaseOrderDetails)
+                    {
+                        if (orderLine.OrderLineStatus.Status!.Equals("Open") && orderLine.QuantityOrdered == orderLine.QuantityReceipted)
+                        {
+                            //Change line to filled
+                            orderLine.OrderLineStatus = GetStatus(FILLED);
+                            orderLine.OrderLineStatusID = orderLine.OrderLineStatus.StatusID;
+                        }
+                    }
+                    //Check if all lines are now filled
+                    //if this is the case then the order status of open must be altered to Filled
+                    bool allLineFilled = true;
+                    foreach (PurchaseOrderDetailModel orderLine in _editedPurchaseOrder.PurchaseOrderDetails)
+                    {
+                        if (!orderLine.OrderLineStatus.Status!.Equals("Filled"))
+                        {
+                            allLineFilled = false;
+                        }
+                    }
+                    if (allLineFilled)
+                    {
+                        //Change order status to filled
+                        _editedPurchaseOrder.OrderStatus = GetStatus(FILLED);
+                        _editedPurchaseOrder.OrderStatusID = _editedPurchaseOrder.OrderStatus.StatusID;
+                        headerDetailsAltered = true;
+                    }
+                }
+            }
+        }
+
+        private StatusModel GetStatus(int id)
+        {
+            StatusModel status = new StatusModel();
+            Tuple<StatusModel, string> statusData = new StatusRepository(_connectionString).GetByID(id).ToTuple();
+            //check for errors
+            if (statusData.Item2 == null)
+            {
+                //No error
+                status = statusData.Item1;
+            }
+            else
+            {
+                throw new Exception(statusData.Item2);
+            }
+            return status;
+        }
+
+        private void CheckVendorReference()
+        {
+            if (_editedPurchaseOrder.VendorReference != _originalPurchaseOrder.VendorReference)
+            {
+                headerDetailsAltered = true;
+            }
+        }
+
+        private void CheckVendor()
+        {
+            //The vendor may not be changed as this is an existing order
+            if (_editedPurchaseOrder.Vendor.VendorID != _originalPurchaseOrder.Vendor.VendorID)
+            {
+                string message = "The vendor may not be changed on an existing order.";
+                throw new Exception(message);
+            }
+        }
+
+        private void CheckRequiredDate()
+        {
+            //check if required date was altered
+            if (_editedPurchaseOrder.RequiredDate != _originalPurchaseOrder.RequiredDate)
+            {
+                headerDetailsAltered = true;
+            }
+            //Required date may not be less than the order date
+            if (_editedPurchaseOrder.RequiredDate < _editedPurchaseOrder.OrderDate)
+            {
+                string message = "The required date may not be earlier than the order date";
+                throw new Exception(message);
+            }
+        }
+
+        private void CheckOrderDate()
+        {
+            //check if the order date was altered
+            if (_editedPurchaseOrder.OrderDate != _originalPurchaseOrder.OrderDate)
+            {
+                headerDetailsAltered = true;
+            }
         }
 
         private void ValidateLines()
-        {            
-            //Make sure no line has been removed
+        {
+            //Exisiting lines
             foreach (PurchaseOrderDetailModel orderLine in _originalPurchaseOrder.PurchaseOrderDetails)
             {
                 int index = _editedPurchaseOrder.PurchaseOrderDetails.FindIndex(x => x.ProductID == orderLine.ProductID);
-
+                //Make sure no line has been removed
                 if (index == -1)
                 {
                     string message = $"Order line with {orderLine.Product.ProductName} has been removed. \r\n";
@@ -86,7 +393,7 @@ namespace BussinessLogicLibrary.Purchases
                 else
                 {
                     //Line not removed check if the line has changed
-                    if(HasLineChanged(index, orderLine))
+                    if (HasLineChanged(index, orderLine))
                     {
                         //Set existingLinesAltered
                         existingLinesAltered = true;
@@ -96,6 +403,7 @@ namespace BussinessLogicLibrary.Purchases
                 }
             }
 
+            //New Lines
             //Check if new lines added
             foreach (PurchaseOrderDetailModel orderLine in _editedPurchaseOrder.PurchaseOrderDetails)
             {
@@ -159,22 +467,18 @@ namespace BussinessLogicLibrary.Purchases
             //Product not allowed to change
             if (editedLine.ProductID != editedLine.Product.ProductID)
             {
-                string message = $"Order line {index +1} has the product changed \r\n";
+                string message = $"Order line {index + 1} has the product changed \r\n";
                 message += $"from {originalLine.Product.ProductName} to {editedLine.Product.ProductName}.\r\n";
                 message += "Existing order line product item may not be altered.\r\n";
                 message += $"Please change the product back to {originalLine.Product.ProductName}.\r\n";
                 throw new Exception(message);
             }
 
-            //Check if the order line status was changed and validate the change
-            if (editedLine.OrderLineStatus.Status != originalLine.OrderLineStatus.Status)
-            {
-                ValidateOrderLineStatus(editedLine, originalLine);
-            }
-
             
+
+
             //Quantity on order cannot be less than amount receipted
-            int quantityReceipted = GetLineReceiptQuantity(editedLine); 
+            int quantityReceipted = editedLine.QuantityReceipted;
 
             if (editedLine.QuantityOrdered < quantityReceipted)
             {
@@ -204,6 +508,18 @@ namespace BussinessLogicLibrary.Purchases
                 lineChanged = true;
             }
 
+            //Check if the order line status was changed and validate the change
+            if (editedLine.OrderLineStatus.Status != originalLine.OrderLineStatus.Status)
+            {
+                if (lineChanged && !editedLine.OrderLineStatus.Status!.Equals("Open"))
+                {
+                    //status of line must be open
+                    string message = "Altered lines may only have a status of open.";
+                    throw new Exception(message);
+                }
+                ValidateOrderLineStatus(editedLine, originalLine);
+            }
+
             return lineChanged;
         }
 
@@ -226,7 +542,7 @@ namespace BussinessLogicLibrary.Purchases
         {
             string originalStatus = originalLine.OrderLineStatus.Status!;
             string editedStatus = editedLine.OrderLineStatus.Status!;
-            int qtyReceipted = GetLineReceiptQuantity(editedLine);
+            int qtyReceipted = editedLine.QuantityReceipted;
             string message = "";
             //switch on the original status
             switch (originalStatus)
@@ -236,10 +552,14 @@ namespace BussinessLogicLibrary.Purchases
                     {
                         case "Completed":
                             //May only be changed to Completed if a partial quantity of the order has been receipted                            
-                            if ( qtyReceipted == 0 || qtyReceipted == editedLine.QuantityOrdered)
+                            if (qtyReceipted == 0 || qtyReceipted == editedLine.QuantityOrdered)
                             {
                                 message += "Completed order status line may only be added to lines with partial receipts";
-                                throw new Exception(message); 
+                                throw new Exception(message);
+                            }
+                            else
+                            {
+                                editedLine.OrderLineStatusID = editedLine.OrderLineStatus.StatusID;
                             }
                             break;
                         case "Filled":
@@ -254,6 +574,10 @@ namespace BussinessLogicLibrary.Purchases
                             {
                                 message += "Cancelled line status is only allowed if nothing has been receipted on this line";
                                 throw new Exception(message);
+                            }
+                            else
+                            {
+                                editedLine.OrderLineStatusID = editedLine.OrderLineStatus.StatusID;
                             }
                             break;
                     }
@@ -294,7 +618,7 @@ namespace BussinessLogicLibrary.Purchases
         }
         private void UpdateHeader()
         {
-            
+
         }
 
         private void UpdateLine()

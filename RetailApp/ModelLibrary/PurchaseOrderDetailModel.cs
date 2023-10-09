@@ -53,8 +53,6 @@ namespace ModelsLibrary
         /// </summary>
         public StatusModel OrderLineStatus { get; set; } = new StatusModel();
 
-        // TODO - Look at adding an order status line
-
         /// <summary>
         /// Holds the Validation errors if any for this purchase order detail
         /// </summary>
