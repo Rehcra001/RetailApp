@@ -1217,6 +1217,9 @@ BEGIN
 			WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
 
 			SELECT 'No Error' AS Message;
+
+			--Update the number of this product on order
+			EXECUTE dbo.usp_UpdateProductOnOrder @ProductID;
 		COMMIT TRAN;
 	END TRY
 

@@ -179,9 +179,19 @@ namespace RetailAppUI.ViewModels.Purchases
             try
             {
                 _purchaseOrderManager.SaveChanges();
-                SelectedOrderStatus = OrderStatuses.First(x => x.StatusID == PurchaseOrder.OrderStatusID);
-                SetState("View");
-                PurchaseOrderLines.Refresh();
+                //Reload the saved purchase order
+                try
+                {
+                    //Re-loaded the purchase order view
+                    //Make sure the shared data has the purchase order ID
+                    SharedData.SharedData = PurchaseOrder.PurchaseOrderID;
+                    Navigation.NavigateTo<PurchaseOrderViewModel>();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message + "\r\n Reloading Purchase Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
+                }
             }
             catch (Exception ex)
             {

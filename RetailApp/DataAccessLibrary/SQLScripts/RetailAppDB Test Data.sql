@@ -130,5 +130,27 @@ DECLARE @OrderLineStatusID INT = 1;
 
 
 EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
-  --Insert Order lines
+
+
+--Receipt
+INSERT INTO dbo.Receipts
+(PurchaseOrderID, ProductID,QuantityReceipted, UnitCost)
+VALUES
+(450000001, 10000, 5, 80);
+GO
+
+--Update qty receipted in purchase order detail
+EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID = 450000001, @ProductID = 10000;
+
+--Mark as filled
+UPDATE dbo.PurchaseOrderHeader
+SET OrderStatusID = 3
+WHERE PurchaseOrderID = 450000001;
+
+UPDATE dbo.PurchaseOrderDetail
+SET OrderLineStatusID = 3
+WHERE PurchaseOrderID = 450000001 AND ProductID = 10000;
+
+--update qty of this product currently on order
+EXECUTE dbo.usp_UpdateProductOnOrder  @ProductID = 10000;
 --****************************************************************************************************************
