@@ -679,6 +679,31 @@ BEGIN
 	WHERE ProductID = @ProductID;
 END;
 GO
+
+--Update the specified product with current number in stock
+--Use the Inventory transactions
+--Sums all Inventory transactions of ProductID
+CREATE PROCEDURE dbo.usp_UpdateProductOnHand
+(
+	@ProductID int
+)AS
+BEGIN
+	SET NOCOUNT ON;
+
+	--Get the sum of all transactions on ProductID
+	DECLARE @OnHand INT;
+	SELECT @OnHand = ISNULL(SUM(Quantity),0)
+	FROM dbo.InventoryTransactions 
+	WHERE ProductID = @ProductID;
+
+	--Update Product quantity on hand
+	UPDATE dbo.Products
+	SET OnHand = @OnHand
+	WHERE ProductID = @ProductID;
+END;
+GO
+
+
 --**********Units**********
 
 --Returns the UnitPer ID on success
@@ -907,6 +932,75 @@ BEGIN
 END;
 GO
 
+--Returns a message "No Error" on success
+--or an error message on failure
+--it also updates the product of productID with quantity on hand and on order
+--and inserts a receipt transaction into the InventoryTransactions table
+CREATE PROCEDURE dbo.usp_InsertReceipt
+(
+	@PurchaseOrderID BIGINT,
+	@ProductID INT,
+	@QuantityReceipted INT,
+	@UnitCost MONEY
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.Receipts
+			(
+				PurchaseOrderID,
+				ProductID,
+				QuantityReceipted,
+				UnitCost
+			)
+			VALUES
+			(
+				@PurchaseOrderID,
+				@ProductID,
+				@QuantityReceipted,
+				@UnitCost
+			);
+
+			--Insert Inventory transaction
+			--Get the ID of the inserted receipt
+			DECLARE @ReceiptID INT;
+			SET @ReceiptID = SCOPE_IDENTITY();
+
+			--Get the receipt date
+			DECLARE @ReceiptDate DATETIME;
+			SELECT @ReceiptDate = ReceiptDate
+			FROM dbo.Receipts
+			WHERE ReceiptID = @ReceiptID;
+
+			EXECUTE dbo.usp_InsertInventoryTransactions 'R', @ReceiptDate, @ProductID, @ReceiptID, @QuantityReceipted;
+
+			--Update Product On Order			
+			--Update the number of this product on order
+			EXECUTE dbo.usp_UpdateProductOnOrder @ProductID;
+
+			--Update Product On Hand
+			EXECUTE dbo.usp_UpdateProductOnHand @ProductID;
+
+			--Update Purchase order detail with quantity receipted
+			EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID, @ProductID;
+
+			--Return no error on success
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
 
 
 --**********Inventory Transactions**********
@@ -925,6 +1019,45 @@ BEGIN
 			   ProductID, OrderID, Quantity
 		FROM InventoryTransactions
 		WHERE ProductID = @ProductID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Inserts a line into the Inventory transactions table
+--Returns a message 'No Error' on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_InsertInventoryTransactions
+(
+	@TransactionType CHAR(1),
+	@TransactionDate DATETIME,
+	@ProductID INT,
+	@OrderID INT, --Goods receipt ID or Goods issue ID
+	@Quantity INT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		INSERT INTO dbo.InventoryTransactions
+		(
+			TransactionType,
+			TransactionDate,
+			ProductID,
+			OrderID,
+			Quantity
+		)
+		VALUES
+		(
+			@TransactionType,
+			@TransactionDate,
+			@ProductID,
+			@OrderID,
+			@Quantity
+		);
 	END TRY
 
 	BEGIN CATCH

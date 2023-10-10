@@ -66,52 +66,8 @@ VALUES
 GO
 
 --*********************************************************************************************************
---Insert Purchase orders
-INSERT INTO dbo.PurchaseOrderHeader
-(VendorID, VendorReference, OrderDate, OrderAmount, VATPercentage,
- VATAmount, TotalAmount, RequiredDate, OrderStatusID, IsImport)
- VALUES
- (20002, 89000236, GETDATE(), 400, 0.15,
-  60.0, 460, DATEADD(WEEK, 2, GetDate()), 1, 0);
-
-DECLARE @ID BIGINT;
-SELECT @ID = MAX(PurchaseOrderID) FROM dbo.PurchaseOrderHeader;
-  --Insert Order lines
-INSERT INTO dbo.PurchaseOrderDetail
-(PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID)
-VALUES
-(@ID, 10000, 5, 80, 0, 1);
-GO
 
 --Insert Purchase orders
-INSERT INTO dbo.PurchaseOrderHeader
-(VendorID, VendorReference, OrderDate, OrderAmount, VATPercentage,
- VATAmount, TotalAmount, RequiredDate, OrderStatusID, IsImport)
- VALUES
- (20002, 89000236, GETDATE(), 400, 0.15,
-  60.0, 460, DATEADD(WEEK, 2, GetDate()), 1, 0);
-
-DECLARE @ID BIGINT;
-SELECT @ID = MAX(PurchaseOrderID) FROM dbo.PurchaseOrderHeader;
-  --Insert Order lines
-INSERT INTO dbo.PurchaseOrderDetail
-(PurchaseOrderID, ProductID, Quantity, UnitCost, UnitFreightCost, OrderLineStatusID)
-VALUES
-(@ID, 10000, 5, 80, 0, 1);
-GO
-
---Receipt
-INSERT INTO dbo.Receipts
-(PurchaseOrderID, ProductID,QuantityReceipted, UnitCost)
-VALUES
-(450000000, 10000, 3, 80);
-GO
-
---Update qty receipted in purchase order detail
-EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID = 450000000, @ProductID = 10000;
-
-
---Insert another purchase order to test the stored Procedure used to update OnOrder quantity
 INSERT INTO dbo.PurchaseOrderHeader
 (VendorID, VendorReference, OrderDate, OrderAmount, VATPercentage,
  VATAmount, TotalAmount, RequiredDate, OrderStatusID, IsImport)
@@ -126,31 +82,52 @@ DECLARE @ProductID INT = 10000;
 DECLARE @Quantity INT = 5;
 DECLARE @UnitCost MONEY = 80;
 DECLARE @UnitFreightCost MONEY = 0;
-DECLARE @OrderLineStatusID INT = 1;
-
+DECLARE @OrderLineStatusID INT = 1; --Open
 
 EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
 
-
---Receipt
-INSERT INTO dbo.Receipts
-(PurchaseOrderID, ProductID,QuantityReceipted, UnitCost)
-VALUES
-(450000001, 10000, 5, 80);
+EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 3, @UnitCost;
 GO
 
---Update qty receipted in purchase order detail
-EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID = 450000001, @ProductID = 10000;
+--Insert Purchase orders
+INSERT INTO dbo.PurchaseOrderHeader
+(VendorID, VendorReference, OrderDate, OrderAmount, VATPercentage,
+ VATAmount, TotalAmount, RequiredDate, OrderStatusID, IsImport)
+ VALUES
+ (20001, 2222, GETDATE(), 4000, 0.15,
+  600.0, 4600, DATEADD(WEEK, 2, GetDate()), 1, 0);
 
---Mark as filled
-UPDATE dbo.PurchaseOrderHeader
-SET OrderStatusID = 3
-WHERE PurchaseOrderID = 450000001;
+DECLARE @PurchaseOrderID BIGINT;
+SELECT @PurchaseOrderID = MAX(PurchaseOrderID) FROM dbo.PurchaseOrderHeader;
 
-UPDATE dbo.PurchaseOrderDetail
-SET OrderLineStatusID = 3
-WHERE PurchaseOrderID = 450000001 AND ProductID = 10000;
+DECLARE @ProductID INT = 10001;
+DECLARE @Quantity INT = 50;
+DECLARE @UnitCost MONEY = 80;
+DECLARE @UnitFreightCost MONEY = 0;
+DECLARE @OrderLineStatusID INT = 1; --Open
 
---update qty of this product currently on order
-EXECUTE dbo.usp_UpdateProductOnOrder  @ProductID = 10000;
+EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
+
+EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 33, @UnitCost;
+GO
+
+--Insert Purchase orders
+INSERT INTO dbo.PurchaseOrderHeader
+(VendorID, VendorReference, OrderDate, OrderAmount, VATPercentage,
+ VATAmount, TotalAmount, RequiredDate, OrderStatusID, IsImport)
+ VALUES
+ (20002, 89000236, GETDATE(), 400, 0.15,
+  60.0, 460, DATEADD(WEEK, 2, GetDate()), 1, 0);
+
+DECLARE @PurchaseOrderID BIGINT;
+SELECT @PurchaseOrderID = MAX(PurchaseOrderID) FROM dbo.PurchaseOrderHeader;
+
+DECLARE @ProductID INT = 10000;
+DECLARE @Quantity INT = 5;
+DECLARE @UnitCost MONEY = 80;
+DECLARE @UnitFreightCost MONEY = 0;
+DECLARE @OrderLineStatusID INT = 1; --Open
+
+EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
+GO
 --****************************************************************************************************************
