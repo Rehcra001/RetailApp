@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace ModelsLibrary
         public int ProductID { get; set; }
 
         /// <summary>
-        /// Hold the date the receipt was created
+        /// Holds the date the receipt was created
         /// </summary>
         public DateTime ReceiptDate { get; set; }
 
@@ -37,5 +38,42 @@ namespace ModelsLibrary
         /// holds the cost per unit receipted
         /// </summary>
         public decimal UnitCost { get; set; }
+
+        /// <summary>
+        /// Holds validation error messages
+        /// </summary>
+        public string? ValidationMessage { get; set; }
+
+        public bool Validate()
+        {
+            bool isValid = true;
+            ValidationMessage = "";
+
+            if (PurchaseOrderID == default)
+            {
+                ValidationMessage += "Purchase Order ID is required.";
+                isValid = false;
+            }
+
+            if (ProductID == default)
+            {
+                ValidationMessage += "ProductID is required.";
+                isValid = false;
+            }
+
+            if (QuantityReceipted == default)
+            {
+                ValidationMessage += "Quantity receipted is required.";
+                isValid = true;
+            }
+
+            if (UnitCost == default)
+            {
+                ValidationMessage += "Unit cost is required.";
+                isValid = false;
+            }
+
+            return isValid;
+        }
     }
 }

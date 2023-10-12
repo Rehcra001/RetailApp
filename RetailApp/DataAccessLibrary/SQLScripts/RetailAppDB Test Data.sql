@@ -111,12 +111,32 @@ EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantit
 EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 33, @UnitCost;
 GO
 
+
+
+--Generate a goods issue
+DECLARE @IssueDate DATETIME = GETDATE();
+DECLARE @ProductID INT = 10001;
+DECLARE @IssueID INT;
+
+INSERT INTO dbo.Issues(SalesOrderID, ProductID, IssueDate, QuantityIssued,UnitCost)
+VALUES(8900000236, @ProductID, @IssueDate, -10, 80 )
+
+SELECT @IssueID = MAX(IssueID)
+FROM dbo.Issues;
+
+--Update InventoryTransactions
+INSERT INTO dbo.InventoryTransactions (TransactionType, TransactionDate, ProductID, OrderID, Quantity)
+VALUES ('I', GETDATE(), @ProductID, @IssueID, -10);
+
+EXECUTE dbo.usp_UpdateProductOnHand @ProductID;
+GO
+
 --Insert Purchase orders
 INSERT INTO dbo.PurchaseOrderHeader
 (VendorID, VendorReference, OrderDate, OrderAmount, VATPercentage,
  VATAmount, TotalAmount, RequiredDate, OrderStatusID, IsImport)
  VALUES
- (20002, 89000236, GETDATE(), 400, 0.15,
+ (20002, 89000237, GETDATE(), 400, 0.15,
   60.0, 460, DATEADD(WEEK, 2, GetDate()), 1, 0);
 
 DECLARE @PurchaseOrderID BIGINT;
@@ -129,5 +149,28 @@ DECLARE @UnitFreightCost MONEY = 0;
 DECLARE @OrderLineStatusID INT = 1; --Open
 
 EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
+GO
+
+--Insert Purchase orders and test reversal of receipt
+INSERT INTO dbo.PurchaseOrderHeader
+(VendorID, VendorReference, OrderDate, OrderAmount, VATPercentage,
+ VATAmount, TotalAmount, RequiredDate, OrderStatusID, IsImport)
+ VALUES
+ (20001, 2223, GETDATE(), 4000, 0.15,
+  600.0, 4600, DATEADD(WEEK, 2, GetDate()), 1, 0);
+
+DECLARE @PurchaseOrderID BIGINT;
+SELECT @PurchaseOrderID = MAX(PurchaseOrderID) FROM dbo.PurchaseOrderHeader;
+
+DECLARE @ProductID INT = 10001;
+DECLARE @Quantity INT = 50;
+DECLARE @UnitCost MONEY = 80;
+DECLARE @UnitFreightCost MONEY = 0;
+DECLARE @OrderLineStatusID INT = 1; --Open
+
+EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
+
+EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 33, @UnitCost;
+EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, -33, @UnitCost;
 GO
 --****************************************************************************************************************

@@ -82,6 +82,13 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _products = value; OnPropertyChanged(); }
         }
 
+        private ObservableCollection<ReceiptingLineModel> _receiptingLines;
+        public ObservableCollection<ReceiptingLineModel> ReceiptingLines
+        {
+            get { return _receiptingLines; }
+            set { _receiptingLines = value; OnPropertyChanged(); }
+        }
+
         private int _selectPurchaseOrderLineIndex = -1;
         public int SelectedPurchaseOrderLineIndex
         {
@@ -96,15 +103,13 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _textReadOnly = value; OnPropertyChanged(); }
         }
 
-        private bool _dateEnabled;
-        public bool DateEnabled
+        private bool _dateEnabled; public bool DateEnabled
         {
             get { return _dateEnabled; }
             set { _dateEnabled = value; OnPropertyChanged(); }
         }
 
         private bool _orderStatusEnabled;
-
         public bool OrderStatusEnabled
         {
             get { return _orderStatusEnabled; }
@@ -112,7 +117,6 @@ namespace RetailAppUI.ViewModels.Purchases
         }
 
         private bool _canChangeImported;
-
         public bool CanChangeImported
         {
             get { return _canChangeImported; }
@@ -120,7 +124,6 @@ namespace RetailAppUI.ViewModels.Purchases
         }
 
         private bool _canEditOderLines;
-
         public bool CanEditOrderLines
         {
             get { return _canEditOderLines; }
@@ -128,16 +131,14 @@ namespace RetailAppUI.ViewModels.Purchases
         }
 
         private bool _canChangeProduct;
-
         public bool CanChangeProduct
         {
             get { return _canChangeProduct; }
             set { _canChangeProduct = value; OnPropertyChanged(); }
         }
 
-
         public ICollectionView PurchaseOrderLines { get; set; }
-
+        public ICollectionView ReceiptingLinesCollectionView { get; set; }
 
         //Commands
         public RelayCommand CloseViewCommand { get; set; }
@@ -146,6 +147,7 @@ namespace RetailAppUI.ViewModels.Purchases
         public RelayCommand CancelActionCommand { get; set; }
         public RelayCommand AddNewLineCommand { get; set; }
         public RelayCommand RemoveLineCommand { get; set; }
+        public RelayCommand ReceiptCommand { get; set; }
 
         //constructor
         public PurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString, ISharedDataService sharedData)
@@ -165,9 +167,46 @@ namespace RetailAppUI.ViewModels.Purchases
             RemoveLineCommand = new RelayCommand(RemoveLine, CanRemoveLine);
             SaveCommand = new RelayCommand(SavePurchaseOrder, CanSavePurchaseOrder);
             CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
+            ReceiptCommand = new RelayCommand(ReceiptOrderLine, CanReceiptOrderLine);
+
+            ReceiptingLines = new ObservableCollection<ReceiptingLineModel>();
+            ReceiptingLinesCollectionView = CollectionViewSource.GetDefaultView(ReceiptingLines);
 
             SetState("View");
         }
+
+        private bool CanReceiptOrderLine(object obj)
+        {
+            return _state.Equals("View") && PurchaseOrder.PurchaseOrderDetails.Where(x => x.OrderLineStatus.Status!.Equals("Open")).Any();
+        }
+
+        private void ReceiptOrderLine(object obj)
+        {
+            ReceiptingLines.Clear();
+
+            foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
+            {
+                if (orderLine.OrderLineStatus.Status!.Equals("Open"))
+                {
+                    ReceiptingLineModel receiptingLine = new ReceiptingLineModel
+                    {
+                        ProductName = orderLine.Product.ProductName!,
+                        PurchaseOrderID = orderLine.PurchaseOrderID,
+                        ProductID = orderLine.ProductID,
+                        QuantityOrdered = orderLine.QuantityOrdered,
+                        QtyToReceipt = 0,
+                        QtyReceipted = orderLine.QuantityReceipted,
+                        UnitCost = orderLine.UnitCost + orderLine.UnitFreightCost
+                    };
+
+                    ReceiptingLines.Add(receiptingLine);
+                }
+            }
+            ReceiptingLinesCollectionView.Refresh();
+            SetState("Receipt");
+        }
+
+        
 
         private bool CanSavePurchaseOrder(object obj)
         {
@@ -178,26 +217,36 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             try
             {
-                _purchaseOrderManager.SaveChanges();
-                //Reload the saved purchase order
-                try
+                if (_state.Equals("Edit"))
                 {
-                    //Re-loaded the purchase order view
-                    //Make sure the shared data has the purchase order ID
-                    SharedData.SharedData = PurchaseOrder.PurchaseOrderID;
-                    Navigation.NavigateTo<PurchaseOrderViewModel>();
+                    _purchaseOrderManager.SaveChanges();
+                    //Reload the saved purchase order
+                    try
+                    {
+                        //Re-loaded the purchase order view
+                        //Make sure the shared data has the purchase order ID
+                        SharedData.SharedData = PurchaseOrder.PurchaseOrderID;
+                        Navigation.NavigateTo<PurchaseOrderViewModel>();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message + "\r\n Reloading Purchase Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
+                    }
                 }
-                catch (Exception ex)
+                else if (_state.Equals("Receipt"))
                 {
-                    MessageBox.Show(ex.Message + "\r\n Reloading Purchase Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
+                    ReceiptingLines.Clear();
+                    ReceiptingLinesCollectionView.Refresh();
                 }
+                
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error Saving", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            SetState("View");
         }
 
         private bool CanCancelAction(object obj)
@@ -439,6 +488,13 @@ namespace RetailAppUI.ViewModels.Purchases
             switch (_state)
             {
                 case "View":
+                    TextReadOnly = true;
+                    DateEnabled = false;
+                    OrderStatusEnabled = false;
+                    CanChangeImported = false;
+                    CanEditOrderLines = false;
+                    break;
+                case "Receipt":
                     TextReadOnly = true;
                     DateEnabled = false;
                     OrderStatusEnabled = false;

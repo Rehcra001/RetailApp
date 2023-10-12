@@ -703,6 +703,10 @@ BEGIN
 END;
 GO
 
+--Update the specified product with a weighted unit cost 
+--of the products currently in stock
+--based on First In First Out Principle
+
 
 --**********Units**********
 
@@ -932,7 +936,7 @@ BEGIN
 END;
 GO
 
---Returns a message "No Error" on success
+--Returns a ReceiptID on success
 --or an error message on failure
 --it also updates the product of productID with quantity on hand and on order
 --and inserts a receipt transaction into the InventoryTransactions table
@@ -986,8 +990,8 @@ BEGIN
 			--Update Purchase order detail with quantity receipted
 			EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID, @ProductID;
 
-			--Return no error on success
-			SELECT 'No Error' AS Message;
+			--Return receipt id on success
+			SELECT @ReceiptID AS ID;
 		COMMIT TRAN;
 	END TRY
 

@@ -165,11 +165,23 @@ GO
 --Receipts
 CREATE TABLE dbo.Receipts
 (
-	ReceiptID INT IDENTITY(1,1) PRIMARY KEY,
+	ReceiptID INT IDENTITY(100000,1) PRIMARY KEY,
 	PurchaseOrderID BIGINT NOT NULL,
 	ProductID INT NOT NULL,
 	ReceiptDate DATETIME DEFAULT(GETDATE()) NOT NULL, --No need to insert date but is allowed
 	QuantityReceipted INT NOT NULL,
+	UnitCost MONEY NOT NULL
+);
+GO
+
+--Receipts
+CREATE TABLE dbo.Issues
+(
+	IssueID INT IDENTITY(500000,1) PRIMARY KEY,
+	SalesOrderID BIGINT NOT NULL,
+	ProductID INT NOT NULL,
+	IssueDate DATETIME DEFAULT(GETDATE()) NOT NULL, --No need to insert date but is allowed
+	QuantityIssued INT NOT NULL,
 	UnitCost MONEY NOT NULL
 );
 GO
@@ -200,7 +212,7 @@ CREATE TABLE dbo.InventoryTransactions
 	TransactionType CHAR(1) NOT NULL, --'R' for Receipt - 'I' for issue
 	TransactionDate DATETIME NOT NULL,
 	ProductID INT NOT NULL,
-	OrderID INT NOT NUll UNIQUE, --One receipt or issue per transaction
+	OrderID INT NOT NUll,
 	Quantity INT NOT NULL, --Positive for Reciept - Negative for Issue
 	
 );
@@ -353,10 +365,21 @@ FOREIGN KEY (ProductID)
 REFERENCES dbo.Products(ProductID);
 GO
 
+--ALTER TABLE dbo.InventoryTransactions
+--ADD CONSTRAINT FK_InventoryTransactions_Receipts_OrderID_PurchaseOrderID
+--FOREIGN KEY (OrderID, ProductID)
+--REFERENCES dbo.Receipts(PurchaseOrderID,ProductID);
+--GO
+
+--ALTER TABLE dbo.InventoryTransactions
+--ADD CONSTRAINT FK_InventoryTransactions_Issues_OrderID_SalesOrderID
+--FOREIGN KEY (OrderID, ProductID)
+--REFERENCES dbo.Issues(SalesOrderID, ProductID);
+--GO
+
 ALTER TABLE dbo.InventoryTransactions
-ADD CONSTRAINT FK_InventoryTransactions_Receipts_OrderID_ReceiptsID
-FOREIGN KEY (OrderID)
-REFERENCES dbo.Receipts(ReceiptID);
+ADD CONSTRAINT UK_OrderID
+UNIQUE(OrderID);
 GO
 
 ALTER TABLE dbo.InventoryTransactions
