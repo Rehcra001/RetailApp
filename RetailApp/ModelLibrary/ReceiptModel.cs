@@ -40,6 +40,17 @@ namespace ModelsLibrary
         public decimal UnitCost { get; set; }
 
         /// <summary>
+        /// Holds a reference to a reversal or reversed receipt
+        /// will be zero if no reversal done
+        /// </summary>
+        public int ReverseReferenceID { get; set; }
+
+        /// <summary>
+        /// Holds the name of the product for this productID if needed
+        /// </summary>
+        public string? ProductName { get; set; }
+
+        /// <summary>
         /// Holds validation error messages
         /// </summary>
         public string? ValidationMessage { get; set; }

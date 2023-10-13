@@ -100,6 +100,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <StackPanel >
                             <StackPanel Orientation="Horizontal"
@@ -392,10 +393,9 @@
                             </StackPanel>                            
                         </StackPanel >
                         
-                        <StackPanel Grid.Row="1" MinHeight="100">
+                        <StackPanel Grid.Row="1">
                             <TextBlock Text="Receipting"
                                        Foreground="White"
-                                       FontSize="14"
                                        VerticalAlignment="Center"/>
 
                             <DataGrid x:Name="receiptingLines"
@@ -403,13 +403,42 @@
                                       AutoGenerateColumns="False"
                                       CanUserAddRows="False"
                                       Width="735"
-                                      HorizontalAlignment="Left">
+                                      HorizontalAlignment="Left"
+                                      FontSize="12"
+                                      SelectionMode="Single">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Product" Binding="{Binding  ProductName}" IsReadOnly="True"/>
                                     <DataGridTextColumn Header="Qty To Receipt" Binding="{Binding QtyToReceipt}"/>
                                     <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}"/>
                                     <DataGridTextColumn Header="Qty Ordered" Binding="{Binding QuantityOrdered}" IsReadOnly="True"/>
                                     <DataGridTextColumn Header="Qty Receipted" Binding="{Binding QtyReceipted}" IsReadOnly="True"/>                                    
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" >
+                            <TextBlock Text="Reverse Receipt"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+
+                            <DataGrid x:Name="reversingLines"
+                                      ItemsSource="{Binding ReverseReceipts}"
+                                      SelectedIndex="{Binding SelectedReverseReceiptIndex}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      Width="735"
+                                      HorizontalAlignment="Left"
+                                      ToolTip="Select the line that you want to reverse."
+                                      IsReadOnly="True"
+                                      FontSize="12"
+                                      SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Receipt ID" Binding="{Binding  ReceiptID}"/>
+                                    <DataGridTextColumn Header="Purchase ID" Binding="{Binding PurchaseOrderID}"/>
+                                    <DataGridTextColumn Header="Product ID" Binding="{Binding ProductID}"/>
+                                    <DataGridTextColumn Header="Product" Binding="{Binding ProductName}"/>
+                                    <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityReceipted}"/>
+                                    <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
@@ -438,6 +467,7 @@
                                 <DataGridTextColumn Header="Receipt Date" Binding="{Binding ReceiptDate}"/>                                
                                 <DataGridTextColumn Header="Quantity Receipted" Binding="{Binding QuantityReceipted}"/>
                                 <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}"/>
+                                <DataGridTextColumn Header="Reverse Reference ID" Binding="{Binding ReverseReferenceID}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
@@ -677,6 +707,12 @@
                         Style="{StaticResource ButtonTheme}"
                         Margin="5"
                         Command="{Binding ReceiptCommand}"/>
+
+                <Button Content=" Reverse Receipt"
+                        Width="110"
+                        Style="{StaticResource ButtonTheme}"
+                        Margin="5"
+                        Command="{Binding ReverseReceiptCommand}"/>
 
                 <Button Content="Save"
                         Width="75"

@@ -65,6 +65,15 @@ namespace BussinessLogicLibrary.Receipts
             
         }
 
+        public void Reverse(int id)
+        {
+            string errorMessage = new ReceiptRepository(_connectionString).ReverseByID(id);
+            if (errorMessage != null)
+            {
+                throw new Exception(errorMessage);
+            }
+        }
+
         public IEnumerable<ReceiptModel> GetByPurchaseOrderID(long id)
         {
             Tuple<IEnumerable<ReceiptModel>, string> receipts = new ReceiptRepository(_connectionString).GetByPurchaseOrderID(id).ToTuple();

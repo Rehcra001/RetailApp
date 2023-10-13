@@ -98,6 +98,24 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _selectPurchaseOrderLineIndex = value; CanChangeProduct = IsNewLine(); OnPropertyChanged(); }
         }
 
+        private ObservableCollection<ReceiptModel> _reverseReceips;
+
+        public ObservableCollection<ReceiptModel> ReverseReceipts
+        {
+            get { return _reverseReceips; }
+            set { _reverseReceips = value; OnPropertyChanged(); }
+        }
+
+        private int _selectedReverseReceiptIndex = -1;
+
+        public int SelectedReverseReceiptIndex
+        {
+            get { return _selectedReverseReceiptIndex; }
+            set { _selectedReverseReceiptIndex= value; OnPropertyChanged(); }
+        }
+
+
+
         private bool _textReadOnly;
         public bool TextReadOnly
         {
@@ -105,7 +123,8 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _textReadOnly = value; OnPropertyChanged(); }
         }
 
-        private bool _dateEnabled; public bool DateEnabled
+        private bool _dateEnabled; 
+        public bool DateEnabled
         {
             get { return _dateEnabled; }
             set { _dateEnabled = value; OnPropertyChanged(); }
@@ -151,6 +170,8 @@ namespace RetailAppUI.ViewModels.Purchases
         public RelayCommand AddNewLineCommand { get; set; }
         public RelayCommand RemoveLineCommand { get; set; }
         public RelayCommand ReceiptCommand { get; set; }
+        public RelayCommand ReverseReceiptCommand { get; set; }
+
 
         //constructor
         public PurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString, ISharedDataService sharedData)
@@ -171,11 +192,35 @@ namespace RetailAppUI.ViewModels.Purchases
             SaveCommand = new RelayCommand(SavePurchaseOrder, CanSavePurchaseOrder);
             CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
             ReceiptCommand = new RelayCommand(ReceiptOrderLine, CanReceiptOrderLine);
+            ReverseReceiptCommand = new RelayCommand(ReverseReceipt, CanReverseReceipt);
 
             ReceiptingLines = new ObservableCollection<ReceiptingLineModel>();
             ReceiptingLinesCollectionView = CollectionViewSource.GetDefaultView(ReceiptingLines);
 
+            ReverseReceipts = new ObservableCollection<ReceiptModel>();
+            
             SetState("View");
+        }
+
+        private bool CanReverseReceipt(object obj)
+        {
+            return _state.Equals("View") && PurchaseOrder.Receipts.Where(x => x.ReverseReferenceID == 0).Count() > 0;
+        }
+
+        private void ReverseReceipt(object obj)
+        {
+            //Get a list of all valid receipts that may be reversed
+            SetState("ReverseReceipt");
+            ReverseReceipts.Clear();
+            foreach (ReceiptModel receipt in PurchaseOrder.Receipts)
+            {
+                if (receipt.ReverseReferenceID == 0)
+                {
+                    PurchaseOrderDetailModel model = PurchaseOrder.PurchaseOrderDetails.First(x => x.ProductID == receipt.ProductID);
+                    receipt.ProductName = model.Product.ProductName;
+                    ReverseReceipts.Add(receipt);
+                }
+            }
         }
 
         private bool CanReceiptOrderLine(object obj)
@@ -213,7 +258,26 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private bool CanSavePurchaseOrder(object obj)
         {
-            return !_state.Equals("View");
+            if (_state.Equals("View"))
+            {
+                return false;
+            }
+            else if (_state.Equals("Edit"))
+            {
+                return true;
+            }
+            else if (_state.Equals("Receipt"))
+            {
+                return true;
+            }
+            else if (_state.Equals("ReverseReceipt") && SelectedReverseReceiptIndex != -1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void SavePurchaseOrder(object obj)
@@ -245,7 +309,41 @@ namespace RetailAppUI.ViewModels.Purchases
                     catch (Exception ex)
                     {
 
-                        MessageBox.Show(ex.Message + "\r\n Problem trying to save receipts.", "Save Receipts", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(ex.Message + "\r\n Problem trying to save receipts.",
+                                        "Save Receipts",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Error);
+                        return;
+                    }
+                }
+                else if (_state.Equals("ReverseReceipt"))
+                {
+                    MessageBoxResult result = MessageBox.Show("Are you sure that you want to reverse the selected receipt?",
+                                    "Reverse Receipt",
+                                    MessageBoxButton.YesNo,
+                                    MessageBoxImage.Question,
+                                    MessageBoxResult.No);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            int id = ReverseReceipts[SelectedReverseReceiptIndex].ReceiptID;
+                            ReceiptManager receiptManager = new ReceiptManager(ConnectionString.GetConnectionString());
+                            receiptManager.Reverse(id);
+                        }
+                        catch (Exception ex)
+                        {
+
+                            MessageBox.Show(ex.Message + "\r\n Problem trying to reverse receipt.",
+                                            "Reverse Receipt",
+                                            MessageBoxButton.OK,
+                                            MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        //receipt reversal cancelled
                         return;
                     }
                 }
@@ -372,7 +470,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private bool CanAddNewLine(object obj)
         {
-            return !_state.Equals("View") && Products != null && Products.Count > 0;
+            return _state.Equals("Edit") && Products != null && Products.Count > 0;
         }
 
         private void AddNewLine(object obj)
@@ -518,6 +616,13 @@ namespace RetailAppUI.ViewModels.Purchases
                     CanEditOrderLines = false;
                     break;
                 case "Receipt":
+                    TextReadOnly = true;
+                    DateEnabled = false;
+                    OrderStatusEnabled = false;
+                    CanChangeImported = false;
+                    CanEditOrderLines = false;
+                    break;
+                case "ReverseReceipt":
                     TextReadOnly = true;
                     DateEnabled = false;
                     OrderStatusEnabled = false;

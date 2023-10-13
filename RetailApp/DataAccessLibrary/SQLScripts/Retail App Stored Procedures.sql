@@ -925,7 +925,8 @@ BEGIN
 		SET NOCOUNT ON;
 
 		SELECT ReceiptID, PurchaseOrderID, ProductID,
-			   ReceiptDate, QuantityReceipted, UnitCost
+			   ReceiptDate, QuantityReceipted, UnitCost,
+			   ReverseReferenceID
 		FROM Receipts
 		WHERE PurchaseOrderID = @PurchaseOrderID;
 	END TRY

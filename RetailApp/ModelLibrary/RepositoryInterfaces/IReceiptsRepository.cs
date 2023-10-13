@@ -10,5 +10,6 @@ namespace ModelsLibrary.RepositoryInterfaces
     {
         (IEnumerable<ReceiptModel>, string) GetByPurchaseOrderID(long id);
         (ReceiptModel, string) Insert(ReceiptModel receipt);
+        string ReverseByID(int id);
     }
 }

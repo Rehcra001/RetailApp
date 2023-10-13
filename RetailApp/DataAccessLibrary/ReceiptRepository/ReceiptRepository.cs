@@ -49,6 +49,15 @@ namespace DataAccessLibrary.ReceiptRepository
                                     receipt.ReceiptDate = Convert.ToDateTime(reader["ReceiptDate"]);
                                     receipt.QuantityReceipted = Convert.ToInt32(reader["QuantityReceipted"]);
                                     receipt.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
+                                    if (reader["ReverseReferenceID"] is DBNull)
+                                    {
+                                        receipt.ReverseReferenceID = 0;
+                                    }
+                                    else
+                                    {
+                                        receipt.ReverseReferenceID = Convert.ToInt32(reader["ReverseReferenceID"]);
+                                    }
+                                    
 
                                     receipts.Add(receipt);
                                 }
@@ -100,6 +109,33 @@ namespace DataAccessLibrary.ReceiptRepository
                 }
             }
             return (receipt, errorMessage); //error message will be null if no error raised by database
+        }
+
+        public string ReverseByID(int id)
+        {
+            string? errorMessage = null;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_ReverseReceiptByID";
+                    command.Parameters.Add("@ReceiptID", SqlDbType.Int).Value = id;
+                    connection.Open();
+
+                    string returnedMessage = command.ExecuteScalar().ToString()!;
+
+                    //Check for error
+                    if (!returnedMessage.Equals("No Error"))
+                    {
+                        errorMessage = returnedMessage;
+                    }
+                }
+            }
+
+            return errorMessage; //Will be null if no error raised by database
         }
     }
 }
