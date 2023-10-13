@@ -360,7 +360,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityOrdered}" MinWidth="100"/>
+                                        <DataGridTextColumn Header="Quantity Ordered" Binding="{Binding QuantityOrdered}" MinWidth="100"/>
                                         <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}" MinWidth="100"/>
                                         <DataGridTextColumn Header="Unit Freight Cost" Binding="{Binding UnitFreightCost}" MinWidth="100"/>
                                         <DataGridTemplateColumn Header="Status" MinWidth="100">
@@ -408,6 +408,7 @@
                                     <DataGridTextColumn Header="Product" Binding="{Binding  ProductName}" IsReadOnly="True"/>
                                     <DataGridTextColumn Header="Qty To Receipt" Binding="{Binding QtyToReceipt}"/>
                                     <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}"/>
+                                    <DataGridTextColumn Header="Qty Ordered" Binding="{Binding QuantityOrdered}" IsReadOnly="True"/>
                                     <DataGridTextColumn Header="Qty Receipted" Binding="{Binding QtyReceipted}" IsReadOnly="True"/>                                    
                                 </DataGrid.Columns>
                             </DataGrid>

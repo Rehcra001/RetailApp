@@ -199,7 +199,7 @@
                                     Margin="0,30,0,10">
 
                             <!--Unit Price-->
-                            <TextBlock Text="Unit Price:"
+                            <TextBlock Text="Unit Selling Price:"
                                        Width="150"
                                        Foreground="White"
                                        HorizontalAlignment="Left"

@@ -17,45 +17,52 @@ namespace BussinessLogicLibrary.Receipts
             _connectionString = connectionString;
         }
 
-        public ReceiptModel Insert(ReceiptingLineModel receiptLine)
+        public void Insert(IEnumerable<ReceiptingLineModel> receiptLines)
         {
+            List<ReceiptModel> receipts = new List<ReceiptModel>();
+
             //Validate the receipting line
-            receiptLine.Validate();
-            if (!string.IsNullOrWhiteSpace(receiptLine.ValidationMessage))
+            foreach (ReceiptingLineModel receiptingLine in receiptLines)
             {
-                //Validation Error
-                throw new Exception(receiptLine.ValidationMessage);
+                receiptingLine.Validate();
+                if (!string.IsNullOrWhiteSpace(receiptingLine.ValidationMessage))
+                {
+                    //Validation Error
+                    throw new Exception(receiptingLine.ValidationMessage);
+                }
+
+                //Validate the receipt
+                ReceiptModel receipt = new ReceiptModel
+                {
+                    PurchaseOrderID = receiptingLine.PurchaseOrderID,
+                    ProductID = receiptingLine.ProductID,
+                    QuantityReceipted = receiptingLine.QtyToReceipt,
+                    UnitCost = receiptingLine.UnitCost
+                };
+
+                receipt.Validate();
+                if (!string.IsNullOrWhiteSpace(receipt.ValidationMessage))
+                {
+                    //Validation Error
+                    throw new Exception(receipt.ValidationMessage);
+                }
+                receipts.Add(receipt);
             }
 
-            //Validate the receipt
-            ReceiptModel receipt = new ReceiptModel
-            {
-                PurchaseOrderID = receiptLine.PurchaseOrderID,
-                ProductID = receiptLine.ProductID,
-                QuantityReceipted = receiptLine.QtyToReceipt,
-                UnitCost = receiptLine.UnitCost
-            };
 
-            receipt.Validate();
-            if (!string.IsNullOrWhiteSpace(receipt.ValidationMessage))
-            {
-                //Validation Error
-                throw new Exception(receipt.ValidationMessage);
-            }
 
-            //Insert the receipt
-            Tuple<ReceiptModel, string> insertedReceipt = new ReceiptRepository(_connectionString).Insert(receipt).ToTuple();
-            //Check for errors
-            if (insertedReceipt.Item2 == null)
+            foreach (ReceiptModel receipt in receipts)
             {
-                //No errors
-                return insertedReceipt.Item1;
+                //Insert the receipt
+                Tuple<ReceiptModel, string> insertedReceipt = new ReceiptRepository(_connectionString).Insert(receipt).ToTuple();
+                //Check for errors
+                if (insertedReceipt.Item2 != null)
+                {
+                    //Error raised inserting into database
+                    throw new Exception(insertedReceipt.Item2);
+                }
             }
-            else
-            {
-                //Error raised inserting into database
-                throw new Exception(insertedReceipt.Item2);
-            }
+            
         }
 
         public IEnumerable<ReceiptModel> GetByPurchaseOrderID(long id)

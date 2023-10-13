@@ -1,5 +1,7 @@
 ﻿using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
+using BussinessLogicLibrary.Receipts;
+using DataAccessLibrary.ReceiptRepository;
 using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
@@ -137,6 +139,7 @@ namespace RetailAppUI.ViewModels.Purchases
             set { _canChangeProduct = value; OnPropertyChanged(); }
         }
 
+
         public ICollectionView PurchaseOrderLines { get; set; }
         public ICollectionView ReceiptingLinesCollectionView { get; set; }
 
@@ -220,24 +223,31 @@ namespace RetailAppUI.ViewModels.Purchases
                 if (_state.Equals("Edit"))
                 {
                     _purchaseOrderManager.SaveChanges();
-                    //Reload the saved purchase order
-                    try
-                    {
-                        //Re-loaded the purchase order view
-                        //Make sure the shared data has the purchase order ID
-                        SharedData.SharedData = PurchaseOrder.PurchaseOrderID;
-                        Navigation.NavigateTo<PurchaseOrderViewModel>();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message + "\r\n Reloading Purchase Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
-                        Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
-                    }
+                    
                 }
                 else if (_state.Equals("Receipt"))
                 {
-                    ReceiptingLines.Clear();
-                    ReceiptingLinesCollectionView.Refresh();
+                    ReceiptManager receiptManager = new ReceiptManager(ConnectionString.GetConnectionString());
+                    List<ReceiptingLineModel> receiptingLines = new List<ReceiptingLineModel>();
+                    //Loop through the list of receipts
+                    foreach (ReceiptingLineModel receiptingLine in ReceiptingLines)
+                    {
+                        if (receiptingLine.QtyToReceipt != 0)
+                        {
+                            receiptingLines.Add(receiptingLine);
+                        }
+                    }
+
+                    try
+                    {
+                        receiptManager.Insert(receiptingLines);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        MessageBox.Show(ex.Message + "\r\n Problem trying to save receipts.", "Save Receipts", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
                 }
                 
             }
@@ -246,7 +256,20 @@ namespace RetailAppUI.ViewModels.Purchases
                 MessageBox.Show(ex.Message, "Error Saving", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            SetState("View");
+
+            //Reload the saved purchase order
+            try
+            {
+                //Re-loaded the purchase order view
+                //Make sure the shared data has the purchase order ID
+                SharedData.SharedData = PurchaseOrder.PurchaseOrderID;
+                Navigation.NavigateTo<PurchaseOrderViewModel>();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\r\n Reloading Purchase Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
+                Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
+            }
         }
 
         private bool CanCancelAction(object obj)

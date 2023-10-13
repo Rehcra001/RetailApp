@@ -990,6 +990,10 @@ BEGIN
 			--Update Purchase order detail with quantity receipted
 			EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID, @ProductID;
 
+			--Check if receipt fills the order line
+			--If yes then change line to filled
+			EXECUTE dbo.usp_UpdatePurchaseOrderDetailToFilled @PurchaseOrderID, @ProductID;			
+
 			--Return receipt id on success
 			SELECT @ReceiptID AS ID;
 		COMMIT TRAN;
@@ -1005,6 +1009,135 @@ BEGIN
 END;
 GO
 
+--Reverse a receipt
+--Returns 'No Error' on success
+--or error message on failure
+CREATE PROCEDURE dbo.usp_ReverseReceiptByID
+(
+	@ReceiptID INT --Receipt to reverse
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+			--First ensure it has not been reversed before
+			DECLARE @IsReversed BIT;
+			DECLARE @PurchaseOrderID BIGINT;
+			DECLARE @ProductID INT;
+			DECLARE @QuantityReceipted INT;
+			DECLARE @UnitCost MONEY;
+			DECLARE @ReversedReceiptID INT;
+
+			SELECT @PurchaseOrderID = PurchaseOrderID,
+				   @ProductID = ProductID,
+				   @QuantityReceipted = QuantityReceipted,
+				   @UnitCost = UnitCost,
+				   @ReversedReceiptID = ReverseReferenceID
+			FROM dbo.Receipts
+			WHERE ReceiptID = @ReceiptID;
+
+			
+			IF (@ReversedReceiptID IS NULL)--Not reversed previously
+			BEGIN				
+				--Generate the new reversed receipt
+				INSERT INTO dbo.Receipts
+				(
+					PurchaseOrderID,
+					ProductID,
+					QuantityReceipted,
+					UnitCost,
+					ReverseReferenceID
+				)
+				VALUES
+				(
+					@PurchaseOrderID,
+					@ProductID,
+					@QuantityReceipted * -1,
+					@UnitCost,
+					@ReceiptID
+				);
+
+				SET @ReversedReceiptID = SCOPE_IDENTITY();
+				
+				--Add the receipt id of the reversal to the original receipt
+				UPDATE dbo.Receipts
+				SET ReverseReferenceID = @ReversedReceiptID
+				WHERE ReceiptID = @ReceiptID;
+
+				--Check if the purchase order line was filled or completed
+			--if yes then change to open
+			--OPEN: 1
+			--COMPLETE: 2
+			--FILLED: 3
+			--CANCELLED: 4
+			DECLARE @OrderLineStatusID INT;
+
+			SELECT @OrderLineStatusID = OrderLineStatusID
+			FROM dbo.PurchaseOrderDetail
+			WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
+
+			IF (@OrderLineStatusID = 2 OR @OrderLineStatusID = 3)
+			BEGIN
+				UPDATE dbo.PurchaseOrderDetail
+				SET OrderLineStatusID = 1
+				WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
+			END;
+
+			--Check if the purchase order was filled or completed
+			--if yes then change to open
+			--OPEN: 1
+			--COMPLETE: 2
+			--FILLED: 3
+			--CANCELLED: 4
+			DECLARE @OrderStatusID INT;
+
+			SELECT @OrderStatusID = OrderStatusID
+			FROM dbo.PurchaseOrderHeader
+			WHERE PurchaseOrderID = @PurchaseOrderID;
+			
+			IF (@OrderStatusID = 2 OR @OrderStatusID = 3)
+			BEGIN
+				UPDATE dbo.PurchaseOrderHeader
+				SET OrderStatusID = 1
+				WHERE PurchaseOrderID = @PurchaseOrderID;
+			END;
+
+			--Inventory transaction
+			--Get the receipt date
+			DECLARE @ReceiptDate DATETIME;
+			SELECT @ReceiptDate = ReceiptDate
+			FROM dbo.Receipts
+			WHERE ReceiptID = @ReversedReceiptID;
+
+			--change to negative value
+			SET @QuantityReceipted = @QuantityReceipted * -1;
+			
+			--Add to Inventory transactions
+			EXECUTE dbo.usp_InsertInventoryTransactions 'R', @ReceiptDate, @ProductID, @ReversedReceiptID, @QuantityReceipted;
+			
+			--Update the number of this product on order
+			EXECUTE dbo.usp_UpdateProductOnOrder @ProductID;
+
+			--Update Product On Hand
+			EXECUTE dbo.usp_UpdateProductOnHand @ProductID;
+
+			--Update Purchase order detail with quantity receipted
+			EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID, @ProductID;
+			END;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;		
+	END CATCH;
+END;
+GO
 
 
 --**********Inventory Transactions**********
@@ -1275,6 +1408,41 @@ BEGIN
 END;
 GO
 
+--Check if all lines are filled 
+--if yes then change the order header status to filled
+CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderHeaderToFilled
+(
+@PurchaseOrderID BIGINT
+)AS
+BEGIN
+	SET NOCOUNT ON;
+	--OPEN: 1
+	--COMPLETE: 2
+	--FILLED: 3
+	--CANCELLED: 4
+	DECLARE @NumLines INT;
+	DECLARE @NumLinesFilled INT;
+
+	--if num line = num filled lines then change order status to filled
+	SELECT @NumLines = ISNULL(COUNT(*),0)
+	FROM dbo.PurchaseOrderDetail
+	WHERE PurchaseOrderID = @PurchaseOrderID;
+
+	--Count the number of filled lines
+	SELECT @NumLinesFilled = ISNULL(COUNT(*),0)
+	FROM dbo.PurchaseOrderDetail
+	WHERE PurchaseOrderID = @PurchaseOrderID AND OrderLineStatusID = 3;
+
+	IF (@NumLines = @NumLinesFilled)
+	BEGIN
+		--All lines filled change order status to filled
+		UPDATE dbo.PurchaseOrderHeader
+		SET OrderStatusID = 3 --Filled
+		WHERE PurchaseOrderID = @PurchaseOrderID;
+	END;
+END;
+GO
+
 --**********Purchase Order Details**********
 --Insert
 --Return 'No Error' on success
@@ -1424,6 +1592,36 @@ BEGIN
 	UPDATE dbo.PurchaseOrderDetail
 	SET QuantityReceipted = (SELECT QtyReceipted FROM QtyReceipted)
 	WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
+END;
+GO
+
+--Check if receipt fills the order line
+--If yes then change line to filled
+CREATE PROCEDURE dbo.usp_UpdatePurchaseOrderDetailToFilled
+(
+	@PurchaseOrderID BIGINT, 
+	@ProductID INT
+)AS
+BEGIN
+	--SET NOCOUNT ON;
+
+	DECLARE @IsFilled BIT = 0;
+	--0 if the line is not filled 1 otherwise
+	SELECT @IsFilled = IIF(QuantityReceipted < Quantity, 0, 1)
+	FROM dbo.PurchaseOrderDetail
+	WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID;
+	
+	IF (@IsFilled = 1)--Line filled
+	BEGIN
+		UPDATE dbo.PurchaseOrderDetail
+		SET OrderLineStatusID = 3
+		WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID; 
+		
+		--A line has been altered to filled
+		--Check if all lines are filled 
+		--if yes then change the order header status to filled
+		EXECUTE dbo.usp_UpdatePurchaseOrderHeaderToFilled @PurchaseOrderID;
+	END;
 END;
 GO
 

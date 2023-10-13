@@ -170,7 +170,8 @@ CREATE TABLE dbo.Receipts
 	ProductID INT NOT NULL,
 	ReceiptDate DATETIME DEFAULT(GETDATE()) NOT NULL, --No need to insert date but is allowed
 	QuantityReceipted INT NOT NULL,
-	UnitCost MONEY NOT NULL
+	UnitCost MONEY NOT NULL,
+	ReverseReferenceID INT NULL
 );
 GO
 

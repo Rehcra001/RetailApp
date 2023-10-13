@@ -171,6 +171,10 @@ DECLARE @OrderLineStatusID INT = 1; --Open
 EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
 
 EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 33, @UnitCost;
-EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, -33, @UnitCost;
+DECLARE @ReceiptID INT;
+SELECT @ReceiptID = MAX(ReceiptID) FROM dbo.Receipts;
+--Should only reverse once
+EXECUTE usp_ReverseReceiptByID @ReceiptID;
+EXECUTE usp_ReverseReceiptByID @ReceiptID;
 GO
 --****************************************************************************************************************
