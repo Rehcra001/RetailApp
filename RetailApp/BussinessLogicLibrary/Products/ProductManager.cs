@@ -4,6 +4,8 @@ using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace BussinessLogicLibrary.Products
 {
@@ -13,11 +15,13 @@ namespace BussinessLogicLibrary.Products
     public class ProductManager
     {
 		private string _connectionString;
+        private IVendorRepository _vendorRepository;
 		public ProductModel Product { get; set; } = new ProductModel();
 
-        public ProductManager(string connectionString)
+        public ProductManager(string connectionString, IVendorRepository vendorRepository)
         {
 			_connectionString = connectionString;
+            _vendorRepository = vendorRepository;
         }
 
         #region Retrieve a product
@@ -116,7 +120,7 @@ namespace BussinessLogicLibrary.Products
         /// <exception cref="Exception"></exception>
         private void GetVendor()
         {
-            Tuple<VendorModel, string> vendor = new VendorRepository(_connectionString).GetByID(Product.VendorID).ToTuple();
+            Tuple<VendorModel, string> vendor = _vendorRepository.GetByID(Product.VendorID).ToTuple();
 
             if (vendor.Item2 == null)
             {

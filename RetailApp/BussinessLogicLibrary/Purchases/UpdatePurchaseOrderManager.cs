@@ -3,6 +3,7 @@ using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VATRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
@@ -10,6 +11,7 @@ namespace BussinessLogicLibrary.Purchases
     {
         private readonly PurchaseOrderHeaderModel _originalPurchaseOrder;
         private readonly PurchaseOrderHeaderModel _editedPurchaseOrder;
+        private IVendorRepository _vendorRepository;
         private bool existingLinesAltered = false;
         private bool newLinesAdded = false;
         private bool headerDetailsAltered = false;
@@ -32,11 +34,13 @@ namespace BussinessLogicLibrary.Purchases
         /// <param name="purchaseOrder">
         /// Takes in an existing purchase order model that has been edited
         /// </param>
-        public UpdatePurchaseOrderManager(string connectionString, PurchaseOrderHeaderModel editedPurchaseOrder)
+        public UpdatePurchaseOrderManager(string connectionString, PurchaseOrderHeaderModel editedPurchaseOrder, IVendorRepository vendorRepository)
         {
             _connectionString = connectionString;
+            _vendorRepository = vendorRepository;
+
             _editedPurchaseOrder = editedPurchaseOrder;
-            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString).GetByID(_editedPurchaseOrder.PurchaseOrderID);
+            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorRepository).GetByID(_editedPurchaseOrder.PurchaseOrderID);
             Update();
         }
 

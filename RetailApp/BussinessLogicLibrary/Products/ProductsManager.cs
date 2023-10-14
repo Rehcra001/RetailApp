@@ -1,8 +1,10 @@
-﻿using DataAccessLibrary.CategoryRepository;
+﻿using BussinessLogicLibrary.Vendors;
+using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Products
 {
@@ -10,11 +12,13 @@ namespace BussinessLogicLibrary.Products
     {
         private IEnumerable<ProductModel>? _products;
         private readonly string _connectionString;
+        private readonly IVendorRepository _vendorRepository;
 
 
-        public ProductsManager(string connectionString)
+        public ProductsManager(string connectionString, IVendorRepository vendorRepository)
         {
             _connectionString = connectionString;
+            _vendorRepository = vendorRepository;
         }
 
         /// <summary>
@@ -95,7 +99,7 @@ namespace BussinessLogicLibrary.Products
 
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = new VendorRepository(_connectionString).GetAll().ToTuple();
+            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
 
             if (vendors.Item2 == null)
             {

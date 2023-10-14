@@ -17,7 +17,7 @@ namespace DataAccessLibrary.CompanyDetailRepository
         /// Retrieves this companies details
         /// </summary>
         /// <returns>
-        /// returns the company detail model if successfull - otherwise it return and error message
+        /// returns the company detail model if successfull - otherwise it return an error message
         /// </returns>
         public (CompanyDetailModel, string) Get()
         {

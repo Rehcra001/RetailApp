@@ -28,8 +28,6 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         public INavigationService Navigation { get => _navigation; set { _navigation = value; OnPropertyChanged(); } }
 
-        public IConnectionStringService Connection { get => _connection; set => _connection = value; }
-
 
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewCompanyDetailCommand { get; set; }
@@ -37,10 +35,9 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand SaveCompanyDetailCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public CompanyDetailViewModel(IConnectionStringService connection, INavigationService navigation, ICompanyDetailManager companyDetailManager)
+        public CompanyDetailViewModel(INavigationService navigation, ICompanyDetailManager companyDetailManager)
         {
             Navigation = navigation;
-            Connection = connection;
 
             _companyDetailManager = companyDetailManager;
 

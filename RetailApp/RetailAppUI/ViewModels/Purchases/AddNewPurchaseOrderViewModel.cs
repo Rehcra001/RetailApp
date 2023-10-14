@@ -3,6 +3,7 @@ using BussinessLogicLibrary.Purchases;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -18,6 +19,7 @@ namespace RetailAppUI.ViewModels.Purchases
     public class AddNewPurchaseOrderViewModel : BaseViewModel
     {
         private AddNewPurchaseOrderManager _purchaseOrderManager;
+		private IVendorRepository _vendorRepository;
         public ICollectionView PurchaseOrderLines { get; set; }
 
         private INavigationService _navigation;
@@ -146,10 +148,11 @@ namespace RetailAppUI.ViewModels.Purchases
 		public RelayCommand SaveCommand { get; set; }
 
         //Constructor
-        public AddNewPurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString)
+        public AddNewPurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString, IVendorRepository vendorRepository)
         {
 			Navigation = navigation;
 			ConnectionString = connectionString;
+			_vendorRepository = vendorRepository;
 
             //Retrieve a list of Vendors
             GetVendors();
@@ -443,7 +446,7 @@ namespace RetailAppUI.ViewModels.Purchases
         /// </summary>
         private void GetVendors()
 		{
-            Tuple<IEnumerable<VendorModel>, string> vendors = new VendorRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
 			//check for errors
 			if (vendors.Item2 == null)
 			{
@@ -480,7 +483,7 @@ namespace RetailAppUI.ViewModels.Purchases
 		{
 			try
 			{
-                Products = new ObservableCollection<ProductModel>(new ProductsManager(ConnectionString.GetConnectionString()).GetByVendorID(id));
+                Products = new ObservableCollection<ProductModel>(new ProductsManager(ConnectionString.GetConnectionString(), _vendorRepository).GetByVendorID(id));
             }
 			catch (Exception ex)
 			{

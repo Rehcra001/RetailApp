@@ -1,4 +1,5 @@
-﻿using DataAccessLibrary.VendorRepository;
+﻿using BussinessLogicLibrary.Vendors;
+using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
@@ -11,14 +12,13 @@ namespace RetailAppUI.ViewModels.Adminstration
 {
     public class VendorViewModel : BaseViewModel
     {
-        private VendorRepository _vendorRepository;
+        private IVendorManager _vendorManager;
         private VendorModel? _vendor;
         private ObservableCollection<VendorModel> _vendors;
-        private string _connectionString;
         private INavigationService _navigation;
         private int _vendorIndex;
         private string _state;
-        private VendorModel undoVendorEdit;
+        private VendorModel _undoVendorEdit;
         private bool _textReadOnly;
 
         public VendorModel Vendor
@@ -33,8 +33,8 @@ namespace RetailAppUI.ViewModels.Adminstration
             set { _vendors = value; OnPropertyChanged(); }
         }
 
-        public int VendorIndex 
-        { 
+        public int VendorIndex
+        {
             get { return _vendorIndex; }
             set { _vendorIndex = value; OnPropertyChanged(); }
         }
@@ -48,7 +48,7 @@ namespace RetailAppUI.ViewModels.Adminstration
         }
 
 
-        public bool TextReadOnly { get => _textReadOnly; set { _textReadOnly = value; OnPropertyChanged(); }  }
+        public bool TextReadOnly { get => _textReadOnly; set { _textReadOnly = value; OnPropertyChanged(); } }
 
         public INavigationService Navigation { get => _navigation; set { _navigation = value; OnPropertyChanged(); } }
 
@@ -56,27 +56,25 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewVendorCommand { get; set; }
         public RelayCommand EditVendorCommand { get; set; }
+
         //public RelayCommand DeleteVendorCommand { get; set; }
         public RelayCommand SaveVendorCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public VendorViewModel(IConnectionStringService connectionString, INavigationService navigation)
+        public VendorViewModel(INavigationService navigation, IVendorManager vendorManager)
         {
             Navigation = navigation;
+            _vendorManager = vendorManager;
 
-
-            _connectionString = connectionString.GetConnectionString();
-            _vendorRepository = new VendorRepository(_connectionString);
-            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
-            if (vendors.Item2 == null)
+            //Populate Vendors Property
+            try
             {
-                //No error retrieving vendors
-                Vendors = new ObservableCollection<VendorModel>(vendors.Item1);
+                Vendors = new ObservableCollection<VendorModel>(_vendorManager.GetAll());
                 VendorIndex = 0;
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show(vendors.Item2, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error retrieving Vendors.\r\n\r\n" + ex.Message, "Retrieval Errro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -130,20 +128,18 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void EditVendor(object obj)
         {
+            SetState("Edit");
             //Save a copy of the existing vendor prior to editing
             int id = Vendors[VendorIndex].VendorID;
-            Tuple<VendorModel, string> vendor = _vendorRepository.GetByID(id).ToTuple();
-            //check if there was an error retrieving
-            if (vendor.Item2 == null)
+
+            try
             {
-                //No error
-                undoVendorEdit = vendor.Item1;
-                SetState("Edit");
+                _undoVendorEdit = _vendorManager.GetByID(id);
             }
-            else
+            catch (Exception ex)
             {
                 //error copying existing vendor
-                MessageBox.Show(vendor.Item2, "Error Editing Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error retrieve the undo vendor model.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
         }
@@ -166,7 +162,7 @@ namespace RetailAppUI.ViewModels.Adminstration
             else if (_state.Equals("Edit"))
             {
                 //Undo any editing
-                Vendor = undoVendorEdit;
+                Vendor = _undoVendorEdit;
             }
             SetState("View");
         }
@@ -178,44 +174,34 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void SaveVendor(object obj)
         {
-            if (Vendor.Validate())
+            if (_state.Equals("Add"))
             {
-                if (_state.Equals("Add"))
+                try
                 {
-                    Tuple<VendorModel, string> vendor = _vendorRepository.Insert(Vendors[VendorIndex]).ToTuple();
-                    //check if insert was successful
-                    if (vendor.Item2 == null)
-                    {
-                        Vendors[VendorIndex] = vendor.Item1;
+                    Vendors[VendorIndex] = _vendorManager.Insert(Vendors[VendorIndex]);
+                }
+                catch (Exception ex)
+                {
+                    //Problem adding the new vendor
+                    MessageBox.Show("Error Saving the new vendor.\r\n\r\n" + ex.Message, "Error Adding Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+            else if (_state.Equals("Edit"))
+            {
+                try
+                {
+                    _vendorManager.Update(Vendors[VendorIndex]);
+                }
+                catch (Exception ex)
+                {
+                    //Error saving edit
+                    MessageBox.Show("Error saving the vendor.\r\n\r\n" + ex.Message, "Error Saving Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
 
-                        VendorIndex = Vendors.Count - 1;
-                    }
-                    else
-                    {
-                        //Problem adding the new vendor
-                        MessageBox.Show(vendor.Item2, "Error Adding Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-                }
-                else if (_state.Equals("Edit"))
-                {
-                    string errorMessage = _vendorRepository.Update(Vendors[VendorIndex]);
-                    //Check if no error saving
-                    if (errorMessage != null)
-                    {
-                        //Error saving edit
-                        MessageBox.Show(errorMessage, "Error Saving Vendor", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show(Vendor.ValidationMessage, "Data Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            
-            
+
             SetState("View");
         }
 

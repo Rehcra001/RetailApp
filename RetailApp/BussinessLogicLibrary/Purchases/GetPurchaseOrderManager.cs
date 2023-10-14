@@ -6,18 +6,21 @@ using DataAccessLibrary.ReceiptRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using System.Numerics;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
     public class GetPurchaseOrderManager
     {
         private string _connectionString;
+        private IVendorRepository _vendorRepository;
 
         private PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
 
-        public GetPurchaseOrderManager(string connectionString)
+        public GetPurchaseOrderManager(string connectionString, IVendorRepository vendorRepository)
         {
             _connectionString = connectionString;
+            _vendorRepository = vendorRepository;
         }
 
         public PurchaseOrderHeaderModel GetByID(long id)
@@ -101,7 +104,7 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetVendor()
         {
-            Tuple<VendorModel, string> vendor = new VendorRepository(_connectionString).GetByID(PurchaseOrder.VendorID).ToTuple();
+            Tuple<VendorModel, string> vendor = _vendorRepository.GetByID(PurchaseOrder.VendorID).ToTuple();
             //Check for errors
             if (vendor.Item2 == null)
             {

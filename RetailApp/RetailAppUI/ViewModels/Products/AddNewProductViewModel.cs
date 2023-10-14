@@ -13,12 +13,14 @@ using DataAccessLibrary.UnitsPerRepository;
 using RetailAppUI.Commands;
 using System.Text.RegularExpressions;
 using DataAccessLibrary.CategoryRepository;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace RetailAppUI.ViewModels.Products
 {
     public class AddNewProductViewModel : BaseViewModel
     {
         private ProductManager _productManager;
+        private IVendorRepository _vendorRepository;
 
         private ProductModel? _product;
         public ProductModel? Product
@@ -79,18 +81,19 @@ namespace RetailAppUI.ViewModels.Products
         public RelayCommand SaveProductCommand { get; set; }
 
 
-        public AddNewProductViewModel(INavigationService navigation, IConnectionStringService connectionString, ICurrentViewService currentView)
+        public AddNewProductViewModel(INavigationService navigation, IConnectionStringService connectionString, ICurrentViewService currentView, IVendorRepository vendorRepository)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
             CurrentView = currentView;
+            _vendorRepository = vendorRepository;
 
             //Set product to a new product model
-            _productManager = new ProductManager(ConnectionString.GetConnectionString());
+            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorRepository);
             Product = _productManager.Product;
 
             //Add list of vendor to Vendors
-            Tuple<IEnumerable<VendorModel>, string> vendors = new VendorRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
             //Check for errors
             if (vendors.Item2 == null)//null if no errors raised
             {

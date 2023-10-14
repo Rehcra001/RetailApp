@@ -13,10 +13,10 @@ namespace DataAccessLibrary.VendorRepository
 {
     public class VendorRepository : IVendorRepository
     {
-        private string _connectionString;
-        public VendorRepository(string connectionString)
+        private IRelationalDataAccess _sqlDataAccess;
+        public VendorRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         /// <summary>
@@ -32,15 +32,15 @@ namespace DataAccessLibrary.VendorRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_DeleteVendor";
                     command.Parameters.Add("@VendorID", SqlDbType.Int).Value = vendor.VendorID;
-                    connection.Open();
+                    command.Connection.Open();
 
                     //if not error then "No Error" string is returned
                     //Otherwise an error message is returned
@@ -66,14 +66,14 @@ namespace DataAccessLibrary.VendorRepository
             List<VendorModel> vendors = new List<VendorModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllVendors";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -119,15 +119,15 @@ namespace DataAccessLibrary.VendorRepository
             VendorModel vendor = new VendorModel();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetVendorByID";
                     command.Parameters.Add("@VendorID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -178,11 +178,11 @@ namespace DataAccessLibrary.VendorRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertVendor";
                     command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = vendor.FirstName;
@@ -264,7 +264,7 @@ namespace DataAccessLibrary.VendorRepository
                     }
 
                     command.Parameters.Add("@InternationalVendor", SqlDbType.Bit).Value = vendor.InternationalVendor;
-                    connection.Open();
+                    command.Connection.Open();
 
                     //Database will return an ID if successful otherwise an error message
                     //ID is can be parsed to an int
@@ -298,11 +298,11 @@ namespace DataAccessLibrary.VendorRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_UpdateVendor";
                     command.Parameters.Add("@VendorID", SqlDbType.Int).Value = vendor.VendorID;
@@ -385,7 +385,7 @@ namespace DataAccessLibrary.VendorRepository
                     }
 
                     command.Parameters.Add("@InternationalVendor", SqlDbType.Bit).Value = vendor.InternationalVendor;
-                    connection.Open();
+                    command.Connection.Open();
 
                     //if not error then "No Error" string is returned
                     //Otherwise an error message is returned

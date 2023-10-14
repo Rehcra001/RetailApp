@@ -2,12 +2,14 @@
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
     public class PurchaseOrdersListManager
     {
         private string _connectionString;
+        private IVendorRepository _vendorRepository;
         private PurchaseOrderHeaderRepository _purchaseOrderHeaderRepository;
 
         /// <summary>
@@ -15,9 +17,11 @@ namespace BussinessLogicLibrary.Purchases
         /// </summary>
         public IEnumerable<PurchaseOrderHeaderModel> PurchaseOrders { get; set; } = new List<PurchaseOrderHeaderModel>();
 
-        public PurchaseOrdersListManager(string connectionString)
+        public PurchaseOrdersListManager(string connectionString, IVendorRepository vendorRepository)
         {
             _connectionString = connectionString;
+            _vendorRepository = vendorRepository;
+
             _purchaseOrderHeaderRepository = new PurchaseOrderHeaderRepository(_connectionString);
         }
 
@@ -123,7 +127,7 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = new VendorRepository(_connectionString).GetAll().ToTuple();
+            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
 
             //Check for errors
             if (vendors.Item2 == null)

@@ -2,6 +2,7 @@
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -17,6 +18,7 @@ namespace RetailAppUI.ViewModels.Purchases
     public class PurchaseOrdersSwitchboardViewModel : BaseViewModel
     {
         private PurchaseOrdersListManager _ordersListManager;
+        private IVendorRepository _vendorRepository;
         private string _groupByState = string.Empty;
 
         private INavigationService _navigation;
@@ -105,15 +107,17 @@ namespace RetailAppUI.ViewModels.Purchases
 
 
         public PurchaseOrdersSwitchboardViewModel(INavigationService navigation, IConnectionStringService connectionString, 
-                                                  ICurrentViewService currentView, ISharedDataService sharedData)
+                                                  ICurrentViewService currentView, ISharedDataService sharedData,
+                                                  IVendorRepository vendorRepository)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
             CurrentView = currentView;
             SharedData = sharedData;
+            _vendorRepository = vendorRepository;
 
             //Instantiate orders list manager
-            _ordersListManager = new PurchaseOrdersListManager(ConnectionString.GetConnectionString());
+            _ordersListManager = new PurchaseOrdersListManager(ConnectionString.GetConnectionString(), _vendorRepository);
             //Instantiate PurchaseOrders
             PurchaseOrders = new ObservableCollection<PurchaseOrderHeaderModel>();
             //Add to collection view
@@ -217,7 +221,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = new VendorRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
             //Check for errors
             if (vendors.Item2 == null)
             {

@@ -3,7 +3,9 @@ using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
 using DataAccessLibrary.ReceiptRepository;
 using DataAccessLibrary.StatusRepository;
+using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -19,6 +21,7 @@ namespace RetailAppUI.ViewModels.Purchases
     public class PurchaseOrderViewModel : BaseViewModel
     {
         private PurchaseOrderManager _purchaseOrderManager;
+        private IVendorRepository _vendorRepository;
         //two states view or edit
         private string _state;
 
@@ -174,11 +177,12 @@ namespace RetailAppUI.ViewModels.Purchases
 
 
         //constructor
-        public PurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString, ISharedDataService sharedData)
+        public PurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString, ISharedDataService sharedData, IVendorRepository vendorRepository)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
             SharedData = sharedData;
+            _vendorRepository = vendorRepository;
 
             GetPurchaseOrder();
             GetStatuses();
@@ -689,7 +693,7 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             try
             {
-                List<ProductModel> products = new ProductsManager(ConnectionString.GetConnectionString()).GetByVendorID(id).ToList();
+                List<ProductModel> products = new ProductsManager(ConnectionString.GetConnectionString(), _vendorRepository).GetByVendorID(id).ToList();
 
                 //Remove any products from the list of products if the existing purchase order lines already have that product*
                 for (int i = 0; i < PurchaseOrder.PurchaseOrderDetails.Count; i++)

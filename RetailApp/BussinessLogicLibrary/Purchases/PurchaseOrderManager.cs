@@ -1,5 +1,6 @@
 ﻿using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace BussinessLogicLibrary.Purchases
         public PurchaseOrderHeaderModel PurchaseOrder { get; private set; } = new PurchaseOrderHeaderModel();
 
         private string _connectionString;
+        private IVendorRepository _vendorRepository;
 
         public PurchaseOrderManager(string connectionString)
         {
@@ -27,7 +29,7 @@ namespace BussinessLogicLibrary.Purchases
         /// </param>
         public void GetByID(long id)
         {
-            PurchaseOrder = new GetPurchaseOrderManager(_connectionString).GetByID(id);
+            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorRepository).GetByID(id);
         }
 
         /// <summary>
@@ -35,7 +37,7 @@ namespace BussinessLogicLibrary.Purchases
         /// </summary>
         public void SaveChanges()
         {
-            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder);
+            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorRepository);
         }
 
         private void GetOrderLineStatus(PurchaseOrderDetailModel orderLine)

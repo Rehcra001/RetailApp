@@ -3,6 +3,7 @@ using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -19,6 +20,7 @@ namespace RetailAppUI.ViewModels.Products
     {
 		private string _state;
 		private ProductManager _productManager;
+		private IVendorRepository _vendorRepository;
 
         #region Service Properties
         private ISharedDataService _sharedData;
@@ -128,14 +130,15 @@ namespace RetailAppUI.ViewModels.Products
         #endregion RelayCommand Properties
 
         #region Constructor
-        public ProductViewModel(IConnectionStringService connectionString, ISharedDataService sharedData, INavigationService navigation)
+        public ProductViewModel(IConnectionStringService connectionString, ISharedDataService sharedData, INavigationService navigation, IVendorRepository vendorRepository)
         {
 			SharedData = sharedData; //Will hold the Product ID selected in the products switchboard view
 			ConnectionString = connectionString;
 			Navigation = navigation;
+			_vendorRepository = vendorRepository;
 
-			//Get the Product to display
-			_productManager = new ProductManager(ConnectionString.GetConnectionString());
+            //Get the Product to display
+            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorRepository);
 			try
 			{
 				int id = (int)SharedData.SharedData;
@@ -219,7 +222,7 @@ namespace RetailAppUI.ViewModels.Products
             //prepare for cancelling any edits
             try
             {                
-                ProductUndoEdit = new ProductManager(ConnectionString.GetConnectionString()).GetByID(Product.ProductID);
+                ProductUndoEdit = new ProductManager(ConnectionString.GetConnectionString(), _vendorRepository).GetByID(Product.ProductID);
             }
             catch (Exception ex)
             {
@@ -314,7 +317,7 @@ namespace RetailAppUI.ViewModels.Products
         #region Get Vendors
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = new VendorRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
+            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
 
             if (vendors.Item2 == null)
             {

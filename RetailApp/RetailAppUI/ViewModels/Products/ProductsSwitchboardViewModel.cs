@@ -1,5 +1,6 @@
 ﻿using BussinessLogicLibrary.Products;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -13,7 +14,9 @@ namespace RetailAppUI.ViewModels.Products
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
 		private readonly ProductsManager _productsManager;
-		private string _groupByState;
+        private IVendorRepository _vendorRepository;
+
+        private string _groupByState;
 
         #region Collection View Property
         public ICollectionView ProductsCollectionView { get; set; }
@@ -81,15 +84,16 @@ namespace RetailAppUI.ViewModels.Products
         #endregion Relay Command Properties
 
         #region Constructor
-        public ProductsSwitchboardViewModel(INavigationService navigation, ICurrentViewService currentView, ISharedDataService sharedData, IConnectionStringService connectionString)
+        public ProductsSwitchboardViewModel(INavigationService navigation, ICurrentViewService currentView, ISharedDataService sharedData, IConnectionStringService connectionString, IVendorRepository vendorRepository)
         {
 			Navigation = navigation;
 			CurrentView = currentView;
 			SharedData = sharedData;
 			ConnectionString = connectionString;
+            _vendorRepository = vendorRepository;
 
 			//Fetch a list of products
-            _productsManager = new ProductsManager(ConnectionString.GetConnectionString());
+            _productsManager = new ProductsManager(ConnectionString.GetConnectionString(), _vendorRepository);
             GetProductsList();
 
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
