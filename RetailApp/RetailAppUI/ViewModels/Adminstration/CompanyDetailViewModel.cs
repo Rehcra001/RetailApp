@@ -1,4 +1,5 @@
-﻿using DataAccessLibrary.CompanyDetailRepository;
+﻿using BussinessLogicLibrary.CompanyDetail;
+using DataAccessLibrary.CompanyDetailRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
@@ -9,26 +10,25 @@ namespace RetailAppUI.ViewModels.Adminstration
 {
     public class CompanyDetailViewModel : BaseViewModel
     {
-        private CompanyDetailRepository _companyDetailRepository;
+        private readonly ICompanyDetailManager _companyDetailManager;
         private CompanyDetailModel? _companyDetail;
-        private string _connectionString;
         private INavigationService _navigation;
+        private IConnectionStringService _connection;
         private string _state;
         private CompanyDetailModel undoCompanyDetailEdit;
         private bool _textReadOnly;
         private string _addIsVisible;
 
-        public CompanyDetailModel CompanyDetail
-        {
-            get { return _companyDetail; }
-            set { _companyDetail = value; OnPropertyChanged(); }
-        }
+
+        public CompanyDetailModel? CompanyDetail { get => _companyDetail; set { _companyDetail = value; OnPropertyChanged(); } }
 
         public bool TextReadOnly { get => _textReadOnly; set { _textReadOnly = value; OnPropertyChanged(); } }
 
         public string AddIsVisible { get => _addIsVisible; set { _addIsVisible = value; OnPropertyChanged(); } }
 
         public INavigationService Navigation { get => _navigation; set { _navigation = value; OnPropertyChanged(); } }
+
+        public IConnectionStringService Connection { get => _connection; set => _connection = value; }
 
 
         public RelayCommand CloseViewCommand { get; set; }
@@ -37,42 +37,42 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand SaveCompanyDetailCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public CompanyDetailViewModel(IConnectionStringService connectionString, INavigationService navigation)
+        public CompanyDetailViewModel(IConnectionStringService connection, INavigationService navigation, ICompanyDetailManager companyDetailManager)
         {
             Navigation = navigation;
+            Connection = connection;
 
+            _companyDetailManager = companyDetailManager;
 
-            _connectionString = connectionString.GetConnectionString();
-            _companyDetailRepository = new CompanyDetailRepository(_connectionString);
-            Tuple<CompanyDetailModel, string> companyDetail = _companyDetailRepository.Get().ToTuple();
-            if (companyDetail.Item2 == null)
+            //retrieve the company detail
+            try
             {
-                //No error retrieving company detail
-                CompanyDetail = companyDetail.Item1;
-                if (CompanyDetail.CompanyID == 0)
-                {
-                    //No record returned allow adding
-                    AddIsVisible = "Visible";
-                }
-                else
-                {
-                    //Valid record returned disallow adding a new one
-                    AddIsVisible = "Hidden";
-                }
+                CompanyDetail = _companyDetailManager.Get();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unable to retrieve the Company Detail.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
+            }
+
+            //Set the visibility level of AddIsVisible
+            if (CompanyDetail!.CompanyID == 0)
+            {
+                AddIsVisible = "Visible";
             }
             else
             {
-                MessageBox.Show(companyDetail.Item2, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                AddIsVisible = "Hidden";
             }
 
+            //Instantiate the commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
             AddNewCompanyDetailCommand = new RelayCommand(AddNewCompanyDetail, CanAddNewCompanyDetail);
             SaveCompanyDetailCommand = new RelayCommand(SaveCompanyDetail, CanSaveCompanyDetail);
             CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
             EditCompanyDetailCommand = new RelayCommand(EditCompanyDetail, CanEditCompanyDetail);
 
-
+            //Set the state
             SetState("View");
         }
 
@@ -83,21 +83,17 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void EditCompanyDetail(object obj)
         {
-            //Save a copy of the existing Company detail prior to editing
-            int id = CompanyDetail.CompanyID;
-            Tuple<CompanyDetailModel, string> companyDetail = _companyDetailRepository.Get().ToTuple();
-            //check if there was an error retrieving
-            if (companyDetail.Item2 == null)
+            //Save a copy of the existing Company detail prior to editing            
+            //retrieve the company detail
+            try
             {
-                //No error
-                undoCompanyDetailEdit = companyDetail.Item1;
+                undoCompanyDetailEdit = _companyDetailManager.Get();
                 SetState("Edit");
             }
-            else
+            catch (Exception ex)
             {
-                //error copying existing company detail
-                MessageBox.Show(companyDetail.Item2, "Error Editing Company Detail", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MessageBox.Show("Error retrieving model for undo action.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
             }
         }
 
@@ -127,41 +123,36 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void SaveCompanyDetail(object obj)
         {
-            if (CompanyDetail.Validate())
+            if (_state.Equals("Add"))
             {
-                if (_state.Equals("Add"))
+                try
                 {
-                    Tuple<CompanyDetailModel, string> companyDetail = _companyDetailRepository.Insert(CompanyDetail).ToTuple();
-                    //check if insert was successful
-                    if (companyDetail.Item2 == null)
-                    {
-                        CompanyDetail = companyDetail.Item1;
-                        //Hide the Add new button as only one record is allowed
-                        AddIsVisible = "Hidden";
-                    }
-                    else
-                    {
-                        //Problem adding the new company detail
-                        MessageBox.Show(companyDetail.Item2, "Error Adding Company Detail", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                    CompanyDetail = _companyDetailManager.Insert(CompanyDetail);
+                    //Hide the Add new button as only one record is allowed
+                    AddIsVisible = "Hidden";
+                    //Give user acknowledgement of the successful save
+                    MessageBox.Show("Company Detail Saved", "Save Company Detail", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-                else if (_state.Equals("Edit"))
+                catch (Exception ex)
                 {
-                    string errorMessage = _companyDetailRepository.Update(CompanyDetail);
-                    //Check if no error saving
-                    if (errorMessage != null)
-                    {
-                        //Error saving edit
-                        MessageBox.Show(errorMessage, "Error Saving Company Detail", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                    MessageBox.Show("Error saving the model.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
             }
-            else
+            else if (_state.Equals("Edit"))
             {
-                MessageBox.Show(CompanyDetail.ValidationMessage, "Data Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                try
+                {
+                    _companyDetailManager.Update(CompanyDetail);
+
+                    //Give user acknowledgement of the successful save
+                    MessageBox.Show("Company Detail Saved", "Save Company Detail", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error saving the model.\r\n\r\n" + ex.Message, "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
 
 

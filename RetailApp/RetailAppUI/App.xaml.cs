@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BussinessLogicLibrary.CompanyDetail;
+using DataAccessLibrary;
+using DataAccessLibrary.CompanyDetailRepository;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Services;
 using RetailAppUI.ViewModels;
 using RetailAppUI.ViewModels.Adminstration;
@@ -6,6 +11,8 @@ using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Purchases;
 using RetailAppUI.Views;
 using System;
+using System.Configuration;
+using System.IO;
 using System.Windows;
 
 namespace RetailAppUI
@@ -15,10 +22,25 @@ namespace RetailAppUI
     /// </summary>
     public partial class App : Application
     {
-        private ServiceProvider __serviceProvider;
+        private ServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// Adds access to appsettings.json
+        /// </summary>
+        /// <returns>
+        /// Returns an IConfiguration
+        /// </returns>
+        private IConfiguration AddConfiguration()
+        {
+            IConfigurationBuilder builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+            return builder.Build();
+        }
 
         public App()
         {
+
             IServiceCollection services = new ServiceCollection();
 
             //Views and viewModels
@@ -41,6 +63,18 @@ namespace RetailAppUI
             services.AddTransient<PurchaseOrdersSwitchboardViewModel>();
             services.AddTransient<PurchaseOrderViewModel>();
 
+            //Add appsettings.json Configuration
+            services.AddSingleton(AddConfiguration());
+
+            //Sql connection
+            services.AddSingleton<IRelationalDataAccess, RelationalDataAccess>();
+
+            //Repositories
+            services.AddTransient<ICompanyDetailRepository, CompanyDetailRepository>();
+
+            //Managers
+            services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
+
             //Services
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IConnectionStringService, ConnectionStringService>();
@@ -49,12 +83,15 @@ namespace RetailAppUI
 
             services.AddSingleton<Func<Type, BaseViewModel>>(ServiceProvider => viewModelType => (BaseViewModel)ServiceProvider.GetRequiredService(viewModelType));
 
-            __serviceProvider = services.BuildServiceProvider();
+
+
+            _serviceProvider = services.BuildServiceProvider();
+
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            var mainView = __serviceProvider.GetRequiredService<MainView>();
+            var mainView = _serviceProvider.GetRequiredService<MainView>();
             mainView.Show();
             base.OnStartup(e);
         }

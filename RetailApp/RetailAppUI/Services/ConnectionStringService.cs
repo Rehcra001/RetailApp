@@ -11,7 +11,7 @@ namespace RetailAppUI.Services
     {
         public string GetConnectionString()
         {
-            return ConfigurationManager.ConnectionStrings["RetailAppDB"].ConnectionString;
+            return ConfigurationManager.ConnectionStrings["SqlRetailAppDB"].ConnectionString;
         }
     }
 }
