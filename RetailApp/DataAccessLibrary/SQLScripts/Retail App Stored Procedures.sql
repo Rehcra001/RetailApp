@@ -1051,7 +1051,10 @@ BEGIN
 
 			--Check if receipt fills the order line
 			--If yes then change line to filled
-			EXECUTE dbo.usp_UpdatePurchaseOrderDetailToFilled @PurchaseOrderID, @ProductID;			
+			EXECUTE dbo.usp_UpdatePurchaseOrderDetailToFilled @PurchaseOrderID, @ProductID;		
+			
+			--Update the weight unit cost of the product
+			EXECUTE dbo.usp_UpdateProductWeightedUnitCostFIFO @ProductID
 
 			--Return receipt id on success
 			SELECT @ReceiptID AS ID;
@@ -1182,6 +1185,9 @@ BEGIN
 
 			--Update Purchase order detail with quantity receipted
 			EXECUTE dbo.usp_UpdatePurchaseOrderDetailQuantityReceipted @PurchaseOrderID, @ProductID;
+
+			--Update the weight unit cost of the product
+			EXECUTE dbo.usp_UpdateProductWeightedUnitCostFIFO @ProductID
 			END;
 
 			SELECT 'No Error' AS Message;

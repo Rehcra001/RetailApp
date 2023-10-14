@@ -119,14 +119,14 @@ DECLARE @ProductID INT = 10001;
 DECLARE @IssueID INT;
 
 INSERT INTO dbo.Issues(SalesOrderID, ProductID, IssueDate, QuantityIssued,UnitCost)
-VALUES(8900000236, @ProductID, @IssueDate, -10, 80 )
+VALUES(8900000236, @ProductID, @IssueDate, -33, 80 )
 
 SELECT @IssueID = MAX(IssueID)
 FROM dbo.Issues;
 
 --Update InventoryTransactions
 INSERT INTO dbo.InventoryTransactions (TransactionType, TransactionDate, ProductID, OrderID, Quantity)
-VALUES ('I', GETDATE(), @ProductID, @IssueID, -10);
+VALUES ('I', GETDATE(), @ProductID, @IssueID, -33);
 
 EXECUTE dbo.usp_UpdateProductOnHand @ProductID;
 GO
