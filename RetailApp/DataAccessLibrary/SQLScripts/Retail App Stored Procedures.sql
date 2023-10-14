@@ -703,6 +703,64 @@ BEGIN
 END;
 GO
 
+--Updates the specified product's weighted unit cost
+--of the stock on hand
+--this is done on a first in first out basis
+CREATE PROCEDURE dbo.UpdateProductWeightedUnitCostFIFO
+(
+	@ProductID INT
+)AS
+BEGIN
+	DECLARE @QuantityInStock INT;
+	DECLARE @CostPerUnit MONEY;
+
+	--Check if there is any stock on hand for this product
+	SELECT @QuantityInStock = ISNULL(SUM(QuantityReceipted),0) FROM Receipts WHERE ProductID = @ProductID;
+
+	IF (@QuantityInStock > 0)
+	BEGIN
+		--There is stock. Determine the weight unit cost of the stock on hand
+		;WITH productIssued AS
+		(
+			--sum up the number of this product issued out of stock/sold
+			SELECT ISNULL(SUM(QuantityIssued),0) AS SumIssued
+			FROM dbo.Issues
+			WHERE ProductID = @ProductID
+		),
+		productReceipts AS 
+		(
+			--Create a record set of all vaild receipts for this product 
+			SELECT QuantityReceipted, UnitCost, ReceiptDate,
+			       (ISNULL(SUM(QuantityReceipted) OVER(ORDER BY ReceiptDate),0) + p.SumIssued) AS QtyLeft			   
+			FROM dbo.Receipts AS r
+			CROSS JOIN productIssued AS p
+			WHERE ReverseReferenceID IS NULL AND r.ProductID = @ProductID
+		),
+		productReceiptsWithRowNum AS
+		(
+			--Only keep the rows with a QtyLeft greater than zero and then add row nummbers
+			SELECT QuantityReceipted, UnitCost, QtyLeft,
+				   ROW_NUMBER() OVER(ORDER BY ReceiptDate) AS RowNum
+			FROM productReceipts
+			WHERE QtyLeft > 0
+		)
+		SELECT @CostPerUnit = ISNULL(SUM(CASE WHEN RowNum = 1 THEN (QtyLeft * UnitCost) ELSE (QuantityReceipted * UnitCost) END) /
+							  SUM(CASE WHEN RowNum = 1 THEN QtyLeft ELSE QuantityReceipted END),0)
+		FROM productReceiptsWithRowNum;		
+	END;
+
+	ELSE --No Stock just set unit cost to zero
+	BEGIN
+		SET @CostPerUnit = 0;
+	END
+
+	--Update the weighted unit cost of the product
+	UPDATE dbo.Products
+	SET UnitCost = @CostPerUnit
+	WHERE ProductID = @ProductID;
+END;
+GO
+
 --Update the specified product with a weighted unit cost 
 --of the products currently in stock
 --based on First In First Out Principle
