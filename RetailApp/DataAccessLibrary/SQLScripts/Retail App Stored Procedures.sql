@@ -706,7 +706,7 @@ GO
 --Updates the specified product's weighted unit cost
 --of the stock on hand
 --this is done on a first in first out basis
-CREATE PROCEDURE dbo.UpdateProductWeightedUnitCostFIFO
+CREATE PROCEDURE dbo.usp_UpdateProductWeightedUnitCostFIFO
 (
 	@ProductID INT
 )AS
