@@ -1,4 +1,5 @@
-﻿using DataAccessLibrary.CategoryRepository;
+﻿using BussinessLogicLibrary.Categories;
+using DataAccessLibrary.CategoryRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
@@ -15,104 +16,88 @@ namespace RetailAppUI.ViewModels.Adminstration
 {
     public class ProductCategoryViewModel : BaseViewModel
     {
-		private CategoryRepository _categoryRepository;
-		private CategoryModel _undoEdit;
+        private ICategoryManager _categoryManager;
+        private string _state;
+        private CategoryModel _undoEdit;
 
         private ICollectionView _categoryCollectionView;
-        public ICollectionView CategoryCollectionView 
-		{ 
-			get { return _categoryCollectionView; }
-			set { _categoryCollectionView = value; OnPropertyChanged(); } 
-		}
+        public ICollectionView CategoryCollectionView
+        {
+            get { return _categoryCollectionView; }
+            set { _categoryCollectionView = value; OnPropertyChanged(); }
+        }
 
         private CategoryModel _selectedCategory;
-		public CategoryModel SelectedCategory
-		{
-			get { return _selectedCategory; }
-			set { _selectedCategory = value; OnPropertyChanged(); }
-		}
+        public CategoryModel SelectedCategory
+        {
+            get { return _selectedCategory; }
+            set { _selectedCategory = value; OnPropertyChanged(); }
+        }
 
-		private ObservableCollection<CategoryModel> _categories;
-		public ObservableCollection<CategoryModel> Categories
-		{
-			get { return _categories; }
-			set { _categories = value; OnPropertyChanged(); }
-		}
+        private ObservableCollection<CategoryModel> _categories;
+        public ObservableCollection<CategoryModel> Categories
+        {
+            get { return _categories; }
+            set { _categories = value; OnPropertyChanged(); }
+        }
 
-
-
-		private IConnectionStringService _connectionString;
-        private string _state;
-
-        public IConnectionStringService ConnectionString
-		{
-			get { return _connectionString; }
-			set { _connectionString = value; }
-		}
-
-		private INavigationService _navigation;        
+        private INavigationService _navigation;
 
         public INavigationService Navigation
-		{
-			get { return _navigation; }
-			set { _navigation = value; OnPropertyChanged(); }
-		}
+        {
+            get { return _navigation; }
+            set { _navigation = value; OnPropertyChanged(); }
+        }
 
-		private bool _textReadOnly;
-		public bool TextReadOnly
-		{
-			get { return _textReadOnly; }
-			set { _textReadOnly = value; OnPropertyChanged(); }
-		}
+        private bool _textReadOnly;
+        public bool TextReadOnly
+        {
+            get { return _textReadOnly; }
+            set { _textReadOnly = value; OnPropertyChanged(); }
+        }
 
 
 
-		//Commands
-		public RelayCommand	CloseViewCommand { get; set; }
+        //Commands
+        public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand AddNewCommand { get; set; }
-		public RelayCommand EditCommand { get; set; }
-		public RelayCommand SaveCommand { get; set; }
+        public RelayCommand EditCommand { get; set; }
+        public RelayCommand SaveCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public ProductCategoryViewModel(IConnectionStringService connectionString, INavigationService navigation)
+        public ProductCategoryViewModel(INavigationService navigation, ICategoryManager categoryManager)
         {
-			ConnectionString = connectionString;
-			Navigation = navigation;
+            Navigation = navigation;
+            _categoryManager = categoryManager;
 
-			//Category repository
-			_categoryRepository = new CategoryRepository(ConnectionString.GetConnectionString());
+            //Load Categories
+            try
+            {
+                Categories = new ObservableCollection<CategoryModel>(_categoryManager.GetAll());
+                CategoryCollectionView = CollectionViewSource.GetDefaultView(Categories);
 
-			//Load Categories
-			Tuple<IEnumerable<CategoryModel>, string> categories = _categoryRepository.GetAll().ToTuple();
-			//check for errors
-			if (categories.Item2 == null)
-			{
-				//No Errors
-				Categories = new ObservableCollection<CategoryModel>(categories.Item1);
-				//Add to collection View
-				CategoryCollectionView = CollectionViewSource.GetDefaultView(Categories);
-				
                 //set SelectedCategory 
                 if (Categories.Any<CategoryModel>())
-				{
-					SelectedCategory = Categories.First();
+                {
+                    SelectedCategory = Categories.First();
                 }
-			}
-			else
-			{
-				//Error raised by database
-				MessageBox.Show("Error retrieving the categories.\r\n" + categories.Item2, "Category Error", MessageBoxButton.OK, MessageBoxImage.Error);
-			}
+            }
+            catch (Exception ex)
+            {
+                //Unable to retrieve categories
+                MessageBox.Show("Error retrieving the categories.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
+            }
 
-			//Instantiate commands
-			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
-			AddNewCommand = new RelayCommand(AddNewCategory, CanAddNewCategory);
-			EditCommand = new RelayCommand(EditCategory, CanEditCategory);
-			SaveCommand = new RelayCommand(SaveCategory, CanSaveCategory);
-			CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
-			
+            //Instantiate commands
+            CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
+            AddNewCommand = new RelayCommand(AddNewCategory, CanAddNewCategory);
+            EditCommand = new RelayCommand(EditCategory, CanEditCategory);
+            SaveCommand = new RelayCommand(SaveCategory, CanSaveCategory);
+            CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
 
-			SetState("View");
+
+            SetState("View");
         }
 
         private bool CanCancelAction(object obj)
@@ -123,24 +108,24 @@ namespace RetailAppUI.ViewModels.Adminstration
         private void CancelAction(object obj)
         {
             //check if state is add or edit
-			if (_state.Equals("Add"))
-			{
-				//Remove the added CategoryModel
-				int index = Categories.Count - 1;
-				Categories.RemoveAt(index);
+            if (_state.Equals("Add"))
+            {
+                //Remove the added CategoryModel
+                int index = Categories.Count - 1;
+                Categories.RemoveAt(index);
                 //set SelectedCategory 
                 if (Categories.Any<CategoryModel>())
                 {
                     SelectedCategory = Categories.First();
                 }
             }
-			else if (_state.Equals("Edit"))
-			{
-				SelectedCategory.CategoryName = _undoEdit.CategoryName;
-				SelectedCategory = (CategoryModel)CategoryCollectionView.CurrentItem;
-				CategoryCollectionView.Refresh();
-			}
-			SetState("View");
+            else if (_state.Equals("Edit"))
+            {
+                SelectedCategory.CategoryName = _undoEdit.CategoryName;
+                SelectedCategory = (CategoryModel)CategoryCollectionView.CurrentItem;
+                CategoryCollectionView.Refresh();
+            }
+            SetState("View");
         }
 
         private bool CanSaveCategory(object obj)
@@ -151,10 +136,10 @@ namespace RetailAppUI.ViewModels.Adminstration
         private void SaveCategory(object obj)
         {
             //Check if state is add or edit
-			if (_state.Equals("Add"))
-			{
-				if (!string.IsNullOrWhiteSpace(SelectedCategory.CategoryName))
-				{
+            if (_state.Equals("Add"))
+            {
+                if (!string.IsNullOrWhiteSpace(SelectedCategory.CategoryName))
+                {
                     //Check that the new category does not exist yet
                     foreach (CategoryModel model in Categories)
                     {
@@ -165,34 +150,22 @@ namespace RetailAppUI.ViewModels.Adminstration
                         }
                     }
                 }
-				
-				//Validate data
-				if (SelectedCategory.Validate())
-				{
-					//Add to database
-					Tuple<CategoryModel, string> category =  _categoryRepository.Insert(SelectedCategory).ToTuple();
-					//Check for errors
-					if (category.Item2 == null)//Will be null if no error raised
-					{
-						//Add the unique id returned from the database
-						SelectedCategory.CategoryID = category.Item1.CategoryID;
-						CategoryCollectionView.Refresh();
-					}
-					else
-					{
-                        MessageBox.Show(category.Item2, "Error Saving Category", MessageBoxButton.OK, MessageBoxImage.Error);
-						return;
-                    }
-				}
-				else
-				{
-					//Shows data validation errors
-					MessageBox.Show(SelectedCategory.ValidationMessage, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-					return;
-				}
-			}
-			else if (_state.Equals("Edit"))
-			{
+
+                //Insert new category
+                try
+                {
+                    //Add the unique id returned from the database
+                    SelectedCategory.CategoryID = _categoryManager.Insert(SelectedCategory).CategoryID;
+                    CategoryCollectionView.Refresh();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error saving the category.\r\n\r\n" + ex.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+            else if (_state.Equals("Edit"))
+            {
                 if (!string.IsNullOrWhiteSpace(SelectedCategory.CategoryName))
                 {
                     //Check that the edited category does not exist yet
@@ -206,28 +179,17 @@ namespace RetailAppUI.ViewModels.Adminstration
                     }
                 }
 
-				if (SelectedCategory.Validate())
-				{
-					//No validation errors
-					//try and save edited category
-					string errorMessage = _categoryRepository.Update(SelectedCategory);
-					//Check for error
-					if (errorMessage != null)
-					{
-                        //Error raised by database
-                        MessageBox.Show(errorMessage, "Error Saving Category", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-				}
-				else
-				{
-                    //Validation error
-                    //Shows data validation errors
-                    MessageBox.Show(SelectedCategory.ValidationMessage, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try
+                {
+                    _categoryManager.Update(SelectedCategory);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error saving the category.\r\n\r\n" + ex.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }
-			SetState("View");
+            SetState("View");
         }
 
         private bool CanEditCategory(object obj)
@@ -237,51 +199,51 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void EditCategory(object obj)
         {
-			//Save the current category
-			_undoEdit = new CategoryModel();
-			_undoEdit.CategoryID = SelectedCategory.CategoryID;
-			_undoEdit.CategoryName = SelectedCategory.CategoryName;
-			SetState("Edit");
+            //Save the current category
+            _undoEdit = new CategoryModel();
+            _undoEdit.CategoryID = SelectedCategory.CategoryID;
+            _undoEdit.CategoryName = SelectedCategory.CategoryName;
+            SetState("Edit");
         }
 
         private bool CanAddNewCategory(object obj)
         {
-			return _state.Equals("View");
+            return _state.Equals("View");
         }
 
         private void AddNewCategory(object obj)
         {
-			//Add new CategoryModel to Categories
-			Categories.Add(new CategoryModel());
-			//Move to the newly created objec
-			CategoryCollectionView.MoveCurrentToLast();
-			SelectedCategory = (CategoryModel)CategoryCollectionView.CurrentItem;
-			SetState("Add");
+            //Add new CategoryModel to Categories
+            Categories.Add(new CategoryModel());
+            //Move to the newly created objec
+            CategoryCollectionView.MoveCurrentToLast();
+            SelectedCategory = (CategoryModel)CategoryCollectionView.CurrentItem;
+            SetState("Add");
         }
 
         private bool CanCloseView(object obj)
         {
-			return true;
+            return true;
         }
 
         private void CloseView(object obj)
         {
-			Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
-		}
+            Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
+        }
 
         private void SetState(string state)
         {
-			_state = state;
+            _state = state;
 
-			switch (_state)
-			{
-				case "View":
-					TextReadOnly = true;
-					break;
-				default:
-					TextReadOnly = false;
-					break;
-			}
+            switch (_state)
+            {
+                case "View":
+                    TextReadOnly = true;
+                    break;
+                default:
+                    TextReadOnly = false;
+                    break;
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using DataAccessLibrary.CategoryRepository;
+﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.Vendors;
+using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.InventoryTransactionRepository;
 using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.UnitsPerRepository;
@@ -15,13 +17,16 @@ namespace BussinessLogicLibrary.Products
     public class ProductManager
     {
 		private string _connectionString;
-        private IVendorRepository _vendorRepository;
+        private IVendorManager _vendorManager;
+        private ICategoryManager _categoryManager;
+
 		public ProductModel Product { get; set; } = new ProductModel();
 
-        public ProductManager(string connectionString, IVendorRepository vendorRepository)
+        public ProductManager(string connectionString, IVendorManager vendorManager, ICategoryManager categoryManager)
         {
 			_connectionString = connectionString;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _categoryManager = categoryManager;
         }
 
         #region Retrieve a product
@@ -80,17 +85,13 @@ namespace BussinessLogicLibrary.Products
         /// <exception cref="Exception"></exception>
         private void GetCategory()
         {
-            Tuple<CategoryModel, string> category = new CategoryRepository(_connectionString).GetByID(Product.CategoryID).ToTuple();
-
-            if (category.Item2 == null)
+            try
             {
-                //No errors
-                Product.Category = category.Item1;
+                Product.Category = _categoryManager.GetByID(Product.CategoryID);
             }
-            else
+            catch (Exception ex)
             {
-                //Error retrieving categories
-                throw new Exception(category.Item2);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -120,16 +121,13 @@ namespace BussinessLogicLibrary.Products
         /// <exception cref="Exception"></exception>
         private void GetVendor()
         {
-            Tuple<VendorModel, string> vendor = _vendorRepository.GetByID(Product.VendorID).ToTuple();
-
-            if (vendor.Item2 == null)
+            try
             {
-                Product.Vendor = vendor.Item1;
+                Product.Vendor = _vendorManager.GetByID(Product.VendorID);
             }
-            else
+            catch (Exception ex)
             {
-                //Error with vendors
-                throw new Exception(vendor.Item2);
+                throw new Exception(ex.Message);
             }
         }
         #endregion Retrieve a product

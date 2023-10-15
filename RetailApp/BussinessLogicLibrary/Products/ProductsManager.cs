@@ -1,4 +1,5 @@
-﻿using BussinessLogicLibrary.Vendors;
+﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.UnitsPerRepository;
@@ -12,13 +13,15 @@ namespace BussinessLogicLibrary.Products
     {
         private IEnumerable<ProductModel>? _products;
         private readonly string _connectionString;
-        private readonly IVendorRepository _vendorRepository;
+        private readonly IVendorManager _vendorManager;
+        private readonly ICategoryManager _categoryManager;
 
 
-        public ProductsManager(string connectionString, IVendorRepository vendorRepository)
+        public ProductsManager(string connectionString, IVendorManager vendorManager, ICategoryManager categoryManager)
         {
             _connectionString = connectionString;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _categoryManager = categoryManager;
         }
 
         /// <summary>
@@ -61,20 +64,19 @@ namespace BussinessLogicLibrary.Products
 
         private void GetCategories()
         {
-            Tuple<IEnumerable<CategoryModel>, string> categories = new CategoryRepository(_connectionString).GetAll().ToTuple();
+            try
+            {
+                IEnumerable<CategoryModel> categories = _categoryManager.GetAll();
 
-            if (categories.Item2 == null)
-            {
-                //No errors
-                foreach (ProductModel product in _products)
+                foreach (ProductModel product in _products!)
                 {
-                    product.Category = categories.Item1.First(c => c.CategoryID == product.CategoryID);
+                    product.Category = categories.First(c => c.CategoryID == product.CategoryID);
                 }
+
             }
-            else
+            catch (Exception ex)
             {
-                //Error retrieving categories
-                throw new Exception(categories.Item2);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -99,20 +101,19 @@ namespace BussinessLogicLibrary.Products
 
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
+            try
+            {
+                IEnumerable<VendorModel> vendors = _vendorManager.GetAll();
 
-            if (vendors.Item2 == null)
-            {
-                foreach (ProductModel product in _products)
+                foreach (ProductModel product in _products!)
                 {
-                    //Add vendor detail to each product in products
-                    product.Vendor = vendors.Item1.First(v => v.VendorID == product.VendorID);
+                    product.Vendor = vendors.First(v => v.VendorID == product.VendorID);
                 }
+
             }
-            else
+            catch (Exception ex)
             {
-                //Error with vendors
-                throw new Exception(vendors.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

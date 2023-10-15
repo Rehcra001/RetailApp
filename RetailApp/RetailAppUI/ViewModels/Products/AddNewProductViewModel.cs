@@ -4,23 +4,19 @@ using RetailAppUI.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccessLibrary.VendorRepository;
 using System.Windows;
 using DataAccessLibrary.UnitsPerRepository;
 using RetailAppUI.Commands;
-using System.Text.RegularExpressions;
-using DataAccessLibrary.CategoryRepository;
-using ModelsLibrary.RepositoryInterfaces;
+using BussinessLogicLibrary.Vendors;
+using BussinessLogicLibrary.Categories;
 
 namespace RetailAppUI.ViewModels.Products
 {
     public class AddNewProductViewModel : BaseViewModel
     {
-        private ProductManager _productManager;
-        private IVendorRepository _vendorRepository;
+        private readonly ProductManager _productManager;
+        private readonly IVendorManager _vendorManager;
+        private readonly ICategoryManager _categoryManager;
 
         private ProductModel? _product;
         public ProductModel? Product
@@ -81,28 +77,31 @@ namespace RetailAppUI.ViewModels.Products
         public RelayCommand SaveProductCommand { get; set; }
 
 
-        public AddNewProductViewModel(INavigationService navigation, IConnectionStringService connectionString, ICurrentViewService currentView, IVendorRepository vendorRepository)
+        public AddNewProductViewModel(INavigationService navigation,
+                                      IConnectionStringService connectionString,
+                                      ICurrentViewService currentView,
+                                      IVendorManager vendorManager,
+                                      ICategoryManager categoryManager)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
             CurrentView = currentView;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _categoryManager = categoryManager;
 
             //Set product to a new product model
-            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorRepository);
+            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager);
             Product = _productManager.Product;
 
             //Add list of vendor to Vendors
-            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
-            //Check for errors
-            if (vendors.Item2 == null)//null if no errors raised
+            try
             {
-                Vendors = new ObservableCollection<VendorModel>(vendors.Item1);
+                Vendors = new ObservableCollection<VendorModel>(_vendorManager.GetAll());
             }
-            else
+            catch (Exception ex)
             {
                 //error retrieving vendors
-                MessageBox.Show("Unable to retrieve the vendors.\r\n" + vendors.Item2, "Vendors Errror",
+                MessageBox.Show("Unable to retrieve the vendors.\r\n\r\n" + ex.Message, "Retrieval Errror",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
@@ -123,19 +122,18 @@ namespace RetailAppUI.ViewModels.Products
             }
 
             //Add list of categories to Categories
-            Tuple<IEnumerable<CategoryModel>, string> categories = new CategoryRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
-            //Check for errors
-            if (categories.Item2 == null)//null if no error raised
+            try
             {
-                Categories = new ObservableCollection<CategoryModel>(categories.Item1);
+                Categories = new ObservableCollection<CategoryModel>(_categoryManager.GetAll());
             }
-            else
+            catch (Exception ex)
             {
                 //error retrieving Categories
-                MessageBox.Show("Unable to retrieve the categories.\r\n" + categories.Item2, "Categories Errror",
+                MessageBox.Show("Unable to retrieve the categories.\r\n\r\n" + ex.Message, "Categories Errror",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
+
 
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);

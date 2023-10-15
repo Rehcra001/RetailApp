@@ -7,11 +7,11 @@ namespace DataAccessLibrary.CategoryRepository
 {
     public class CategoryRepository : ICategoryRepository
     {
-        private string _connectionSting;
+        private IRelationalDataAccess _sqlDataAccess;
 
-        public CategoryRepository(string connectionSting)
+        public CategoryRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionSting = connectionSting;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public (IEnumerable<CategoryModel>, string) GetAll()
@@ -19,14 +19,14 @@ namespace DataAccessLibrary.CategoryRepository
             List<CategoryModel> categories = new List<CategoryModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionSting))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllCategories";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -66,15 +66,15 @@ namespace DataAccessLibrary.CategoryRepository
             CategoryModel category = new CategoryModel();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionSting))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetCategoryByID";
                     command.Parameters.Add("@CategoryID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -106,15 +106,15 @@ namespace DataAccessLibrary.CategoryRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionSting))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertCategory";
                     command.Parameters.Add("@CategoryName", SqlDbType.NVarChar).Value = category.CategoryName;
-                    connection.Open();
+                    command.Connection.Open();
 
                     //Only one column and row will be returned
                     string returnMessage = command.ExecuteScalar().ToString()!;
@@ -139,16 +139,16 @@ namespace DataAccessLibrary.CategoryRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionSting))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_UpdateCategory";
                     command.Parameters.Add("@CategoryID", SqlDbType.Int).Value = category.CategoryID;
                     command.Parameters.Add("@CategoryName", SqlDbType.NVarChar).Value = category.CategoryName;
-                    connection.Open();
+                    command.Connection.Open();
 
                     //"No Error" returned on success.
                     //error message return on failiure

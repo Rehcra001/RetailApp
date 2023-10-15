@@ -1,4 +1,6 @@
-﻿using BussinessLogicLibrary.Products;
+﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VendorRepository;
@@ -20,7 +22,8 @@ namespace RetailAppUI.ViewModels.Products
     {
 		private string _state;
 		private ProductManager _productManager;
-		private IVendorRepository _vendorRepository;
+		private IVendorManager _vendorManager;
+		private ICategoryManager _categoryManager;
 
         #region Service Properties
         private ISharedDataService _sharedData;
@@ -130,15 +133,20 @@ namespace RetailAppUI.ViewModels.Products
         #endregion RelayCommand Properties
 
         #region Constructor
-        public ProductViewModel(IConnectionStringService connectionString, ISharedDataService sharedData, INavigationService navigation, IVendorRepository vendorRepository)
+        public ProductViewModel(IConnectionStringService connectionString,
+                                ISharedDataService sharedData,
+                                INavigationService navigation,
+                                IVendorManager vendorManager,
+								ICategoryManager categoryManager)
         {
 			SharedData = sharedData; //Will hold the Product ID selected in the products switchboard view
 			ConnectionString = connectionString;
 			Navigation = navigation;
-			_vendorRepository = vendorRepository;
+			_vendorManager = vendorManager;
+			_categoryManager = categoryManager;
 
             //Get the Product to display
-            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorRepository);
+            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager);
 			try
 			{
 				int id = (int)SharedData.SharedData;
@@ -222,7 +230,7 @@ namespace RetailAppUI.ViewModels.Products
             //prepare for cancelling any edits
             try
             {                
-                ProductUndoEdit = new ProductManager(ConnectionString.GetConnectionString(), _vendorRepository).GetByID(Product.ProductID);
+                ProductUndoEdit = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager).GetByID(Product.ProductID);
             }
             catch (Exception ex)
             {
@@ -274,20 +282,17 @@ namespace RetailAppUI.ViewModels.Products
         #region Get Categories
         private void GetCategories()
         {
-            Tuple<IEnumerable<CategoryModel>, string> categories = new CategoryRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
-
-            if (categories.Item2 == null)
-            {
-				//No errors
-				Categories = new ObservableCollection<CategoryModel>(categories.Item1);
+			try
+			{
+				Categories = new ObservableCollection<CategoryModel>(_categoryManager.GetAll());
 
                 //Set selected category
                 Product.Category = Categories.First(c => c.CategoryID == Product.CategoryID);
             }
-            else
-            {
+			catch (Exception ex)
+			{
                 //Error retrieving categories
-                MessageBox.Show(categories.Item2, "Categories Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error retrieving the categories\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
         }
@@ -317,20 +322,17 @@ namespace RetailAppUI.ViewModels.Products
         #region Get Vendors
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
-
-            if (vendors.Item2 == null)
-            {
-				Vendors = new ObservableCollection<VendorModel>(vendors.Item1);
+			try
+			{
+                Vendors = new ObservableCollection<VendorModel>(_vendorManager.GetAll());
 
                 //Set selected vendor
                 Product.Vendor = Vendors.First(v => v.VendorID == Product.VendorID);
-
             }
-            else
-            {
-				//Error with vendors
-				MessageBox.Show(vendors.Item2, "Vendors Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			catch (Exception ex)
+			{
+                //Error retrieving vendors
+                MessageBox.Show("Error retrieving the vendors\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
         }

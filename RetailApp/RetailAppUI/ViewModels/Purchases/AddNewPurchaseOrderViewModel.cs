@@ -1,5 +1,7 @@
-﻿using BussinessLogicLibrary.Products;
+﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
+using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
@@ -18,8 +20,10 @@ namespace RetailAppUI.ViewModels.Purchases
 {
     public class AddNewPurchaseOrderViewModel : BaseViewModel
     {
-        private AddNewPurchaseOrderManager _purchaseOrderManager;
-		private IVendorRepository _vendorRepository;
+        private readonly AddNewPurchaseOrderManager _purchaseOrderManager;
+		private readonly IVendorManager _vendorManager;
+		private readonly ICategoryManager _categoryManager;
+
         public ICollectionView PurchaseOrderLines { get; set; }
 
         private INavigationService _navigation;
@@ -148,11 +152,15 @@ namespace RetailAppUI.ViewModels.Purchases
 		public RelayCommand SaveCommand { get; set; }
 
         //Constructor
-        public AddNewPurchaseOrderViewModel(INavigationService navigation, IConnectionStringService connectionString, IVendorRepository vendorRepository)
+        public AddNewPurchaseOrderViewModel(INavigationService navigation,
+                                            IConnectionStringService connectionString,
+                                            IVendorManager vendorManager,
+											ICategoryManager categoryManager)
         {
 			Navigation = navigation;
 			ConnectionString = connectionString;
-			_vendorRepository = vendorRepository;
+			_vendorManager = vendorManager;
+			_categoryManager = categoryManager;
 
             //Retrieve a list of Vendors
             GetVendors();
@@ -446,17 +454,14 @@ namespace RetailAppUI.ViewModels.Purchases
         /// </summary>
         private void GetVendors()
 		{
-            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
-			//check for errors
-			if (vendors.Item2 == null)
+			try
 			{
-				//No error
-				Vendors = new ObservableCollection<VendorModel>(vendors.Item1);
+				Vendors = new ObservableCollection<VendorModel>(_vendorManager.GetAll());
 			}
-			else
+			catch (Exception ex)
 			{
-				//Error raised
-				MessageBox.Show(vendors.Item2, "Error retrieving vendors.", MessageBoxButton.OK, MessageBoxImage.Error);
+                //Error raised
+                MessageBox.Show("Error retrieving the vendors\r\n\r\n" + ex.Message, "Retrieval Error.", MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
             }
         }
@@ -483,7 +488,7 @@ namespace RetailAppUI.ViewModels.Purchases
 		{
 			try
 			{
-                Products = new ObservableCollection<ProductModel>(new ProductsManager(ConnectionString.GetConnectionString(), _vendorRepository).GetByVendorID(id));
+                Products = new ObservableCollection<ProductModel>(new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager).GetByVendorID(id));
             }
 			catch (Exception ex)
 			{

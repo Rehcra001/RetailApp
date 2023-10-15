@@ -1,4 +1,6 @@
-﻿using BussinessLogicLibrary.Products;
+﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Vendors;
 using ModelsLibrary;
 using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
@@ -14,7 +16,8 @@ namespace RetailAppUI.ViewModels.Products
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
 		private readonly ProductsManager _productsManager;
-        private IVendorRepository _vendorRepository;
+        private IVendorManager _vendorManager;
+        private ICategoryManager _categoryManager;
 
         private string _groupByState;
 
@@ -84,16 +87,22 @@ namespace RetailAppUI.ViewModels.Products
         #endregion Relay Command Properties
 
         #region Constructor
-        public ProductsSwitchboardViewModel(INavigationService navigation, ICurrentViewService currentView, ISharedDataService sharedData, IConnectionStringService connectionString, IVendorRepository vendorRepository)
+        public ProductsSwitchboardViewModel(INavigationService navigation,
+                                            ICurrentViewService currentView,
+                                            ISharedDataService sharedData,
+                                            IConnectionStringService connectionString,
+                                            IVendorManager vendorManager,
+                                            ICategoryManager categoryManager)
         {
 			Navigation = navigation;
 			CurrentView = currentView;
 			SharedData = sharedData;
 			ConnectionString = connectionString;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _categoryManager = categoryManager;
 
 			//Fetch a list of products
-            _productsManager = new ProductsManager(ConnectionString.GetConnectionString(), _vendorRepository);
+            _productsManager = new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager);
             GetProductsList();
 
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
