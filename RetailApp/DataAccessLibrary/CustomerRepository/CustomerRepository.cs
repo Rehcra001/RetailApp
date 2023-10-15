@@ -13,10 +13,10 @@ namespace DataAccessLibrary.CustomerRepository
 {
     public class CustomerRepository : ICustomerRepository
     {
-        private string _connectionString;
-        public CustomerRepository(string connectionString)
+        private readonly IRelationalDataAccess _sqlDataAccess;
+        public CustomerRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         /// <summary>
@@ -32,15 +32,15 @@ namespace DataAccessLibrary.CustomerRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_DeleteCustomer";
                     command.Parameters.Add("@CustomerID", SqlDbType.Int).Value = customer.CustomerID;
-                    connection.Open();
+                    command.Connection.Open();
 
                     //if not error then "No Error" string is returned
                     //Otherwise an error message is returned
@@ -66,14 +66,14 @@ namespace DataAccessLibrary.CustomerRepository
             List<CustomerModel> customers = new List<CustomerModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllCustomers";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -119,15 +119,15 @@ namespace DataAccessLibrary.CustomerRepository
             CustomerModel customer = new CustomerModel();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetCustomerByID";
                     command.Parameters.Add("@CustomerID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -178,11 +178,11 @@ namespace DataAccessLibrary.CustomerRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertCustomer";
                     command.Parameters.Add("@FirstName", SqlDbType.NVarChar).Value = customer.FirstName;
@@ -203,7 +203,7 @@ namespace DataAccessLibrary.CustomerRepository
                     command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = customer.PostalCode;
                     command.Parameters.Add("@EMailAddress", SqlDbType.NVarChar).Value = customer.EmailAddress;
                     command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = (customer.PhoneAreaCode + customer.PhonePrefix + customer.PhoneSuffix);
-                    connection.Open();
+                    command.Connection.Open();
 
                     //Database will return an ID if successful otherwise an error message
                     //ID is can be parsed to an int
@@ -237,11 +237,11 @@ namespace DataAccessLibrary.CustomerRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_UpdateCustomer";
                     command.Parameters.Add("@CustomerID", SqlDbType.Int).Value = customer.CustomerID;
@@ -263,7 +263,7 @@ namespace DataAccessLibrary.CustomerRepository
                     command.Parameters.Add("@PostalCode", SqlDbType.NVarChar).Value = customer.PostalCode;
                     command.Parameters.Add("@EMailAddress", SqlDbType.NVarChar).Value = customer.EmailAddress;
                     command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar).Value = (customer.PhoneAreaCode + customer.PhonePrefix + customer.PhoneSuffix);
-                    connection.Open();
+                    command.Connection.Open();
 
                     //if not error then "No Error" string is returned
                     //Otherwise an error message is returned

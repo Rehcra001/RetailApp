@@ -1,4 +1,5 @@
-﻿using DataAccessLibrary.CustomerRepository;
+﻿using BussinessLogicLibrary.Customers;
+using DataAccessLibrary.CustomerRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
@@ -11,14 +12,13 @@ namespace RetailAppUI.ViewModels.Adminstration
 {
     public class CustomerViewModel : BaseViewModel
     {
-        private CustomerRepository _customerRepository;
+        private ICustomerManager _customerManager;
         private CustomerModel? _customer;
         private ObservableCollection<CustomerModel> _customers;
-        private string _connectionString;
         private INavigationService _navigation;
         private int _customerIndex;
         private string _state;
-        private CustomerModel undoCustomerEdit;
+        private CustomerModel _undoCustomerEdit;
         private bool _textReadOnly;
 
         public CustomerModel Customer
@@ -51,26 +51,23 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand SaveCustomerCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public CustomerViewModel(IConnectionStringService connectionString, INavigationService navigation)
+        public CustomerViewModel(INavigationService navigation, ICustomerManager customerManager)
         {
             Navigation = navigation;
+            _customerManager = customerManager;
 
-
-            _connectionString = connectionString.GetConnectionString();
-            _customerRepository = new CustomerRepository(_connectionString);
-            Tuple<IEnumerable<CustomerModel>, string> customers = _customerRepository.GetAll().ToTuple();
-            if (customers.Item2 == null)
+            //Retriev a list of customers and populate Customers Property
+            try
             {
-                //No error retrieving vendors
-                Customers = new ObservableCollection<CustomerModel>(customers.Item1);
-                CustomerIndex = 0;
+                Customers = new ObservableCollection<CustomerModel>(_customerManager.GetAll());
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show(customers.Item2, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error retrieving the customers.\r\n\r\n." + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
+            //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
             AddNewCustomerCommand = new RelayCommand(AddNewCustomer, CanAddNewCustomer);
             SaveCustomerCommand = new RelayCommand(SaveCustomer, CanSaveCustomer);
@@ -123,18 +120,15 @@ namespace RetailAppUI.ViewModels.Adminstration
         {
             //Save a copy of the existing vendor prior to editing
             int id = Customers[CustomerIndex].CustomerID;
-            Tuple<CustomerModel, string> customer = _customerRepository.GetByID(id).ToTuple();
-            //check if there was an error retrieving
-            if (customer.Item2 == null)
+            try
             {
-                //No error
-                undoCustomerEdit = customer.Item1;
+                _undoCustomerEdit = _customerManager.GetByID(id);
                 SetState("Edit");
             }
-            else
+            catch (Exception ex)
             {
-                //error copying existing vendor
-                MessageBox.Show(customer.Item2, "Error Editing Customer", MessageBoxButton.OK, MessageBoxImage.Error);
+                //error copying existing customer
+                MessageBox.Show("Error retrieving the undo customer model.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
         }
@@ -157,7 +151,7 @@ namespace RetailAppUI.ViewModels.Adminstration
             else if (_state.Equals("Edit"))
             {
                 //Undo any editing
-                Customer = undoCustomerEdit;
+                Customer = _undoCustomerEdit;
             }
             SetState("View");
         }
@@ -169,43 +163,34 @@ namespace RetailAppUI.ViewModels.Adminstration
 
         private void SaveCustomer(object obj)
         {
-            if (Customer.Validate())
+            if (_state.Equals("Add"))
             {
-                if (_state.Equals("Add"))
+                try
                 {
-                    Tuple<CustomerModel, string> customer = _customerRepository.Insert(Customers[CustomerIndex]).ToTuple();
-                    //check if insert was successful
-                    if (customer.Item2 == null)
-                    {
-                        Customers[CustomerIndex] = customer.Item1;
+                    Customers[CustomerIndex] = _customerManager.Insert(Customers[CustomerIndex]);
 
-                        CustomerIndex = Customers.Count - 1;
-                    }
-                    else
-                    {
-                        //Problem adding the new vendor
-                        MessageBox.Show(customer.Item2, "Error Adding Customer", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                    CustomerIndex = Customers.Count - 1;
                 }
-                else if (_state.Equals("Edit"))
+                catch (Exception ex)
                 {
-                    string errorMessage = _customerRepository.Update(Customers[CustomerIndex]);
-                    //Check if no error saving
-                    if (errorMessage != null)
-                    {
-                        //Error saving edit
-                        MessageBox.Show(errorMessage, "Error Saving Customer", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                    //Problem adding the new vendor
+                    MessageBox.Show("Error saving the customer.\r\n\r\n" + ex.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
             }
-            else
+            else if (_state.Equals("Edit"))
             {
-                MessageBox.Show(Customer.ValidationMessage, "Data Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                try
+                {
+                    _customerManager.Update(Customers[CustomerIndex]);
+                }
+                catch (Exception ex)
+                {
+                    //Problem adding the new vendor
+                    MessageBox.Show("Error saving the customer.\r\n\r\n" + ex.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
-
 
             SetState("View");
         }

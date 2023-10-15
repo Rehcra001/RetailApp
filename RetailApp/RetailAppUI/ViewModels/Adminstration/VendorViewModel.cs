@@ -127,19 +127,19 @@ namespace RetailAppUI.ViewModels.Adminstration
         }
 
         private void EditVendor(object obj)
-        {
-            SetState("Edit");
+        {            
             //Save a copy of the existing vendor prior to editing
             int id = Vendors[VendorIndex].VendorID;
 
             try
             {
                 _undoVendorEdit = _vendorManager.GetByID(id);
+                SetState("Edit");
             }
             catch (Exception ex)
             {
                 //error copying existing vendor
-                MessageBox.Show("Error retrieve the undo vendor model.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error retrieving the undo vendor model.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
         }
