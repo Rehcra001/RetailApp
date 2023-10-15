@@ -1,4 +1,5 @@
 ﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
@@ -15,16 +16,19 @@ namespace BussinessLogicLibrary.Purchases
         private string _connectionString;
         private IVendorManager _vendorManager;
         private IProductsManager _productsManager;
+        private IStatusManager _statusManager;
 
         private PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
 
         public GetPurchaseOrderManager(string connectionString,
                                        IVendorManager vendorManager,
-                                       IProductsManager productsManager)
+                                       IProductsManager productsManager,
+                                       IStatusManager statusManager)
         {
             _connectionString = connectionString;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
+            _statusManager = statusManager;
         }
 
         public PurchaseOrderHeaderModel GetByID(long id)
@@ -73,19 +77,21 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderLinesStatus()
         {
-            Tuple<IEnumerable<StatusModel>, string> lineStatuses = new StatusRepository(_connectionString).GetAll().ToTuple();
-            //Check for errors
-            if (lineStatuses.Item2 == null)
+            try
             {
+                //Get all statuses
+                IEnumerable<StatusModel> lineStatuses = _statusManager.GetAll();
+
                 //no errors
-                foreach(PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
+                foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
                 {
-                    orderLine.OrderLineStatus = lineStatuses.Item1.First(x => x.StatusID == orderLine.OrderLineStatusID);
+                    orderLine.OrderLineStatus = lineStatuses.First(x => x.StatusID == orderLine.OrderLineStatusID);
                 }
+
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(lineStatuses.Item2);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -120,16 +126,13 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderStatus()
         {
-            Tuple<StatusModel, string> orderStatus = new StatusRepository(_connectionString).GetByID(PurchaseOrder.OrderStatusID).ToTuple();
-            //check for errors
-            if (orderStatus.Item2 == null)
+            try
             {
-                //No errors
-                PurchaseOrder.OrderStatus = orderStatus.Item1;
+                PurchaseOrder.OrderStatus = _statusManager.GetByID(PurchaseOrder.OrderStatusID);
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(orderStatus.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

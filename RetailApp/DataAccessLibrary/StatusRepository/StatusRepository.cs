@@ -7,11 +7,11 @@ namespace DataAccessLibrary.StatusRepository
 {
     public class StatusRepository : IStatusRepository
     {
-        private string _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public StatusRepository(string connectionString)
+        public StatusRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public (IEnumerable<StatusModel>, string) GetAll()
@@ -19,14 +19,14 @@ namespace DataAccessLibrary.StatusRepository
             List<StatusModel> statuses = new List<StatusModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllStatus";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -66,15 +66,15 @@ namespace DataAccessLibrary.StatusRepository
             StatusModel status = new StatusModel();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetStatusByID";
                     command.Parameters.Add("@StatusID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {

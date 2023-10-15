@@ -3,6 +3,7 @@ using BussinessLogicLibrary.CompanyDetail;
 using BussinessLogicLibrary.Customers;
 using BussinessLogicLibrary.InventoryTransactions;
 using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary;
@@ -11,6 +12,7 @@ using DataAccessLibrary.CompanyDetailRepository;
 using DataAccessLibrary.CustomerRepository;
 using DataAccessLibrary.InventoryTransactionRepository;
 using DataAccessLibrary.ProductRepository;
+using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VendorRepository;
 using Microsoft.Extensions.Configuration;
@@ -88,6 +90,7 @@ namespace RetailAppUI
             services.AddTransient<IUnitsPerRepository, UnitsPerRepository>();
             services.AddTransient<IInventoryTransactionRepository, InventoryTransactionRepository>();
             services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<IStatusRepository, StatusRepository>();
 
             //Managers
             services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
@@ -99,6 +102,7 @@ namespace RetailAppUI
             services.AddTransient<IProductsManager, ProductsManager>();
             services.AddTransient<IProductManager, ProductManager>();
             services.AddTransient<IProductsManager, ProductsManager>();
+            services.AddTransient<IStatusManager, StatusManager>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

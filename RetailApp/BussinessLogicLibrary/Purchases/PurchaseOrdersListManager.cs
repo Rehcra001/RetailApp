@@ -3,13 +3,16 @@ using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using ModelsLibrary.RepositoryInterfaces;
+using BussinessLogicLibrary.Vendors;
+using BussinessLogicLibrary.Statuses;
 
 namespace BussinessLogicLibrary.Purchases
 {
     public class PurchaseOrdersListManager
     {
         private string _connectionString;
-        private IVendorRepository _vendorRepository;
+        private readonly IVendorManager _vendorManager;
+        private readonly IStatusManager _statusManager;
         private PurchaseOrderHeaderRepository _purchaseOrderHeaderRepository;
 
         /// <summary>
@@ -17,10 +20,13 @@ namespace BussinessLogicLibrary.Purchases
         /// </summary>
         public IEnumerable<PurchaseOrderHeaderModel> PurchaseOrders { get; set; } = new List<PurchaseOrderHeaderModel>();
 
-        public PurchaseOrdersListManager(string connectionString, IVendorRepository vendorRepository)
+        public PurchaseOrdersListManager(string connectionString,
+                                         IVendorManager vendorManager,
+                                         IStatusManager statusManager)
         {
             _connectionString = connectionString;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _statusManager = statusManager;
 
             _purchaseOrderHeaderRepository = new PurchaseOrderHeaderRepository(_connectionString);
         }
@@ -102,18 +108,13 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderStatus()
         {
-            Tuple<IEnumerable<StatusModel>, string> orderStatuses = new StatusRepository(_connectionString).GetAll().ToTuple();
-
-            //Check for errors
-            if (orderStatuses.Item2 == null)
+            try
             {
-                //No errors retrieving
-                AddOrderStatus(orderStatuses.Item1);
+                AddOrderStatus(_statusManager.GetAll());
             }
-            else
+            catch (Exception ex)
             {
-                //Error retrieving
-                throw new Exception(orderStatuses.Item2);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -127,18 +128,13 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
-
-            //Check for errors
-            if (vendors.Item2 == null)
+            try
             {
-                //No errors retrieving
-                AddVendor(vendors.Item1);
+                AddVendor(_vendorManager.GetAll());
             }
-            else
+            catch (Exception ex)
             {
-                //Error retrieving
-                throw new Exception(vendors.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

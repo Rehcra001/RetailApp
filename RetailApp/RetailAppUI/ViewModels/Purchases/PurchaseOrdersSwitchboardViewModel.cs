@@ -1,4 +1,6 @@
 ﻿using BussinessLogicLibrary.Purchases;
+using BussinessLogicLibrary.Statuses;
+using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
@@ -17,8 +19,9 @@ namespace RetailAppUI.ViewModels.Purchases
 {
     public class PurchaseOrdersSwitchboardViewModel : BaseViewModel
     {
-        private PurchaseOrdersListManager _ordersListManager;
-        private IVendorRepository _vendorRepository;
+        private readonly PurchaseOrdersListManager _ordersListManager;
+        private readonly IVendorManager _vendorManager;
+        private readonly IStatusManager _statusManager;
         private string _groupByState = string.Empty;
 
         private INavigationService _navigation;
@@ -106,18 +109,22 @@ namespace RetailAppUI.ViewModels.Purchases
         public RelayCommand NavigateToPurchaseOrderViewCommand { get; set; }
 
 
-        public PurchaseOrdersSwitchboardViewModel(INavigationService navigation, IConnectionStringService connectionString, 
-                                                  ICurrentViewService currentView, ISharedDataService sharedData,
-                                                  IVendorRepository vendorRepository)
+        public PurchaseOrdersSwitchboardViewModel(INavigationService navigation,
+                                                  IConnectionStringService connectionString,
+                                                  ICurrentViewService currentView,
+                                                  ISharedDataService sharedData,
+                                                  IVendorManager vendorManager,
+                                                  IStatusManager statusManager)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
             CurrentView = currentView;
             SharedData = sharedData;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _statusManager = statusManager;
 
             //Instantiate orders list manager
-            _ordersListManager = new PurchaseOrdersListManager(ConnectionString.GetConnectionString(), _vendorRepository);
+            _ordersListManager = new PurchaseOrdersListManager(ConnectionString.GetConnectionString(), _vendorManager, _statusManager);
             //Instantiate PurchaseOrders
             PurchaseOrders = new ObservableCollection<PurchaseOrderHeaderModel>();
             //Add to collection view
@@ -221,35 +228,25 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetVendors()
         {
-            Tuple<IEnumerable<VendorModel>, string> vendors = _vendorRepository.GetAll().ToTuple();
-            //Check for errors
-            if (vendors.Item2 == null)
+            try
             {
-                //No errors
-                Vendors = vendors.Item1.OrderBy(x => x.CompanyName);
+                Vendors = _vendorManager.GetAll().OrderBy(x => x.CompanyName);
             }
-            else
+            catch (Exception ex)
             {
-                //Error retrieving
-                MessageBox.Show(vendors.Item2, "Error Retrieving Vendors", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                throw new Exception(ex.Message);
             }
         }
 
         private void GetOrderStatuses()
         {
-            Tuple<IEnumerable<StatusModel>, string> orderStatuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
-            //Check for errors
-            if (orderStatuses.Item2 == null)
+            try
             {
-                //No errors
-                OrderStatuses = orderStatuses.Item1.OrderBy(x => x.StatusID);
+                OrderStatuses = _statusManager.GetAll().OrderBy(x => x.StatusID);
             }
-            else
+            catch (Exception ex)
             {
-                //Error retrieving
-                MessageBox.Show(orderStatuses.Item2, "Error Retrieving Order Statuses", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                throw new Exception(ex.Message);
             }
         }
         private bool CanGetPurchaseOrderByVendor(object obj)

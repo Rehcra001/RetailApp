@@ -2,6 +2,7 @@
 using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
+using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.StatusRepository;
@@ -25,6 +26,7 @@ namespace RetailAppUI.ViewModels.Purchases
         private readonly ICategoryManager _categoryManager;
         private readonly IUnitPerManager _unitPerManager;
         private readonly IProductsManager _productsManager;
+        private readonly IStatusManager _statusManager;
 
         //two states view or edit
         private string _state;
@@ -187,7 +189,8 @@ namespace RetailAppUI.ViewModels.Purchases
                                       IVendorManager vendorManager,
                                       ICategoryManager categoryManager,
                                       IUnitPerManager unitPerManager,
-                                      IProductsManager productsManager)
+                                      IProductsManager productsManager,
+                                      IStatusManager statusManager)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
@@ -196,6 +199,7 @@ namespace RetailAppUI.ViewModels.Purchases
             _categoryManager = categoryManager;
             _unitPerManager = unitPerManager;
             _productsManager = productsManager;
+            _statusManager = statusManager;
 
             GetPurchaseOrder();
             GetStatuses();
@@ -665,7 +669,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetPurchaseOrder()
         {
-            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString(), _vendorManager, _productsManager);
+            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString(), _vendorManager, _productsManager, _statusManager);
             //fill _purchaseOrderManager PurchaseOrder property
             try
             {
@@ -685,20 +689,18 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetStatuses()
         {
-            Tuple<IEnumerable<StatusModel>, string> statuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
-            //check for errors
-            if (statuses.Item2 == null)
+            try
             {
-                //No errors
-                OrderStatuses = new ObservableCollection<StatusModel>(statuses.Item1);
-                OrderLineStatuses = new ObservableCollection<StatusModel>(statuses.Item1);
+                IEnumerable<StatusModel> statuses = _statusManager.GetAll();
+                OrderStatuses = new ObservableCollection<StatusModel>(statuses);
+                OrderLineStatuses = new ObservableCollection<StatusModel>(statuses);
 
                 //Set the selectOrderStatus to the current order status
                 SelectedOrderStatus = OrderStatuses.First(x => x.StatusID == PurchaseOrder.OrderStatusID);
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(statuses.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

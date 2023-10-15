@@ -1,11 +1,11 @@
 ﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VATRepository;
 using ModelsLibrary;
-using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
@@ -13,8 +13,10 @@ namespace BussinessLogicLibrary.Purchases
     {
         private readonly PurchaseOrderHeaderModel _originalPurchaseOrder;
         private readonly PurchaseOrderHeaderModel _editedPurchaseOrder;
-        private IVendorManager _vendorManager;
-        private IProductsManager _productsManager;
+        private readonly IVendorManager _vendorManager;
+        private readonly IProductsManager _productsManager;
+        private readonly IStatusManager _statusManager;
+
 
         private bool existingLinesAltered = false;
         private bool newLinesAdded = false;
@@ -38,14 +40,19 @@ namespace BussinessLogicLibrary.Purchases
         /// <param name="purchaseOrder">
         /// Takes in an existing purchase order model that has been edited
         /// </param>
-        public UpdatePurchaseOrderManager(string connectionString, PurchaseOrderHeaderModel editedPurchaseOrder, IVendorManager vendorManager, IProductsManager productsManager)
+        public UpdatePurchaseOrderManager(string connectionString,
+                                          PurchaseOrderHeaderModel editedPurchaseOrder,
+                                          IVendorManager vendorManager,
+                                          IProductsManager productsManager,
+                                          IStatusManager statusManager)
         {
             _connectionString = connectionString;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
+            _statusManager = statusManager;
 
             _editedPurchaseOrder = editedPurchaseOrder;
-            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager).GetByID(_editedPurchaseOrder.PurchaseOrderID);
+            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager).GetByID(_editedPurchaseOrder.PurchaseOrderID);
             Update();
         }
 
@@ -509,19 +516,14 @@ namespace BussinessLogicLibrary.Purchases
 
         private StatusModel GetStatus(int id)
         {
-            StatusModel status = new StatusModel();
-            Tuple<StatusModel, string> statusData = new StatusRepository(_connectionString).GetByID(id).ToTuple();
-            //check for errors
-            if (statusData.Item2 == null)
+            try
             {
-                //No error
-                status = statusData.Item1;
+                return _statusManager.GetByID(id);
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(statusData.Item2);
+                throw new Exception(ex.Message);
             }
-            return status;
         }
 
         private void CheckVendorReference()

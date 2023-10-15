@@ -1,7 +1,6 @@
-﻿using BussinessLogicLibrary.Categories;
-using BussinessLogicLibrary.Products;
+﻿using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
-using BussinessLogicLibrary.UnitPers;
+using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
@@ -22,6 +21,7 @@ namespace RetailAppUI.ViewModels.Purchases
         private readonly AddNewPurchaseOrderManager _purchaseOrderManager;
 		private readonly IVendorManager _vendorManager;
 		private readonly IProductsManager _productsManager;
+		private readonly IStatusManager _statusManager;
 
         public ICollectionView PurchaseOrderLines { get; set; }
 
@@ -154,12 +154,14 @@ namespace RetailAppUI.ViewModels.Purchases
         public AddNewPurchaseOrderViewModel(INavigationService navigation,
                                             IConnectionStringService connectionString,
                                             IVendorManager vendorManager,
-											IProductsManager productsManager)
+											IProductsManager productsManager,
+											IStatusManager statusManager)
         {
 			Navigation = navigation;
 			ConnectionString = connectionString;
 			_vendorManager = vendorManager;
 			_productsManager = productsManager;
+			_statusManager = statusManager;
 
             //Retrieve a list of Vendors
             GetVendors();
@@ -467,20 +469,14 @@ namespace RetailAppUI.ViewModels.Purchases
 
 		private void GetOrderStatuses()
 		{
-			Tuple < IEnumerable < StatusModel>, string > orderStatuses = new StatusRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
-			//Check for errors
-			if (orderStatuses.Item2 == null)
+			try
 			{
-				//No errors
-				//Only allow an order status of 'Open' when creating a new purchase order
-				OrderStatuses = new ObservableCollection<StatusModel>(orderStatuses.Item1.Where(x => x.Status!.Equals("Open")));
+				OrderStatuses = new ObservableCollection<StatusModel>(_statusManager.GetAll().Where(x => x.Status!.Equals("Open")));
 			}
-			else
+			catch (Exception ex)
 			{
-                //Error raised
-                MessageBox.Show(orderStatuses.Item2, "Error retrieving order statuses.", MessageBoxButton.OK, MessageBoxImage.Error);
-                Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
-            }
+				throw new Exception(ex.Message);
+			}
         }
 
         private void GetVendorProducts(int id)

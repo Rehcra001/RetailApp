@@ -1,4 +1,5 @@
 ﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
@@ -12,12 +13,17 @@ namespace BussinessLogicLibrary.Purchases
         private string _connectionString;
         private readonly IVendorManager _vendorManager;
         private readonly IProductsManager _productsManager;
+        private readonly IStatusManager _statusManager;
 
-        public PurchaseOrderManager(string connectionString, IVendorManager vendorManager, IProductsManager productsManager)
+        public PurchaseOrderManager(string connectionString,
+                                    IVendorManager vendorManager,
+                                    IProductsManager productsManager,
+                                    IStatusManager statusManager)
         {
             _connectionString = connectionString;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
+            _statusManager = statusManager;
         }
 
         /// <summary>
@@ -28,7 +34,7 @@ namespace BussinessLogicLibrary.Purchases
         /// </param>
         public void GetByID(long id)
         {
-            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager).GetByID(id);
+            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager).GetByID(id);
         }
 
         /// <summary>
@@ -36,22 +42,20 @@ namespace BussinessLogicLibrary.Purchases
         /// </summary>
         public void SaveChanges()
         {
-            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorManager, _productsManager);
+            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorManager, _productsManager, _statusManager);
         }
 
-        private void GetOrderLineStatus(PurchaseOrderDetailModel orderLine)
+        private void GetOpenOrderLineStatus(PurchaseOrderDetailModel orderLine)
         {
-            Tuple<IEnumerable<StatusModel>, string> lineStatuses = new StatusRepository(_connectionString).GetAll().ToTuple();
-            //Check for errors
-            if (lineStatuses.Item2 == null)
+            try
             {
-                //no errors
-                orderLine.OrderLineStatus = lineStatuses.Item1.First(x => x.Status!.Equals("Open"));
+                IEnumerable<StatusModel> lineStatuses = _statusManager.GetAll();
+                orderLine.OrderLineStatus = lineStatuses.First(x => x.Status!.Equals("Open"));
                 orderLine.OrderLineStatusID = orderLine.OrderLineStatus.StatusID;
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(lineStatuses.Item2);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -62,7 +66,7 @@ namespace BussinessLogicLibrary.Purchases
                 PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
                 int index = PurchaseOrder.PurchaseOrderDetails.Count - 1;
                 //Add order line status of open
-                GetOrderLineStatus(PurchaseOrder.PurchaseOrderDetails[index]);
+                GetOpenOrderLineStatus(PurchaseOrder.PurchaseOrderDetails[index]);
             }
 
         }
