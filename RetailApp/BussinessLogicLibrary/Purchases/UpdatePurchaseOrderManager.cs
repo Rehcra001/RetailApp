@@ -1,4 +1,5 @@
 ﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
@@ -16,6 +17,7 @@ namespace BussinessLogicLibrary.Purchases
         private readonly IVendorManager _vendorManager;
         private readonly IProductsManager _productsManager;
         private readonly IStatusManager _statusManager;
+        private readonly IReceiptManager _receiptManager;
 
 
         private bool existingLinesAltered = false;
@@ -44,15 +46,17 @@ namespace BussinessLogicLibrary.Purchases
                                           PurchaseOrderHeaderModel editedPurchaseOrder,
                                           IVendorManager vendorManager,
                                           IProductsManager productsManager,
-                                          IStatusManager statusManager)
+                                          IStatusManager statusManager,
+                                          IReceiptManager receiptManager)
         {
             _connectionString = connectionString;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
             _statusManager = statusManager;
+            _receiptManager = receiptManager;
 
             _editedPurchaseOrder = editedPurchaseOrder;
-            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager).GetByID(_editedPurchaseOrder.PurchaseOrderID);
+            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager, _receiptManager).GetByID(_editedPurchaseOrder.PurchaseOrderID);
             Update();
         }
 

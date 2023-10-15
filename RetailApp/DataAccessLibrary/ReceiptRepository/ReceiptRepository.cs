@@ -7,11 +7,11 @@ namespace DataAccessLibrary.ReceiptRepository
 {
     public class ReceiptRepository : IReceiptsRepository
     {
-        private string _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public ReceiptRepository(string connectionString)
+        public ReceiptRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public (IEnumerable<ReceiptModel>, string) GetByPurchaseOrderID(long id)
@@ -19,15 +19,15 @@ namespace DataAccessLibrary.ReceiptRepository
             List<ReceiptModel> receipts = new List<ReceiptModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.ups_GetReceiptsByPurchaseOrderID";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -79,18 +79,18 @@ namespace DataAccessLibrary.ReceiptRepository
         public (ReceiptModel, string) Insert(ReceiptModel receipt)
         {
             string? errorMessage = null;
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertReceipt";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = receipt.PurchaseOrderID;
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = receipt.ProductID;
                     command.Parameters.Add("@QuantityReceipted", SqlDbType.Int).Value = receipt.QuantityReceipted;
                     command.Parameters.Add("@UnitCost", SqlDbType.Money).Value = receipt.UnitCost;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
 
@@ -115,15 +115,15 @@ namespace DataAccessLibrary.ReceiptRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_ReverseReceiptByID";
                     command.Parameters.Add("@ReceiptID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
 

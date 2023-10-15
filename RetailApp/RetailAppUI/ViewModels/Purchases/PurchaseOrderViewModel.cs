@@ -27,6 +27,7 @@ namespace RetailAppUI.ViewModels.Purchases
         private readonly IUnitPerManager _unitPerManager;
         private readonly IProductsManager _productsManager;
         private readonly IStatusManager _statusManager;
+        private readonly IReceiptManager _receiptManager;
 
         //two states view or edit
         private string _state;
@@ -190,7 +191,8 @@ namespace RetailAppUI.ViewModels.Purchases
                                       ICategoryManager categoryManager,
                                       IUnitPerManager unitPerManager,
                                       IProductsManager productsManager,
-                                      IStatusManager statusManager)
+                                      IStatusManager statusManager,
+                                      IReceiptManager receiptManager)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
@@ -200,6 +202,7 @@ namespace RetailAppUI.ViewModels.Purchases
             _unitPerManager = unitPerManager;
             _productsManager = productsManager;
             _statusManager = statusManager;
+            _receiptManager = receiptManager;
 
             GetPurchaseOrder();
             GetStatuses();
@@ -312,7 +315,7 @@ namespace RetailAppUI.ViewModels.Purchases
                 }
                 else if (_state.Equals("Receipt"))
                 {
-                    ReceiptManager receiptManager = new ReceiptManager(ConnectionString.GetConnectionString());
+
                     List<ReceiptingLineModel> receiptingLines = new List<ReceiptingLineModel>();
                     //Loop through the list of receipts
                     foreach (ReceiptingLineModel receiptingLine in ReceiptingLines)
@@ -325,7 +328,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
                     try
                     {
-                        receiptManager.Insert(receiptingLines);
+                        _receiptManager.Insert(receiptingLines);
                     }
                     catch (Exception ex)
                     {
@@ -349,8 +352,7 @@ namespace RetailAppUI.ViewModels.Purchases
                         try
                         {
                             int id = ReverseReceipts[SelectedReverseReceiptIndex].ReceiptID;
-                            ReceiptManager receiptManager = new ReceiptManager(ConnectionString.GetConnectionString());
-                            receiptManager.Reverse(id);
+                            _receiptManager.Reverse(id);
                         }
                         catch (Exception ex)
                         {
@@ -669,7 +671,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetPurchaseOrder()
         {
-            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString(), _vendorManager, _productsManager, _statusManager);
+            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString(), _vendorManager, _productsManager, _statusManager, _receiptManager);
             //fill _purchaseOrderManager PurchaseOrder property
             try
             {

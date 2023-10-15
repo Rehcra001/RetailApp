@@ -1,15 +1,15 @@
-﻿using DataAccessLibrary.ReceiptRepository;
-using ModelsLibrary;
+﻿using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Receipts
 {
-    public class ReceiptManager
+    public class ReceiptManager : IReceiptManager
     {
-        private readonly string _connectionString;
+        private readonly IReceiptsRepository _receiptsRepository;
 
-        public ReceiptManager(string connectionString)
+        public ReceiptManager(IReceiptsRepository receiptsRepository)
         {
-            _connectionString = connectionString;
+            _receiptsRepository = receiptsRepository;
         }
 
         public void Insert(IEnumerable<ReceiptingLineModel> receiptLines)
@@ -47,7 +47,7 @@ namespace BussinessLogicLibrary.Receipts
             foreach (ReceiptModel receipt in receipts)
             {
                 //Insert the receipt
-                Tuple<ReceiptModel, string> insertedReceipt = new ReceiptRepository(_connectionString).Insert(receipt).ToTuple();
+                Tuple<ReceiptModel, string> insertedReceipt = _receiptsRepository.Insert(receipt).ToTuple();
                 //Check for errors
                 if (insertedReceipt.Item2 != null)
                 {
@@ -55,12 +55,12 @@ namespace BussinessLogicLibrary.Receipts
                     throw new Exception(insertedReceipt.Item2);
                 }
             }
-            
+
         }
 
         public void Reverse(int id)
         {
-            string errorMessage = new ReceiptRepository(_connectionString).ReverseByID(id);
+            string errorMessage = _receiptsRepository.ReverseByID(id);
             if (errorMessage != null)
             {
                 throw new Exception(errorMessage);
@@ -69,7 +69,7 @@ namespace BussinessLogicLibrary.Receipts
 
         public IEnumerable<ReceiptModel> GetByPurchaseOrderID(long id)
         {
-            Tuple<IEnumerable<ReceiptModel>, string> receipts = new ReceiptRepository(_connectionString).GetByPurchaseOrderID(id).ToTuple();
+            Tuple<IEnumerable<ReceiptModel>, string> receipts = _receiptsRepository.GetByPurchaseOrderID(id).ToTuple();
 
             //check for errors
             if (receipts.Item2 == null)

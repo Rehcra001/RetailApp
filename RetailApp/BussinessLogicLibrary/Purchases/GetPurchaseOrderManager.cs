@@ -1,34 +1,34 @@
 ﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
-using DataAccessLibrary.ReceiptRepository;
-using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
-using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
     public class GetPurchaseOrderManager
     {
         private string _connectionString;
-        private IVendorManager _vendorManager;
-        private IProductsManager _productsManager;
-        private IStatusManager _statusManager;
+        private readonly IVendorManager _vendorManager;
+        private readonly IProductsManager _productsManager;
+        private readonly IStatusManager _statusManager;
+        private readonly IReceiptManager _receiptManager;
 
         private PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
 
         public GetPurchaseOrderManager(string connectionString,
                                        IVendorManager vendorManager,
                                        IProductsManager productsManager,
-                                       IStatusManager statusManager)
+                                       IStatusManager statusManager,
+                                       IReceiptManager receiptManager)
         {
             _connectionString = connectionString;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
             _statusManager = statusManager;
+            _receiptManager = receiptManager;
         }
 
         public PurchaseOrderHeaderModel GetByID(long id)
@@ -138,16 +138,13 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetReceipts()
         {
-            Tuple<IEnumerable<ReceiptModel>, string> receipts = new ReceiptRepository(_connectionString).GetByPurchaseOrderID(PurchaseOrder.PurchaseOrderID).ToTuple();
-            //check for errors
-            if (receipts.Item2 == null)
+            try
             {
-                //No errors
-                PurchaseOrder.Receipts = receipts.Item1;
+                PurchaseOrder.Receipts = _receiptManager.GetByPurchaseOrderID(PurchaseOrder.PurchaseOrderID);
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(receipts.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

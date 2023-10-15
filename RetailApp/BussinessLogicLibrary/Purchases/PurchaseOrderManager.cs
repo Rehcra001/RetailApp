@@ -1,4 +1,5 @@
 ﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.StatusRepository;
@@ -14,16 +15,19 @@ namespace BussinessLogicLibrary.Purchases
         private readonly IVendorManager _vendorManager;
         private readonly IProductsManager _productsManager;
         private readonly IStatusManager _statusManager;
+        private readonly IReceiptManager _receiptManager;
 
         public PurchaseOrderManager(string connectionString,
                                     IVendorManager vendorManager,
                                     IProductsManager productsManager,
-                                    IStatusManager statusManager)
+                                    IStatusManager statusManager,
+                                    IReceiptManager receiptManager)
         {
             _connectionString = connectionString;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
             _statusManager = statusManager;
+            _receiptManager = receiptManager;
         }
 
         /// <summary>
@@ -34,7 +38,7 @@ namespace BussinessLogicLibrary.Purchases
         /// </param>
         public void GetByID(long id)
         {
-            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager).GetByID(id);
+            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager, _receiptManager).GetByID(id);
         }
 
         /// <summary>
@@ -42,7 +46,7 @@ namespace BussinessLogicLibrary.Purchases
         /// </summary>
         public void SaveChanges()
         {
-            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorManager, _productsManager, _statusManager);
+            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorManager, _productsManager, _statusManager, _receiptManager);
         }
 
         private void GetOpenOrderLineStatus(PurchaseOrderDetailModel orderLine)
