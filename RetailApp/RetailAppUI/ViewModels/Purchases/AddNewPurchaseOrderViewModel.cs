@@ -1,11 +1,10 @@
 ﻿using BussinessLogicLibrary.Categories;
 using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
+using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.StatusRepository;
-using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
-using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -23,6 +22,7 @@ namespace RetailAppUI.ViewModels.Purchases
         private readonly AddNewPurchaseOrderManager _purchaseOrderManager;
 		private readonly IVendorManager _vendorManager;
 		private readonly ICategoryManager _categoryManager;
+		private readonly IUnitPerManager _unitPerManager;
 
         public ICollectionView PurchaseOrderLines { get; set; }
 
@@ -155,12 +155,14 @@ namespace RetailAppUI.ViewModels.Purchases
         public AddNewPurchaseOrderViewModel(INavigationService navigation,
                                             IConnectionStringService connectionString,
                                             IVendorManager vendorManager,
-											ICategoryManager categoryManager)
+											ICategoryManager categoryManager,
+											IUnitPerManager unitPerManager)
         {
 			Navigation = navigation;
 			ConnectionString = connectionString;
 			_vendorManager = vendorManager;
 			_categoryManager = categoryManager;
+			_unitPerManager = unitPerManager;
 
             //Retrieve a list of Vendors
             GetVendors();
@@ -488,7 +490,7 @@ namespace RetailAppUI.ViewModels.Purchases
 		{
 			try
 			{
-                Products = new ObservableCollection<ProductModel>(new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager).GetByVendorID(id));
+                Products = new ObservableCollection<ProductModel>(new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager).GetByVendorID(id));
             }
 			catch (Exception ex)
 			{

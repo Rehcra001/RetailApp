@@ -1,24 +1,21 @@
-﻿using DataAccessLibrary.CategoryRepository;
+﻿using BussinessLogicLibrary.UnitPers;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Windows;
-using DataAccessLibrary.UnitsPerRepository;
+using System.Windows.Data;
 
 namespace RetailAppUI.ViewModels.Adminstration
 {
     public class ProductUnitPerViewModel : BaseViewModel
     {
-        private UnitsPerRepository _unitPerRepository;
+        private readonly IUnitPerManager _unitPerManager;
         private UnitsPerModel _undoEdit;
+        private string _state;
 
         private ICollectionView _unitPerCollectionView;
         public ICollectionView UnitPerCollectionView
@@ -39,17 +36,6 @@ namespace RetailAppUI.ViewModels.Adminstration
         {
             get { return _unitPers; }
             set { _unitPers = value; OnPropertyChanged(); }
-        }
-
-
-
-        private IConnectionStringService _connectionString;
-        private string _state;
-
-        public IConnectionStringService ConnectionString
-        {
-            get { return _connectionString; }
-            set { _connectionString = value; }
         }
 
         private INavigationService _navigation;
@@ -76,34 +62,24 @@ namespace RetailAppUI.ViewModels.Adminstration
         public RelayCommand SaveCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
 
-        public ProductUnitPerViewModel(IConnectionStringService connectionString, INavigationService navigation)
+        public ProductUnitPerViewModel(INavigationService navigation, IUnitPerManager unitPerManager)
         {
-            ConnectionString = connectionString;
             Navigation = navigation;
+            _unitPerManager = unitPerManager;
 
-            //Unit Per repository
-            _unitPerRepository = new UnitsPerRepository(ConnectionString.GetConnectionString());
 
             //Load Unit Pers
-            Tuple<IEnumerable<UnitsPerModel>, string> unitPers = _unitPerRepository.GetAll().ToTuple();
-            //check for errors
-            if (unitPers.Item2 == null)
+            try
             {
-                //No Errors
-                UnitPers = new ObservableCollection<UnitsPerModel>(unitPers.Item1);
+                UnitPers = new ObservableCollection<UnitsPerModel>(_unitPerManager.GetAll());
                 //Add to collection View
                 UnitPerCollectionView = CollectionViewSource.GetDefaultView(UnitPers);
-
-                //set SelectedUnitPer
-                if (UnitPers.Any<UnitsPerModel>())
-                {
-                    SelectedUnitPer = UnitPers.First();
-                }
             }
-            else
+            catch (Exception ex)
             {
-                //Error raised by database
-                MessageBox.Show("Error retrieving the unit pers.\r\n" + unitPers.Item2, "Unit Per Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Error raised by database
+                MessageBox.Show("Error retrieving the unit pers.\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Navigation.NavigateTo<AdministrativeSwitchboardViewModel>();
             }
 
             //Instantiate commands
@@ -169,28 +145,15 @@ namespace RetailAppUI.ViewModels.Adminstration
                     }
                 }
 
-                //Validate data
-                if (SelectedUnitPer.Validate())
+                try
                 {
-                    //Add to database
-                    Tuple<UnitsPerModel, string> unitPer = _unitPerRepository.Insert(SelectedUnitPer).ToTuple();
-                    //Check for errors
-                    if (unitPer.Item2 == null)//Will be null if no error raised
-                    {
-                        //Add the unique id returned from the database
-                        SelectedUnitPer.UnitPerID = unitPer.Item1.UnitPerID;
-                        UnitPerCollectionView.Refresh();
-                    }
-                    else
-                    {
-                        MessageBox.Show(unitPer.Item2, "Error Saving Unit Per", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                    //Add the unique id returned from the database
+                    SelectedUnitPer.UnitPerID = _unitPerManager.Insert(SelectedUnitPer).UnitPerID;
+                    UnitPerCollectionView.Refresh();
                 }
-                else
+                catch (Exception ex)
                 {
-                    //Shows data validation errors
-                    MessageBox.Show(SelectedUnitPer.ValidationMessage, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Error Saving Unit Per" + ex.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }
@@ -209,24 +172,13 @@ namespace RetailAppUI.ViewModels.Adminstration
                     }
                 }
 
-                if (SelectedUnitPer.Validate())
+                try
                 {
-                    //No validation errors
-                    //try and save edited unit per
-                    string errorMessage = _unitPerRepository.Update(SelectedUnitPer);
-                    //Check for error
-                    if (errorMessage != null)
-                    {
-                        //Error raised by database
-                        MessageBox.Show(errorMessage, "Error Saving Unit Per", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                    _unitPerManager.Update(SelectedUnitPer);
                 }
-                else
+                catch (Exception ex)
                 {
-                    //Validation error
-                    //Shows data validation errors
-                    MessageBox.Show(SelectedUnitPer.ValidationMessage, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Error Saving Unit Per" + ex.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }

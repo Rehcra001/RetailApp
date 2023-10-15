@@ -9,6 +9,7 @@ using DataAccessLibrary.UnitsPerRepository;
 using RetailAppUI.Commands;
 using BussinessLogicLibrary.Vendors;
 using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.UnitPers;
 
 namespace RetailAppUI.ViewModels.Products
 {
@@ -17,6 +18,7 @@ namespace RetailAppUI.ViewModels.Products
         private readonly ProductManager _productManager;
         private readonly IVendorManager _vendorManager;
         private readonly ICategoryManager _categoryManager;
+        private readonly IUnitPerManager _unitPerManager;
 
         private ProductModel? _product;
         public ProductModel? Product
@@ -81,16 +83,18 @@ namespace RetailAppUI.ViewModels.Products
                                       IConnectionStringService connectionString,
                                       ICurrentViewService currentView,
                                       IVendorManager vendorManager,
-                                      ICategoryManager categoryManager)
+                                      ICategoryManager categoryManager,
+                                      IUnitPerManager unitPerManager)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
             CurrentView = currentView;
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
+            _unitPerManager = unitPerManager;
 
             //Set product to a new product model
-            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager);
+            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager);
             Product = _productManager.Product;
 
             //Add list of vendor to Vendors
@@ -107,16 +111,14 @@ namespace RetailAppUI.ViewModels.Products
             }
 
             //Add list of unit pers to UnitPers
-            Tuple<IEnumerable<UnitsPerModel>, string> unitPers = new UnitsPerRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
-            //Check for errors
-            if (unitPers.Item2 == null)//null if no errors raised
+            try
             {
-                UnitPers = new ObservableCollection<UnitsPerModel>(unitPers.Item1);
+                UnitPers = new ObservableCollection<UnitsPerModel>(_unitPerManager.GetAll());
             }
-            else
+            catch (Exception ex)
             {
                 //error retrieving unit pers
-                MessageBox.Show("Unable to retrieve the Units.\r\n" + unitPers.Item2, "Units Errror",
+                MessageBox.Show("Unable to retrieve the Units.\r\n\r\n" + ex.Message, "Retrieval Error",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }

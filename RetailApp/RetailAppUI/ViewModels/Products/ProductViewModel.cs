@@ -1,19 +1,15 @@
 ﻿using BussinessLogicLibrary.Categories;
 using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.UnitsPerRepository;
-using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
-using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace RetailAppUI.ViewModels.Products
@@ -21,9 +17,10 @@ namespace RetailAppUI.ViewModels.Products
     public class ProductViewModel : BaseViewModel
     {
 		private string _state;
-		private ProductManager _productManager;
-		private IVendorManager _vendorManager;
-		private ICategoryManager _categoryManager;
+		private readonly ProductManager _productManager;
+		private readonly IVendorManager _vendorManager;
+		private readonly ICategoryManager _categoryManager;
+		private readonly IUnitPerManager _unitPerManager;
 
         #region Service Properties
         private ISharedDataService _sharedData;
@@ -137,16 +134,18 @@ namespace RetailAppUI.ViewModels.Products
                                 ISharedDataService sharedData,
                                 INavigationService navigation,
                                 IVendorManager vendorManager,
-								ICategoryManager categoryManager)
+								ICategoryManager categoryManager,
+								IUnitPerManager unitPerManager)
         {
 			SharedData = sharedData; //Will hold the Product ID selected in the products switchboard view
 			ConnectionString = connectionString;
 			Navigation = navigation;
 			_vendorManager = vendorManager;
 			_categoryManager = categoryManager;
+			_unitPerManager = unitPerManager;
 
             //Get the Product to display
-            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager);
+            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager);
 			try
 			{
 				int id = (int)SharedData.SharedData;
@@ -230,7 +229,7 @@ namespace RetailAppUI.ViewModels.Products
             //prepare for cancelling any edits
             try
             {                
-                ProductUndoEdit = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager).GetByID(Product.ProductID);
+                ProductUndoEdit = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager).GetByID(Product.ProductID);
             }
             catch (Exception ex)
             {
@@ -301,19 +300,16 @@ namespace RetailAppUI.ViewModels.Products
         #region Get Unit Pers
         private void GetUnitPers()
         {
-            Tuple<IEnumerable<UnitsPerModel>, string> unitPers = new UnitsPerRepository(ConnectionString.GetConnectionString()).GetAll().ToTuple();
-
-            if (unitPers.Item2 == null)
-            {
-				UnitPers = new ObservableCollection<UnitsPerModel>(unitPers.Item1);
-
+			try
+			{
+				UnitPers = new ObservableCollection<UnitsPerModel>(_unitPerManager.GetAll());
                 //Set selected unit per
                 Product.Unit = UnitPers.First(u => u.UnitPerID == Product.UnitPerID);
             }
-            else
-            {
+			catch (Exception ex)
+			{
                 //error with unitPers
-                MessageBox.Show(unitPers.Item2, "UnitPer Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error retrieving unitpers\r\n\r\n" + ex.Message, "Retrieval Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<ProductsSwitchboardViewModel>();
             }
         }

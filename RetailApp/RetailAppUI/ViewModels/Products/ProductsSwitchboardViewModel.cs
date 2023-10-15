@@ -1,5 +1,6 @@
 ﻿using BussinessLogicLibrary.Categories;
 using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
 using ModelsLibrary;
 using ModelsLibrary.RepositoryInterfaces;
@@ -16,8 +17,9 @@ namespace RetailAppUI.ViewModels.Products
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
 		private readonly ProductsManager _productsManager;
-        private IVendorManager _vendorManager;
-        private ICategoryManager _categoryManager;
+        private readonly IVendorManager _vendorManager;
+        private readonly ICategoryManager _categoryManager;
+        private readonly IUnitPerManager _unitPerManager;
 
         private string _groupByState;
 
@@ -92,7 +94,8 @@ namespace RetailAppUI.ViewModels.Products
                                             ISharedDataService sharedData,
                                             IConnectionStringService connectionString,
                                             IVendorManager vendorManager,
-                                            ICategoryManager categoryManager)
+                                            ICategoryManager categoryManager,
+                                            IUnitPerManager unitPerManager)
         {
 			Navigation = navigation;
 			CurrentView = currentView;
@@ -100,9 +103,10 @@ namespace RetailAppUI.ViewModels.Products
 			ConnectionString = connectionString;
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
+            _unitPerManager = unitPerManager;
 
 			//Fetch a list of products
-            _productsManager = new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager);
+            _productsManager = new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager);
             GetProductsList();
 
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);

@@ -7,25 +7,25 @@ namespace DataAccessLibrary.UnitsPerRepository
 {
     public class UnitsPerRepository : IUnitsPerRepository
     {
-        private string _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public UnitsPerRepository(string connectionString)
+        public UnitsPerRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
         public (IEnumerable<UnitsPerModel>, string) GetAll()
         {
             string? errorMessage = null;
             List<UnitsPerModel> unitsPers = new List<UnitsPerModel>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllUnits";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -61,15 +61,15 @@ namespace DataAccessLibrary.UnitsPerRepository
             UnitsPerModel unitsPer = new UnitsPerModel();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetUnitByID";
                     command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -104,16 +104,16 @@ namespace DataAccessLibrary.UnitsPerRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertUnit";
                     command.Parameters.Add("@UnitPer", SqlDbType.NVarChar).Value = unitsPer.UnitPer;
                     command.Parameters.Add("@UnitPerDescription", SqlDbType.NVarChar).Value = unitsPer.UnitPerDescription;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnMessage = command.ExecuteScalar().ToString()!;
 
@@ -137,17 +137,17 @@ namespace DataAccessLibrary.UnitsPerRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_UpdateUnit";
                     command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = unitsPer.UnitPerID;
                     command.Parameters.Add("@UnitPer", SqlDbType.NVarChar).Value = unitsPer.UnitPer;
                     command.Parameters.Add("@UnitPerDescription", SqlDbType.NVarChar).Value = unitsPer.UnitPerDescription;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
                     if (!returnedMessage.Equals("No Error"))

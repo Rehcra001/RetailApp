@@ -1,4 +1,5 @@
 ﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.ProductRepository;
@@ -15,13 +16,18 @@ namespace BussinessLogicLibrary.Products
         private readonly string _connectionString;
         private readonly IVendorManager _vendorManager;
         private readonly ICategoryManager _categoryManager;
+        private readonly IUnitPerManager _unitPerManager;
 
 
-        public ProductsManager(string connectionString, IVendorManager vendorManager, ICategoryManager categoryManager)
+        public ProductsManager(string connectionString,
+                               IVendorManager vendorManager,
+                               ICategoryManager categoryManager,
+                               IUnitPerManager unitPerManager)
         {
             _connectionString = connectionString;
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
+            _unitPerManager = unitPerManager;
         }
 
         /// <summary>
@@ -82,20 +88,19 @@ namespace BussinessLogicLibrary.Products
 
         private void GetUnitsPer()
         {
-            Tuple<IEnumerable<UnitsPerModel>, string> unitPers = new UnitsPerRepository(_connectionString).GetAll().ToTuple();
+            try
+            {
+                IEnumerable<UnitsPerModel> unitPers = _unitPerManager.GetAll();
 
-            if (unitPers.Item2 == null)
-            {
-                //No Error
-                foreach (ProductModel product in _products)
+                foreach (ProductModel product in _products!)
                 {
-                    product.Unit = unitPers.Item1.First(u => u.UnitPerID == product.UnitPerID);
+                    product.Unit = unitPers.First(u => u.UnitPerID == product.UnitPerID);
                 }
+
             }
-            else
+            catch (Exception ex)
             {
-                //error with unitPers
-                throw new Exception(unitPers.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

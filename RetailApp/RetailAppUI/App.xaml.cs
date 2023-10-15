@@ -1,11 +1,13 @@
 ﻿using BussinessLogicLibrary.Categories;
 using BussinessLogicLibrary.CompanyDetail;
 using BussinessLogicLibrary.Customers;
+using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary;
 using DataAccessLibrary.CategoryRepository;
 using DataAccessLibrary.CompanyDetailRepository;
 using DataAccessLibrary.CustomerRepository;
+using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VendorRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,12 +81,14 @@ namespace RetailAppUI
             services.AddTransient<IVendorRepository, VendorRepository>();
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.AddTransient<IUnitsPerRepository, UnitsPerRepository>();
 
             //Managers
             services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
             services.AddTransient<IVendorManager, VendorManager>();
             services.AddTransient<ICustomerManager, CustomerManager>();
             services.AddTransient<ICategoryManager, CategoryManager>();
+            services.AddTransient<IUnitPerManager, UnitPerManager>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();
