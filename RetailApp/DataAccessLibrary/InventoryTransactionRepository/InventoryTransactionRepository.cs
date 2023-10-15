@@ -1,37 +1,32 @@
 ﻿using ModelsLibrary;
 using ModelsLibrary.RepositoryInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace DataAccessLibrary.InventoryTransactionRepository
 {
     public class InventoryTransactionRepository : IInventoryTransactionRepository
     {
-        private readonly string _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public InventoryTransactionRepository(string connectionString)
+        public InventoryTransactionRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
         public (IEnumerable<InventoryTransactionModel>, string) GetByProductID(int id)
         {
             List<InventoryTransactionModel> inventoryTransactions = new List<InventoryTransactionModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetInventoryTransactionsByProductID";
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {

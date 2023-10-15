@@ -1,9 +1,11 @@
 ﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.InventoryTransactions;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.InventoryTransactionRepository;
 using DataAccessLibrary.ProductRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Products
 {
@@ -13,21 +15,24 @@ namespace BussinessLogicLibrary.Products
     public class ProductManager
     {
 		private string _connectionString;
-        private IVendorManager _vendorManager;
-        private ICategoryManager _categoryManager;
-        private IUnitPerManager _unitPerManager;
+        private readonly IVendorManager _vendorManager;
+        private readonly ICategoryManager _categoryManager;
+        private readonly IUnitPerManager _unitPerManager;
+        private readonly IInventoryTransactionsManager _inventoryTransactionManager;
 
 		public ProductModel Product { get; set; } = new ProductModel();
 
         public ProductManager(string connectionString,
                               IVendorManager vendorManager,
                               ICategoryManager categoryManager,
-                              IUnitPerManager unitPerManager)
+                              IUnitPerManager unitPerManager,
+                              IInventoryTransactionsManager inventoryTransactionsManager)
         {
 			_connectionString = connectionString;
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
             _unitPerManager = unitPerManager;
+            _inventoryTransactionManager = inventoryTransactionsManager;
         }
 
         #region Retrieve a product
@@ -65,18 +70,13 @@ namespace BussinessLogicLibrary.Products
         /// <exception cref="Exception"></exception>
         private void GetTransactions()
         {
-            Tuple<IEnumerable<InventoryTransactionModel>, string> transactions = new InventoryTransactionRepository(_connectionString).GetByProductID(Product.ProductID).ToTuple();
-
-            //check for errors
-            if (transactions.Item2 == null)
+            try
             {
-                //No Error
-                Product.InventoryTransactions = transactions.Item1;
+                Product.InventoryTransactions = _inventoryTransactionManager.GetByProductID(Product.ProductID);
             }
-            else
+            catch (Exception ex)
             {
-                //error
-                throw new Exception(transactions.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

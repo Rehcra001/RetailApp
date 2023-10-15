@@ -1,15 +1,14 @@
-﻿using BussinessLogicLibrary.Products;
+﻿using BussinessLogicLibrary.Categories;
+using BussinessLogicLibrary.InventoryTransactions;
+using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.UnitPers;
+using BussinessLogicLibrary.Vendors;
 using ModelsLibrary;
+using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
-using DataAccessLibrary.UnitsPerRepository;
-using RetailAppUI.Commands;
-using BussinessLogicLibrary.Vendors;
-using BussinessLogicLibrary.Categories;
-using BussinessLogicLibrary.UnitPers;
 
 namespace RetailAppUI.ViewModels.Products
 {
@@ -19,6 +18,7 @@ namespace RetailAppUI.ViewModels.Products
         private readonly IVendorManager _vendorManager;
         private readonly ICategoryManager _categoryManager;
         private readonly IUnitPerManager _unitPerManager;
+        private readonly IInventoryTransactionsManager _inventoryTransactionsManager;
 
         private ProductModel? _product;
         public ProductModel? Product
@@ -84,7 +84,8 @@ namespace RetailAppUI.ViewModels.Products
                                       ICurrentViewService currentView,
                                       IVendorManager vendorManager,
                                       ICategoryManager categoryManager,
-                                      IUnitPerManager unitPerManager)
+                                      IUnitPerManager unitPerManager,
+                                      IInventoryTransactionsManager inventoryTransactionsManager)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
@@ -92,9 +93,10 @@ namespace RetailAppUI.ViewModels.Products
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
             _unitPerManager = unitPerManager;
+            _inventoryTransactionsManager = inventoryTransactionsManager;
 
             //Set product to a new product model
-            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager);
+            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager, _inventoryTransactionsManager);
             Product = _productManager.Product;
 
             //Add list of vendor to Vendors
