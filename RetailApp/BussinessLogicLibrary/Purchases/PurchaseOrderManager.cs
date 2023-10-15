@@ -1,11 +1,7 @@
-﻿using DataAccessLibrary.StatusRepository;
+﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Vendors;
+using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
-using ModelsLibrary.RepositoryInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BussinessLogicLibrary.Purchases
 {
@@ -14,11 +10,14 @@ namespace BussinessLogicLibrary.Purchases
         public PurchaseOrderHeaderModel PurchaseOrder { get; private set; } = new PurchaseOrderHeaderModel();
 
         private string _connectionString;
-        private IVendorRepository _vendorRepository;
+        private readonly IVendorManager _vendorManager;
+        private readonly IProductsManager _productsManager;
 
-        public PurchaseOrderManager(string connectionString)
+        public PurchaseOrderManager(string connectionString, IVendorManager vendorManager, IProductsManager productsManager)
         {
             _connectionString = connectionString;
+            _vendorManager = vendorManager;
+            _productsManager = productsManager;
         }
 
         /// <summary>
@@ -29,7 +28,7 @@ namespace BussinessLogicLibrary.Purchases
         /// </param>
         public void GetByID(long id)
         {
-            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorRepository).GetByID(id);
+            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager).GetByID(id);
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace BussinessLogicLibrary.Purchases
         /// </summary>
         public void SaveChanges()
         {
-            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorRepository);
+            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorManager, _productsManager);
         }
 
         private void GetOrderLineStatus(PurchaseOrderDetailModel orderLine)

@@ -21,8 +21,7 @@ namespace RetailAppUI.ViewModels.Purchases
     {
         private readonly AddNewPurchaseOrderManager _purchaseOrderManager;
 		private readonly IVendorManager _vendorManager;
-		private readonly ICategoryManager _categoryManager;
-		private readonly IUnitPerManager _unitPerManager;
+		private readonly IProductsManager _productsManager;
 
         public ICollectionView PurchaseOrderLines { get; set; }
 
@@ -155,14 +154,12 @@ namespace RetailAppUI.ViewModels.Purchases
         public AddNewPurchaseOrderViewModel(INavigationService navigation,
                                             IConnectionStringService connectionString,
                                             IVendorManager vendorManager,
-											ICategoryManager categoryManager,
-											IUnitPerManager unitPerManager)
+											IProductsManager productsManager)
         {
 			Navigation = navigation;
 			ConnectionString = connectionString;
 			_vendorManager = vendorManager;
-			_categoryManager = categoryManager;
-			_unitPerManager = unitPerManager;
+			_productsManager = productsManager;
 
             //Retrieve a list of Vendors
             GetVendors();
@@ -490,7 +487,7 @@ namespace RetailAppUI.ViewModels.Purchases
 		{
 			try
 			{
-                Products = new ObservableCollection<ProductModel>(new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager).GetByVendorID(id));
+                Products = new ObservableCollection<ProductModel>(_productsManager.GetByVendorID(id));
             }
 			catch (Exception ex)
 			{

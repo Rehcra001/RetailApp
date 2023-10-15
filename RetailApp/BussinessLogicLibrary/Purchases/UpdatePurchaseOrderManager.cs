@@ -1,4 +1,6 @@
-﻿using DataAccessLibrary.PurchaseOrderDetailRepository;
+﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Vendors;
+using DataAccessLibrary.PurchaseOrderDetailRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.VATRepository;
@@ -11,7 +13,9 @@ namespace BussinessLogicLibrary.Purchases
     {
         private readonly PurchaseOrderHeaderModel _originalPurchaseOrder;
         private readonly PurchaseOrderHeaderModel _editedPurchaseOrder;
-        private IVendorRepository _vendorRepository;
+        private IVendorManager _vendorManager;
+        private IProductsManager _productsManager;
+
         private bool existingLinesAltered = false;
         private bool newLinesAdded = false;
         private bool headerDetailsAltered = false;
@@ -34,13 +38,14 @@ namespace BussinessLogicLibrary.Purchases
         /// <param name="purchaseOrder">
         /// Takes in an existing purchase order model that has been edited
         /// </param>
-        public UpdatePurchaseOrderManager(string connectionString, PurchaseOrderHeaderModel editedPurchaseOrder, IVendorRepository vendorRepository)
+        public UpdatePurchaseOrderManager(string connectionString, PurchaseOrderHeaderModel editedPurchaseOrder, IVendorManager vendorManager, IProductsManager productsManager)
         {
             _connectionString = connectionString;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _productsManager = productsManager;
 
             _editedPurchaseOrder = editedPurchaseOrder;
-            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorRepository).GetByID(_editedPurchaseOrder.PurchaseOrderID);
+            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager).GetByID(_editedPurchaseOrder.PurchaseOrderID);
             Update();
         }
 

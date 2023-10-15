@@ -1,9 +1,5 @@
-﻿using BussinessLogicLibrary.Categories;
-using BussinessLogicLibrary.Products;
-using BussinessLogicLibrary.UnitPers;
-using BussinessLogicLibrary.Vendors;
+﻿using BussinessLogicLibrary.Products;
 using ModelsLibrary;
-using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -16,10 +12,7 @@ namespace RetailAppUI.ViewModels.Products
 {
     public class ProductsSwitchboardViewModel : BaseViewModel
     {
-		private readonly ProductsManager _productsManager;
-        private readonly IVendorManager _vendorManager;
-        private readonly ICategoryManager _categoryManager;
-        private readonly IUnitPerManager _unitPerManager;
+		private readonly IProductsManager _productsManager;
 
         private string _groupByState;
 
@@ -48,9 +41,6 @@ namespace RetailAppUI.ViewModels.Products
 			get { return _sharedData; }
 			set { _sharedData = value; }
 		}        
-
-        private IConnectionStringService _connectionString;
-        public IConnectionStringService ConnectionString { get => _connectionString; set => _connectionString = value; }
         #endregion Service Properties
 
         #region Product Properties
@@ -92,21 +82,14 @@ namespace RetailAppUI.ViewModels.Products
         public ProductsSwitchboardViewModel(INavigationService navigation,
                                             ICurrentViewService currentView,
                                             ISharedDataService sharedData,
-                                            IConnectionStringService connectionString,
-                                            IVendorManager vendorManager,
-                                            ICategoryManager categoryManager,
-                                            IUnitPerManager unitPerManager)
+                                            IProductsManager productsManager)
         {
 			Navigation = navigation;
 			CurrentView = currentView;
 			SharedData = sharedData;
-			ConnectionString = connectionString;
-            _vendorManager = vendorManager;
-            _categoryManager = categoryManager;
-            _unitPerManager = unitPerManager;
+            _productsManager = productsManager;
 
-			//Fetch a list of products
-            _productsManager = new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager);
+			//Fetch a list of products;
             GetProductsList();
 
 			CloseViewCommand = new RelayCommand(CloseView, CanCloseView);

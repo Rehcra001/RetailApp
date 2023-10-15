@@ -8,11 +8,11 @@ namespace DataAccessLibrary.ProductRepository
 {
     public class ProductRepository : IProductRepository
     {
-        private string _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public ProductRepository(string connectionString)
+        public ProductRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public (IEnumerable<ProductModel>, string) GetAll()
@@ -20,14 +20,14 @@ namespace DataAccessLibrary.ProductRepository
             string? errorMessage = null;
             List<ProductModel> products = new List<ProductModel>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllProducts";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -79,15 +79,15 @@ namespace DataAccessLibrary.ProductRepository
             string? errorMessage = null;
             ProductModel product = new ProductModel();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetProductByID";
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -135,11 +135,11 @@ namespace DataAccessLibrary.ProductRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertProduct";
                     command.Parameters.Add("@ProductName", SqlDbType.NVarChar).Value = product.ProductName;
@@ -151,7 +151,7 @@ namespace DataAccessLibrary.ProductRepository
                     command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = product.UnitPerID;
                     command.Parameters.Add("@UnitWeight", SqlDbType.Float).Value = product.UnitWeight;
                     command.Parameters.Add("@CategoryID", SqlDbType.Int).Value = product.CategoryID;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
                     if (int.TryParse(returnedMessage, out _))
@@ -175,11 +175,11 @@ namespace DataAccessLibrary.ProductRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_UpdateProduct";
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = product.ProductID;
@@ -192,7 +192,7 @@ namespace DataAccessLibrary.ProductRepository
                     command.Parameters.Add("@UnitPerID", SqlDbType.Int).Value = product.UnitPerID;
                     command.Parameters.Add("@UnitWeight", SqlDbType.Float).Value = product.UnitWeight;
                     command.Parameters.Add("@CategoryID", SqlDbType.Int).Value = product.CategoryID;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
                     if (!returnedMessage.Equals("No Error"))
@@ -212,15 +212,15 @@ namespace DataAccessLibrary.ProductRepository
             string? errorMessage = null;
             List<ProductModel> products = new List<ProductModel>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetProductsByVendorID";
                     command.Parameters.Add("VendorID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {

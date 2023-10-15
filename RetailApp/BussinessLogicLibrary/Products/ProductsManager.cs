@@ -1,30 +1,25 @@
 ﻿using BussinessLogicLibrary.Categories;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.CategoryRepository;
-using DataAccessLibrary.ProductRepository;
-using DataAccessLibrary.UnitsPerRepository;
-using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
 using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Products
 {
-    public class ProductsManager
+    public class ProductsManager : IProductsManager
     {
-        private IEnumerable<ProductModel>? _products;
-        private readonly string _connectionString;
+        private readonly IProductRepository _productRepository;
         private readonly IVendorManager _vendorManager;
         private readonly ICategoryManager _categoryManager;
         private readonly IUnitPerManager _unitPerManager;
 
 
-        public ProductsManager(string connectionString,
+        public ProductsManager(IProductRepository productRepository,
                                IVendorManager vendorManager,
                                ICategoryManager categoryManager,
                                IUnitPerManager unitPerManager)
         {
-            _connectionString = connectionString;
+            _productRepository = productRepository;
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
             _unitPerManager = unitPerManager;
@@ -39,46 +34,45 @@ namespace BussinessLogicLibrary.Products
         /// </returns>
         public IEnumerable<ProductModel> GetAll()
         {
+            List<ProductModel> products = new List<ProductModel>();
             //Fills the _products with products, vendors and units
-            GetProducts();
-            GetVendors();
-            GetUnitsPer();
-            GetCategories();
+            products = GetProducts(products).ToList();
+            products = GetVendors(products).ToList();
+            products = GetUnitsPer(products).ToList();
+            products = GetCategories(products).ToList();
 
-            return _products;
+            return products;
         }
 
         public IEnumerable<ProductModel> GetByVendorID(int id)
         {
-            Tuple<IEnumerable<ProductModel>, string> products = new ProductRepository(_connectionString).GetByVendorID(id).ToTuple();
+            Tuple<IEnumerable<ProductModel>, string> products = _productRepository.GetByVendorID(id).ToTuple();
 
 
             //Check for errors
             if (products.Item2 == null)
             {
                 //No errors
-                _products = products.Item1;
+                return products.Item1;
             }
             else
             {
                 //Error with Products
                 throw new Exception(products.Item2);
             }
-
-            return _products;
         }
 
-        private void GetCategories()
+        private IEnumerable<ProductModel> GetCategories(List<ProductModel> products)
         {
             try
             {
                 IEnumerable<CategoryModel> categories = _categoryManager.GetAll();
 
-                foreach (ProductModel product in _products!)
+                foreach (ProductModel product in products!)
                 {
                     product.Category = categories.First(c => c.CategoryID == product.CategoryID);
                 }
-
+                return products;
             }
             catch (Exception ex)
             {
@@ -86,17 +80,17 @@ namespace BussinessLogicLibrary.Products
             }
         }
 
-        private void GetUnitsPer()
+        private IEnumerable<ProductModel> GetUnitsPer(List<ProductModel> products)
         {
             try
             {
                 IEnumerable<UnitsPerModel> unitPers = _unitPerManager.GetAll();
 
-                foreach (ProductModel product in _products!)
+                foreach (ProductModel product in products!)
                 {
                     product.Unit = unitPers.First(u => u.UnitPerID == product.UnitPerID);
                 }
-
+                return products;
             }
             catch (Exception ex)
             {
@@ -104,16 +98,17 @@ namespace BussinessLogicLibrary.Products
             }
         }
 
-        private void GetVendors()
+        private IEnumerable<ProductModel> GetVendors(List<ProductModel> products)
         {
             try
             {
                 IEnumerable<VendorModel> vendors = _vendorManager.GetAll();
 
-                foreach (ProductModel product in _products!)
+                foreach (ProductModel product in products!)
                 {
                     product.Vendor = vendors.First(v => v.VendorID == product.VendorID);
                 }
+                return products;
 
             }
             catch (Exception ex)
@@ -122,21 +117,21 @@ namespace BussinessLogicLibrary.Products
             }
         }
 
-        private void GetProducts()
+        private IEnumerable<ProductModel> GetProducts(List<ProductModel> products)
         {
-            Tuple<IEnumerable<ProductModel>, string> products = new ProductRepository(_connectionString).GetAll().ToTuple();
+            Tuple<IEnumerable<ProductModel>, string> getProducts = _productRepository.GetAll().ToTuple();
 
 
             //Check for errors
-            if (products.Item2 == null)
+            if (getProducts.Item2 == null)
             {
                 //No errors
-                _products = products.Item1;
+                return getProducts.Item1;
             }
             else
             {
                 //Error with Products
-                throw new Exception(products.Item2);
+                throw new Exception(getProducts.Item2);
             }
         }
     }

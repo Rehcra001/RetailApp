@@ -2,8 +2,6 @@
 using BussinessLogicLibrary.InventoryTransactions;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.InventoryTransactionRepository;
-using DataAccessLibrary.ProductRepository;
 using ModelsLibrary;
 using ModelsLibrary.RepositoryInterfaces;
 
@@ -12,23 +10,21 @@ namespace BussinessLogicLibrary.Products
     /// <summary>
     /// Managers a single product model
     /// </summary>
-    public class ProductManager
+    public class ProductManager : IProductManager
     {
-		private string _connectionString;
+        private readonly IProductRepository _productRepository;
         private readonly IVendorManager _vendorManager;
         private readonly ICategoryManager _categoryManager;
         private readonly IUnitPerManager _unitPerManager;
         private readonly IInventoryTransactionsManager _inventoryTransactionManager;
 
-		public ProductModel Product { get; set; } = new ProductModel();
-
-        public ProductManager(string connectionString,
+        public ProductManager(IProductRepository productRepository,
                               IVendorManager vendorManager,
                               ICategoryManager categoryManager,
                               IUnitPerManager unitPerManager,
                               IInventoryTransactionsManager inventoryTransactionsManager)
         {
-			_connectionString = connectionString;
+            _productRepository = productRepository;
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
             _unitPerManager = unitPerManager;
@@ -43,36 +39,35 @@ namespace BussinessLogicLibrary.Products
         /// The unique product id
         /// </param>
         public ProductModel GetByID(int id)
-		{
-			Tuple<ProductModel, string> product = new ProductRepository(_connectionString).GetByID(id).ToTuple();
+        {
+            Tuple<ProductModel, string> product = _productRepository.GetByID(id).ToTuple();
 
-			//check for errors
-			if (product.Item2 == null)
-			{
-				Product = product.Item1;
-				GetVendor();
-				GetCategory();
-                GetUnitPer();
-				GetTransactions();
-			}
-			else
-			{
+            //check for errors
+            if (product.Item2 == null)
+            {
+                GetVendor(product.Item1);
+                GetCategory(product.Item1);
+                GetUnitPer(product.Item1);
+                GetTransactions(product.Item1);
+
+                return product.Item1;
+            }
+            else
+            {
                 //Error retrieving the product
                 throw new Exception(product.Item2);
             }
-
-            return Product;
         }
 
         /// <summary>
         /// Retrieves the transactions for this product
         /// </summary>
         /// <exception cref="Exception"></exception>
-        private void GetTransactions()
+        private void GetTransactions(ProductModel product)
         {
             try
             {
-                Product.InventoryTransactions = _inventoryTransactionManager.GetByProductID(Product.ProductID);
+                product.InventoryTransactions = _inventoryTransactionManager.GetByProductID(product.ProductID);
             }
             catch (Exception ex)
             {
@@ -84,11 +79,11 @@ namespace BussinessLogicLibrary.Products
         /// Retrieves the category for this product
         /// </summary>
         /// <exception cref="Exception"></exception>
-        private void GetCategory()
+        private void GetCategory(ProductModel product)
         {
             try
             {
-                Product.Category = _categoryManager.GetByID(Product.CategoryID);
+                product.Category = _categoryManager.GetByID(product.CategoryID);
             }
             catch (Exception ex)
             {
@@ -100,11 +95,11 @@ namespace BussinessLogicLibrary.Products
         /// Retrieves the unit per for this product
         /// </summary>
         /// <exception cref="Exception"></exception>
-        private void GetUnitPer()
+        private void GetUnitPer(ProductModel product)
         {
             try
             {
-                Product.Unit = _unitPerManager.GetByID(Product.UnitPerID);
+                product.Unit = _unitPerManager.GetByID(product.UnitPerID);
             }
             catch (Exception ex)
             {
@@ -116,11 +111,11 @@ namespace BussinessLogicLibrary.Products
         /// Retrieves the Vendor for this product
         /// </summary>
         /// <exception cref="Exception"></exception>
-        private void GetVendor()
+        private void GetVendor(ProductModel product)
         {
             try
             {
-                Product.Vendor = _vendorManager.GetByID(Product.VendorID);
+                product.Vendor = _vendorManager.GetByID(product.VendorID);
             }
             catch (Exception ex)
             {
@@ -130,28 +125,29 @@ namespace BussinessLogicLibrary.Products
         #endregion Retrieve a product
 
 
-        public void Update()
-		{
+        public void Update(ProductModel product)
+        {
             //Update Product
-            if (Product.VendorID != Product.Vendor.VendorID)
+            if (product.VendorID != product.Vendor.VendorID)
             {
-                Product.VendorID = Product.Vendor.VendorID;
+                product.VendorID = product.Vendor.VendorID;
             }
 
-            if (Product.UnitPerID != Product.Unit.UnitPerID)
+            if (product.UnitPerID != product.Unit.UnitPerID)
             {
-                Product.UnitPerID = Product.Unit.UnitPerID;
+                product.UnitPerID = product.Unit.UnitPerID;
             }
 
-            if (Product.CategoryID != Product.Category.CategoryID)
+            if (product.CategoryID != product.Category.CategoryID)
             {
-                Product.CategoryID = Product.Category.CategoryID;
+                product.CategoryID = product.Category.CategoryID;
             }
 
-            //Validate the model
-            if (Product.Validate())
+            //Check for validation errors
+            if (product.Validate())
             {
-                string errorMessage = new ProductRepository(_connectionString).Update(Product);
+                //No Validation errors
+                string errorMessage = _productRepository.Update(product);
 
                 //Check for insert errors
                 if (errorMessage != null) //null if no error inserting the new product
@@ -162,7 +158,8 @@ namespace BussinessLogicLibrary.Products
             }
             else
             {
-                throw new Exception(Product.ValidationMessage);
+                //Validation errors
+                throw new Exception(product.ValidationMessage);
             }
         }
 
@@ -180,33 +177,33 @@ namespace BussinessLogicLibrary.Products
         /// Requires a Category model
         /// </param>
         /// <exception cref="Exception"></exception>
-		public void Insert()
-		{
-			//Add the vendor and unitsPer id
-			Product.VendorID = Product.Vendor.VendorID;
-			Product.UnitPerID = Product.Unit.UnitPerID;
-			Product.CategoryID = Product.Category.CategoryID;
+		public ProductModel Insert(ProductModel product)
+        {
+            //Add the vendor and unitsPer id
+            product.VendorID = product.Vendor.VendorID;
+            product.UnitPerID = product.Unit.UnitPerID;
+            product.CategoryID = product.Category.CategoryID;
 
-			//Validate the model
-			if (Product.Validate())
-			{
-				Tuple<ProductModel, string> product = new ProductRepository(_connectionString).Insert(Product).ToTuple();
+            //Validate the model
+            if (product.Validate())
+            {
+                Tuple<ProductModel, string> insertedProduct = _productRepository.Insert(product).ToTuple();
 
-				//Check for insert errors
-				if (product.Item2 == null) //null if no error inserting the new product
-				{
-					Product = product.Item1;
-				}
-				else
-				{
-					//Error inserting the new product
-					throw new Exception(product.Item2);
-				}
-			}
-			else
-			{
-				throw new Exception(Product.ValidationMessage);
-			}
+                //Check for insert errors
+                if (insertedProduct.Item2 == null) //null if no error inserting the new product
+                {
+                    return insertedProduct.Item1;
+                }
+                else
+                {
+                    //Error inserting the new product
+                    throw new Exception(insertedProduct.Item2);
+                }
+            }
+            else
+            {
+                throw new Exception(product.ValidationMessage);
+            }
         }
     }
 }

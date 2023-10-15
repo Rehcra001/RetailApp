@@ -14,11 +14,10 @@ namespace RetailAppUI.ViewModels.Products
 {
     public class AddNewProductViewModel : BaseViewModel
     {
-        private readonly ProductManager _productManager;
+        private readonly IProductManager _productManager;
         private readonly IVendorManager _vendorManager;
         private readonly ICategoryManager _categoryManager;
         private readonly IUnitPerManager _unitPerManager;
-        private readonly IInventoryTransactionsManager _inventoryTransactionsManager;
 
         private ProductModel? _product;
         public ProductModel? Product
@@ -48,15 +47,6 @@ namespace RetailAppUI.ViewModels.Products
             set { _categories = value; OnPropertyChanged(); }
         }
 
-
-
-        private IConnectionStringService  _connectionString;
-        public IConnectionStringService ConnectionString
-        {
-            get => _connectionString;
-            set { _connectionString = value; }
-        }
-
         private INavigationService _navigation;
         public INavigationService Navigation
         {
@@ -80,24 +70,22 @@ namespace RetailAppUI.ViewModels.Products
 
 
         public AddNewProductViewModel(INavigationService navigation,
-                                      IConnectionStringService connectionString,
                                       ICurrentViewService currentView,
+                                      IProductManager productManager,
                                       IVendorManager vendorManager,
                                       ICategoryManager categoryManager,
-                                      IUnitPerManager unitPerManager,
-                                      IInventoryTransactionsManager inventoryTransactionsManager)
+                                      IUnitPerManager unitPerManager)
         {
             Navigation = navigation;
-            ConnectionString = connectionString;
             CurrentView = currentView;
+            _productManager = productManager;
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
             _unitPerManager = unitPerManager;
-            _inventoryTransactionsManager = inventoryTransactionsManager;
 
             //Set product to a new product model
-            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager, _inventoryTransactionsManager);
-            Product = _productManager.Product;
+           
+            Product = new ProductModel();
 
             //Add list of vendor to Vendors
             try
@@ -170,7 +158,7 @@ namespace RetailAppUI.ViewModels.Products
             }
             try
             {
-                _productManager.Insert();
+                _productManager.Insert(Product);
             }
             catch (Exception ex)
             {

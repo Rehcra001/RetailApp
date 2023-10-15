@@ -1,11 +1,11 @@
-﻿using DataAccessLibrary.StatusRepository;
+﻿using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.ReceiptRepository;
-using DataAccessLibrary.VendorRepository;
+using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
-using System.Numerics;
 using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
@@ -13,14 +13,18 @@ namespace BussinessLogicLibrary.Purchases
     public class GetPurchaseOrderManager
     {
         private string _connectionString;
-        private IVendorRepository _vendorRepository;
+        private IVendorManager _vendorManager;
+        private IProductsManager _productsManager;
 
         private PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
 
-        public GetPurchaseOrderManager(string connectionString, IVendorRepository vendorRepository)
+        public GetPurchaseOrderManager(string connectionString,
+                                       IVendorManager vendorManager,
+                                       IProductsManager productsManager)
         {
             _connectionString = connectionString;
-            _vendorRepository = vendorRepository;
+            _vendorManager = vendorManager;
+            _productsManager = productsManager;
         }
 
         public PurchaseOrderHeaderModel GetByID(long id)
@@ -87,33 +91,30 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderLinesProduct()
         {
-            Tuple<IEnumerable<ProductModel>, string> products = new ProductRepository(_connectionString).GetByVendorID(PurchaseOrder.VendorID).ToTuple();
-            //Check for errors
-            if (products.Item2 == null)
+            try
             {
+                IEnumerable<ProductModel> products = _productsManager.GetByVendorID(PurchaseOrder.VendorID);
+
                 foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
                 {
-                    orderLine.Product = products.Item1.First(x => x.ProductID == orderLine.ProductID);
+                    orderLine.Product = products.First(x => x.ProductID == orderLine.ProductID);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(products.Item2);
+                throw new Exception(ex.Message);
             }
         }
 
         private void GetVendor()
         {
-            Tuple<VendorModel, string> vendor = _vendorRepository.GetByID(PurchaseOrder.VendorID).ToTuple();
-            //Check for errors
-            if (vendor.Item2 == null)
+            try
             {
-                //no errors
-                PurchaseOrder.Vendor = vendor.Item1;
+                PurchaseOrder.Vendor = _vendorManager.GetByID(PurchaseOrder.VendorID);
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception(vendor.Item2);
+                throw new Exception(ex.Message);
             }
         }
 

@@ -24,6 +24,7 @@ namespace RetailAppUI.ViewModels.Purchases
         private readonly IVendorManager _vendorManager;
         private readonly ICategoryManager _categoryManager;
         private readonly IUnitPerManager _unitPerManager;
+        private readonly IProductsManager _productsManager;
 
         //two states view or edit
         private string _state;
@@ -185,7 +186,8 @@ namespace RetailAppUI.ViewModels.Purchases
                                       ISharedDataService sharedData,
                                       IVendorManager vendorManager,
                                       ICategoryManager categoryManager,
-                                      IUnitPerManager unitPerManager)
+                                      IUnitPerManager unitPerManager,
+                                      IProductsManager productsManager)
         {
             Navigation = navigation;
             ConnectionString = connectionString;
@@ -193,6 +195,7 @@ namespace RetailAppUI.ViewModels.Purchases
             _vendorManager = vendorManager;
             _categoryManager = categoryManager;
             _unitPerManager = unitPerManager;
+            _productsManager = productsManager;
 
             GetPurchaseOrder();
             GetStatuses();
@@ -662,7 +665,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private void GetPurchaseOrder()
         {
-            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString());
+            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString(), _vendorManager, _productsManager);
             //fill _purchaseOrderManager PurchaseOrder property
             try
             {
@@ -703,7 +706,7 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             try
             {
-                List<ProductModel> products = new ProductsManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager).GetByVendorID(id).ToList();
+                List<ProductModel> products = _productsManager.GetByVendorID(id).ToList();
 
                 //Remove any products from the list of products if the existing purchase order lines already have that product*
                 for (int i = 0; i < PurchaseOrder.PurchaseOrderDetails.Count; i++)

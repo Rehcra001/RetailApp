@@ -13,12 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BussinessLogicLibrary\BussinessLogicLibrary.csproj" />
+    <Folder Include="ViewModels\Sales\" />
+    <Folder Include="Views\Sales\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\Sales\" />
-    <Folder Include="Views\Sales\" />
+    <ProjectReference Include="..\BussinessLogicLibrary\BussinessLogicLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,4 @@
 ﻿using BussinessLogicLibrary.Categories;
-using BussinessLogicLibrary.InventoryTransactions;
 using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.Vendors;
@@ -16,11 +15,10 @@ namespace RetailAppUI.ViewModels.Products
     public class ProductViewModel : BaseViewModel
     {
 		private string _state;
-		private readonly ProductManager _productManager;
+		private readonly IProductManager _productManager;
 		private readonly IVendorManager _vendorManager;
 		private readonly ICategoryManager _categoryManager;
 		private readonly IUnitPerManager _unitPerManager;
-		private readonly IInventoryTransactionsManager _inventoryTransactionsManager;
 
         #region Service Properties
         private ISharedDataService _sharedData;
@@ -28,14 +26,6 @@ namespace RetailAppUI.ViewModels.Products
 		{
 			get { return _sharedData; }
 			set { _sharedData = value; }
-		}
-
-
-		private IConnectionStringService _connectionString;
-		public IConnectionStringService ConnectionString
-		{
-			get { return _connectionString; }
-			set { _connectionString = value; }
 		}
 
 		private INavigationService _navigation;
@@ -130,24 +120,21 @@ namespace RetailAppUI.ViewModels.Products
         #endregion RelayCommand Properties
 
         #region Constructor
-        public ProductViewModel(IConnectionStringService connectionString,
-                                ISharedDataService sharedData,
+        public ProductViewModel(ISharedDataService sharedData,
                                 INavigationService navigation,
+								IProductManager productManager,
                                 IVendorManager vendorManager,
 								ICategoryManager categoryManager,
-								IUnitPerManager unitPerManager,
-								IInventoryTransactionsManager inventoryTransactionsManager)
+								IUnitPerManager unitPerManager)
         {
 			SharedData = sharedData; //Will hold the Product ID selected in the products switchboard view
-			ConnectionString = connectionString;
 			Navigation = navigation;
+			_productManager = productManager;
 			_vendorManager = vendorManager;
 			_categoryManager = categoryManager;
 			_unitPerManager = unitPerManager;
-			_inventoryTransactionsManager = inventoryTransactionsManager;
 
             //Get the Product to display
-            _productManager = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager, _inventoryTransactionsManager);
 			try
 			{
 				int id = (int)SharedData.SharedData;
@@ -186,7 +173,7 @@ namespace RetailAppUI.ViewModels.Products
         {
 			try
 			{
-				_productManager.Update();
+				_productManager.Update(Product);
 			}
 			catch (Exception ex)
 			{
@@ -231,7 +218,7 @@ namespace RetailAppUI.ViewModels.Products
             //prepare for cancelling any edits
             try
             {                
-                ProductUndoEdit = new ProductManager(ConnectionString.GetConnectionString(), _vendorManager, _categoryManager, _unitPerManager, _inventoryTransactionsManager).GetByID(Product.ProductID);
+                ProductUndoEdit = _productManager.GetByID(Product.ProductID);
             }
             catch (Exception ex)
             {
