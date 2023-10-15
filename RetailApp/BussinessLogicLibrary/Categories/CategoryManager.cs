@@ -80,10 +80,8 @@ namespace BussinessLogicLibrary.Categories
         /// </exception>
         public CategoryModel Insert(CategoryModel category)
         {
-            //Validate
-            category.Validate();
             //check if any validation errors raised
-            if (string.IsNullOrWhiteSpace(category.ValidationMessage))
+            if (category.Validate())
             {
                 //No errors
                 Tuple<CategoryModel, string> insertedCategory = _categoryRepository.Insert(category).ToTuple();
@@ -118,10 +116,8 @@ namespace BussinessLogicLibrary.Categories
         /// </exception>
         public void Update(CategoryModel category)
         {
-            //Validate
-            category.Validate();
             //check if any validation errors raised
-            if (string.IsNullOrWhiteSpace(category.ValidationMessage))
+            if (category.Validate())
             {
                 //No validation errors
                 string errorMessage = _categoryRepository.Update(category);

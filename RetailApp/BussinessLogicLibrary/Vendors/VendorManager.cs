@@ -107,10 +107,8 @@ namespace BussinessLogicLibrary.Vendors
         /// </exception>
         public VendorModel Insert(VendorModel vendor)
         {
-            //Validate the data entered
-            vendor.Validate();
             //Check if any validation errors encountered
-            if (string.IsNullOrWhiteSpace(vendor.ValidationMessage))
+            if (vendor.Validate())
             {
                 //No Validation errors
                 Tuple<VendorModel, string> insertedVendor = _vendorRepository.Insert(vendor).ToTuple();
@@ -136,10 +134,8 @@ namespace BussinessLogicLibrary.Vendors
 
         public void Update(VendorModel vendor)
         {
-            //Validate the data entered
-            vendor.Validate();
             //Check if any validation errors encountered
-            if (string.IsNullOrWhiteSpace(vendor.ValidationMessage))
+            if (vendor.Validate())
             {
                 //No Validation errors
                 string errorMessage = _vendorRepository.Update(vendor);

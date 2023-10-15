@@ -60,10 +60,8 @@ namespace BussinessLogicLibrary.CompanyDetail
         /// </exception>
         public CompanyDetailModel Insert(CompanyDetailModel model)
         {
-            //First validate the model
-            model.Validate();
             //Check if any validation errors raised
-            if (string.IsNullOrWhiteSpace(model.ValidationMessage))
+            if (model.Validate())
             {
                 //No Validation error 
                 //try insert into database
@@ -101,10 +99,8 @@ namespace BussinessLogicLibrary.CompanyDetail
         /// </exception>
         public void Update(CompanyDetailModel model)
         {
-            //First validate the model
-            model.Validate();
             //Check if any validation errors raised
-            if (string.IsNullOrWhiteSpace(model.ValidationMessage))
+            if (model.Validate())
             {
                 //No Validation error 
                 //try insert into database

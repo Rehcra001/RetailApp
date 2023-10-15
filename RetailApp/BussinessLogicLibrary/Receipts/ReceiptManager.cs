@@ -1,10 +1,5 @@
 ﻿using DataAccessLibrary.ReceiptRepository;
 using ModelsLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BussinessLogicLibrary.Receipts
 {
@@ -24,8 +19,7 @@ namespace BussinessLogicLibrary.Receipts
             //Validate the receipting line
             foreach (ReceiptingLineModel receiptingLine in receiptLines)
             {
-                receiptingLine.Validate();
-                if (!string.IsNullOrWhiteSpace(receiptingLine.ValidationMessage))
+                if (!receiptingLine.Validate())
                 {
                     //Validation Error
                     throw new Exception(receiptingLine.ValidationMessage);
@@ -40,8 +34,7 @@ namespace BussinessLogicLibrary.Receipts
                     UnitCost = receiptingLine.UnitCost
                 };
 
-                receipt.Validate();
-                if (!string.IsNullOrWhiteSpace(receipt.ValidationMessage))
+                if (!receipt.Validate())
                 {
                     //Validation Error
                     throw new Exception(receipt.ValidationMessage);

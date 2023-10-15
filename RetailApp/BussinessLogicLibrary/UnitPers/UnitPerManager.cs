@@ -85,10 +85,8 @@ namespace BussinessLogicLibrary.UnitPers
         /// </exception>
         public UnitsPerModel Insert(UnitsPerModel unitsPer)
         {
-            //validate the UnitsPerModel
-            unitsPer.Validate();
             //Check for validation errors
-            if (string.IsNullOrWhiteSpace(unitsPer.ValidationMessage))
+            if (unitsPer.Validate())
             {
                 //No validation error
                 Tuple<UnitsPerModel, string> insertedUnitPer = _unitsPerRepository.Insert(unitsPer).ToTuple();
@@ -114,10 +112,8 @@ namespace BussinessLogicLibrary.UnitPers
 
         public void Update(UnitsPerModel unitsPer)
         {
-            //Validate the model
-            unitsPer.Validate();
             //Check for validation errors
-            if (string.IsNullOrWhiteSpace(unitsPer.ValidationMessage))
+            if (unitsPer.Validate())
             {
                 //No validation Error
                 string errorMessage = _unitsPerRepository.Update(unitsPer);

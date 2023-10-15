@@ -105,10 +105,8 @@ namespace BussinessLogicLibrary.Customers
         /// </exception>
         public CustomerModel Insert(CustomerModel customer)
         {
-            //Validate the customer
-            customer.Validate();
             //check if any validation errors raised
-            if (string.IsNullOrWhiteSpace(customer.ValidationMessage))
+            if (customer.Validate())
             {
                 //No Validation error
                 Tuple<CustomerModel, string> insertedCustomer = _customerRepository.Insert(customer).ToTuple();
@@ -143,10 +141,8 @@ namespace BussinessLogicLibrary.Customers
         /// </exception>
         public void Update(CustomerModel customer)
         {
-            //Validate customer
-            customer.Validate();
             //check if any validation errors raised
-            if (string.IsNullOrWhiteSpace(customer.ValidationMessage))
+            if (customer.Validate())
             {
                 //No Validation error
                 string errorMessage = _customerRepository.Update(customer);
