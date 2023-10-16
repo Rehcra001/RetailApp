@@ -2,15 +2,15 @@
 using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.PurchaseOrderDetailRepository;
-using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
-    public class GetPurchaseOrderManager
+    public class GetPurchaseOrderManager : IGetPurchaseOrderManager
     {
-        private string _connectionString;
+        private readonly IPurchaseOrderHeaderRepository _purchaseOrderHeaderRepository;
+        private readonly IPurchaseOrderDetailRepository _purchaseOrderDetailRepository;
         private readonly IVendorManager _vendorManager;
         private readonly IProductsManager _productsManager;
         private readonly IStatusManager _statusManager;
@@ -18,13 +18,15 @@ namespace BussinessLogicLibrary.Purchases
 
         private PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
 
-        public GetPurchaseOrderManager(string connectionString,
+        public GetPurchaseOrderManager(IPurchaseOrderHeaderRepository purchaseOrderHeaderRepository,
+                                       IPurchaseOrderDetailRepository purchaseOrderDetailRepository,
                                        IVendorManager vendorManager,
                                        IProductsManager productsManager,
                                        IStatusManager statusManager,
                                        IReceiptManager receiptManager)
         {
-            _connectionString = connectionString;
+            _purchaseOrderHeaderRepository = purchaseOrderHeaderRepository;
+            _purchaseOrderDetailRepository = purchaseOrderDetailRepository;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
             _statusManager = statusManager;
@@ -44,12 +46,12 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrder(long id)
         {
-            Tuple<PurchaseOrderHeaderModel, string> purchaseOrder = new PurchaseOrderHeaderRepository(_connectionString).GetByID(id).ToTuple();
+            Tuple<PurchaseOrderHeaderModel, string> purchaseOrder = _purchaseOrderHeaderRepository.GetByID(id).ToTuple();
             //check for errors
             if (purchaseOrder.Item2 == null)
             {
                 //No errors
-                PurchaseOrder = purchaseOrder.Item1;
+                this.PurchaseOrder = purchaseOrder.Item1;
             }
             else
             {
@@ -60,7 +62,7 @@ namespace BussinessLogicLibrary.Purchases
 
         private void GetOrderLines()
         {
-            Tuple<IEnumerable<PurchaseOrderDetailModel>, string> orderLines = new PurchaseOrderDetailRepository(_connectionString).GetByPurchaseOrderID(PurchaseOrder.PurchaseOrderID).ToTuple();
+            Tuple<IEnumerable<PurchaseOrderDetailModel>, string> orderLines = _purchaseOrderDetailRepository.GetByPurchaseOrderID(PurchaseOrder.PurchaseOrderID).ToTuple();
             //Check for errors
             if (orderLines.Item2 == null)
             {

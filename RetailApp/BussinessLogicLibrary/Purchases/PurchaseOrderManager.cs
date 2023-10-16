@@ -2,32 +2,26 @@
 using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
 
 namespace BussinessLogicLibrary.Purchases
 {
-    public class PurchaseOrderManager
+    public class PurchaseOrderManager : IPurchaseOrderManager
     {
-        public PurchaseOrderHeaderModel PurchaseOrder { get; private set; } = new PurchaseOrderHeaderModel();
-
-        private string _connectionString;
-        private readonly IVendorManager _vendorManager;
-        private readonly IProductsManager _productsManager;
+        private readonly IGetPurchaseOrderManager _getPurchaseOrderManager;
+        private readonly IUpdatePurchaseOrderManager _updatePurchaseOrderManager;
         private readonly IStatusManager _statusManager;
-        private readonly IReceiptManager _receiptManager;
 
-        public PurchaseOrderManager(string connectionString,
+        public PurchaseOrderManager(IGetPurchaseOrderManager getPurchaseOrderManager,
+                                    IUpdatePurchaseOrderManager updatePurchaseOrderManager,
                                     IVendorManager vendorManager,
                                     IProductsManager productsManager,
                                     IStatusManager statusManager,
                                     IReceiptManager receiptManager)
         {
-            _connectionString = connectionString;
-            _vendorManager = vendorManager;
-            _productsManager = productsManager;
+            _getPurchaseOrderManager = getPurchaseOrderManager;
+            _updatePurchaseOrderManager = updatePurchaseOrderManager;
             _statusManager = statusManager;
-            _receiptManager = receiptManager;
         }
 
         /// <summary>
@@ -36,17 +30,17 @@ namespace BussinessLogicLibrary.Purchases
         /// <param name="id">
         /// Takes in a purchase order ID of type long
         /// </param>
-        public void GetByID(long id)
+        public PurchaseOrderHeaderModel GetByID(long id)
         {
-            PurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager, _receiptManager).GetByID(id);
+            return _getPurchaseOrderManager.GetByID(id);
         }
 
         /// <summary>
         /// Saves any valid changes made to the purchase order
         /// </summary>
-        public void SaveChanges()
+        public void SaveChanges(PurchaseOrderHeaderModel purchase)
         {
-            new UpdatePurchaseOrderManager(_connectionString, PurchaseOrder, _vendorManager, _productsManager, _statusManager, _receiptManager);
+            _updatePurchaseOrderManager.Update(purchase);
         }
 
         private void GetOpenOrderLineStatus(PurchaseOrderDetailModel orderLine)
@@ -63,24 +57,24 @@ namespace BussinessLogicLibrary.Purchases
             }
         }
 
-        public void AddOrderLine()
+        public void AddOrderLine(PurchaseOrderHeaderModel purchase)
         {
-            if (CanAddOrderLine())
+            if (CanAddOrderLine(purchase))
             {
-                PurchaseOrder.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
-                int index = PurchaseOrder.PurchaseOrderDetails.Count - 1;
+                purchase.PurchaseOrderDetails.Add(new PurchaseOrderDetailModel());
+                int index = purchase.PurchaseOrderDetails.Count - 1;
                 //Add order line status of open
-                GetOpenOrderLineStatus(PurchaseOrder.PurchaseOrderDetails[index]);
+                GetOpenOrderLineStatus(purchase.PurchaseOrderDetails[index]);
             }
 
         }
 
-        private bool CanAddOrderLine()
+        private bool CanAddOrderLine(PurchaseOrderHeaderModel purchase)
         {
             bool CanAddLine = true;
 
             //Check if the order status is open
-            if (!PurchaseOrder.OrderStatus.Status!.Equals("Open"))
+            if (!purchase.OrderStatus.Status!.Equals("Open"))
             {
                 throw new Exception("Can only add a line if the order status is open.");
             }
@@ -88,9 +82,9 @@ namespace BussinessLogicLibrary.Purchases
             return CanAddLine;
         }
 
-        public bool CanEditOrderLines()
+        public bool CanEditOrderLines(PurchaseOrderHeaderModel purchase)
         {
-            if (PurchaseOrder.OrderStatus.Status!.Equals("Open"))
+            if (purchase.OrderStatus.Status!.Equals("Open"))
             {
                 return true;
             }

@@ -7,11 +7,11 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
 {
     public class PurchaseOrderHeaderRepository : IPurchaseOrderHeaderRepository
     {
-        private string _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public PurchaseOrderHeaderRepository(string connectionString)
+        public PurchaseOrderHeaderRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public (IEnumerable<PurchaseOrderHeaderModel>, string) GetALL()
@@ -19,14 +19,14 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
             List<PurchaseOrderHeaderModel> purchaseOrderHeaders = new List<PurchaseOrderHeaderModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllPurchaseOrderHeaders";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -77,15 +77,15 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
             PurchaseOrderHeaderModel purchaseOrderHeader = new PurchaseOrderHeaderModel();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetPurchaseOrderHeaderByID";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -130,15 +130,15 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
             List<PurchaseOrderHeaderModel> purchaseOrderHeaders = new List<PurchaseOrderHeaderModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetPurchaseOrderHeaderByOrderStatus";
                     command.Parameters.Add("@OrderStatusID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -188,15 +188,15 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
             List<PurchaseOrderHeaderModel> purchaseOrderHeaders = new List<PurchaseOrderHeaderModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetPurchaseOrderHeaderVendorID";
                     command.Parameters.Add("@VendorID", SqlDbType.Int).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -245,11 +245,11 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertPurchaseOrderHeader";
                     command.Parameters.Add("@VendorID", SqlDbType.Int).Value = purchaseOrderHeader.VendorID;
@@ -262,7 +262,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                     command.Parameters.Add("@RequiredDate", SqlDbType.Date).Value = purchaseOrderHeader.RequiredDate;
                     command.Parameters.Add("@OrderStatusID", SqlDbType.Int).Value = purchaseOrderHeader.OrderStatusID;
                     command.Parameters.Add("@IsImport", SqlDbType.Bit).Value = purchaseOrderHeader.IsImport;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
                     //Check for errors
@@ -285,11 +285,11 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_UpdatePurchaseOrderHeader";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = purchaseOrderHeader.PurchaseOrderID;
@@ -303,7 +303,7 @@ namespace DataAccessLibrary.PurchaseOrderHeaderRepository
                     command.Parameters.Add("@RequiredDate", SqlDbType.Date).Value = purchaseOrderHeader.RequiredDate;
                     command.Parameters.Add("@OrderStatusID", SqlDbType.Int).Value = purchaseOrderHeader.OrderStatusID;
                     command.Parameters.Add("@IsImport", SqlDbType.Bit).Value = purchaseOrderHeader.IsImport;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
 

@@ -1,10 +1,7 @@
 ﻿using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.StatusRepository;
-using DataAccessLibrary.VendorRepository;
 using ModelsLibrary;
-using ModelsLibrary.RepositoryInterfaces;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -19,7 +16,7 @@ namespace RetailAppUI.ViewModels.Purchases
 {
     public class PurchaseOrdersSwitchboardViewModel : BaseViewModel
     {
-        private readonly PurchaseOrdersListManager _ordersListManager;
+        private readonly IPurchaseOrdersListManager _ordersListManager;
         private readonly IVendorManager _vendorManager;
         private readonly IStatusManager _statusManager;
         private string _groupByState = string.Empty;
@@ -29,13 +26,6 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             get { return _navigation; }
             set { _navigation = value; OnPropertyChanged(); }
-        }
-
-        private IConnectionStringService _connectionString;
-        public IConnectionStringService ConnectionString
-        {
-            get { return _connectionString; }
-            set { _connectionString = value; }
         }
 
         private ICurrentViewService _currentView;
@@ -110,21 +100,19 @@ namespace RetailAppUI.ViewModels.Purchases
 
 
         public PurchaseOrdersSwitchboardViewModel(INavigationService navigation,
-                                                  IConnectionStringService connectionString,
                                                   ICurrentViewService currentView,
                                                   ISharedDataService sharedData,
+                                                  IPurchaseOrdersListManager ordersListManager,
                                                   IVendorManager vendorManager,
                                                   IStatusManager statusManager)
         {
             Navigation = navigation;
-            ConnectionString = connectionString;
             CurrentView = currentView;
             SharedData = sharedData;
+            _ordersListManager = ordersListManager;
             _vendorManager = vendorManager;
             _statusManager = statusManager;
 
-            //Instantiate orders list manager
-            _ordersListManager = new PurchaseOrdersListManager(ConnectionString.GetConnectionString(), _vendorManager, _statusManager);
             //Instantiate PurchaseOrders
             PurchaseOrders = new ObservableCollection<PurchaseOrderHeaderModel>();
             //Add to collection view
@@ -267,8 +255,11 @@ namespace RetailAppUI.ViewModels.Purchases
                 try
                 {
                     SetGroupByState("OrderStatus");
-                    _ordersListManager.GetByVendorID(id);
-                    GetOrders();
+                    PurchaseOrders.Clear();
+                    foreach (PurchaseOrderHeaderModel order in _ordersListManager.GetByVendorID(id))
+                    {
+                        PurchaseOrders.Add(order);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -296,8 +287,11 @@ namespace RetailAppUI.ViewModels.Purchases
                 try
                 {
                     SetGroupByState("Vendor");
-                    _ordersListManager.GetByOrderStatusID(id);
-                    GetOrders();
+                    PurchaseOrders.Clear();
+                    foreach (PurchaseOrderHeaderModel order in _ordersListManager.GetByOrderStatusID(id))
+                    {
+                        PurchaseOrders.Add(order);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -317,8 +311,11 @@ namespace RetailAppUI.ViewModels.Purchases
             try
             {
                 SetGroupByState("OrderStatus");
-                _ordersListManager.GetAll();
-                GetOrders();
+                PurchaseOrders.Clear();
+                foreach (PurchaseOrderHeaderModel order in _ordersListManager.GetAll())
+                {
+                    PurchaseOrders.Add(order);
+                }
             }
             catch (Exception ex)
             {
@@ -327,14 +324,6 @@ namespace RetailAppUI.ViewModels.Purchases
             }
         }
 
-        private void GetOrders()
-        {
-            PurchaseOrders.Clear();
-            foreach (PurchaseOrderHeaderModel order in _ordersListManager.PurchaseOrders)
-            {
-                PurchaseOrders.Add(order);
-            }
-        }
         private bool CanNavigateToAddNewPurchaseOrdertView(object obj)
         {
             return true;

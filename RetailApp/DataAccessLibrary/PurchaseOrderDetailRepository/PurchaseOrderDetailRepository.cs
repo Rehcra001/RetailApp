@@ -7,11 +7,11 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
 {
     public class PurchaseOrderDetailRepository : IPurchaseOrderDetailRepository
     {
-        private string _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public PurchaseOrderDetailRepository(string connectionString)
+        public PurchaseOrderDetailRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public (IEnumerable<PurchaseOrderDetailModel>, string) GetAll()
@@ -19,14 +19,14 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
             List<PurchaseOrderDetailModel> purchaseOrderDetails = new List<PurchaseOrderDetailModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetAllPurchaseOrderDetails";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -70,15 +70,15 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
             List<PurchaseOrderDetailModel> purchaseOrderDetails = new List<PurchaseOrderDetailModel>();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetPurchaseOrderDetailByPurchaseOrderID";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = id;
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -121,11 +121,11 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_InsertPurchaseOrderDetail";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = purchaseOrderDetail.PurchaseOrderID;
@@ -134,7 +134,7 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                     command.Parameters.Add("@UnitCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitCost;
                     command.Parameters.Add("@UnitFreightCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitFreightCost;
                     command.Parameters.Add("@OrderLineStatusID", SqlDbType.Int).Value = purchaseOrderDetail.OrderLineStatusID;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
 
@@ -153,11 +153,11 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
         {
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_UpdatePurchaseOrderDetail";
                     command.Parameters.Add("@PurchaseOrderID", SqlDbType.BigInt).Value = purchaseOrderDetail.PurchaseOrderID;
@@ -166,7 +166,7 @@ namespace DataAccessLibrary.PurchaseOrderDetailRepository
                     command.Parameters.Add("@UnitCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitCost;
                     command.Parameters.Add("@UnitFreightCost", SqlDbType.Money).Value = purchaseOrderDetail.UnitFreightCost;
                     command.Parameters.Add("@OrderLineStatusID", SqlDbType.Int).Value = purchaseOrderDetail.OrderLineStatusID;
-                    connection.Open();
+                    command.Connection.Open();
 
                     string returnedMessage = command.ExecuteScalar().ToString()!;
 

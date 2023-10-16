@@ -2,12 +2,10 @@
 using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -18,7 +16,7 @@ namespace RetailAppUI.ViewModels.Purchases
 {
     public class AddNewPurchaseOrderViewModel : BaseViewModel
     {
-        private readonly AddNewPurchaseOrderManager _purchaseOrderManager;
+        private readonly IAddNewPurchaseOrderManager _addNewPurchaseOrderManager;
 		private readonly IVendorManager _vendorManager;
 		private readonly IProductsManager _productsManager;
 		private readonly IStatusManager _statusManager;
@@ -30,13 +28,6 @@ namespace RetailAppUI.ViewModels.Purchases
 		{
 			get { return _navigation; }
 			set { _navigation = value; OnPropertyChanged(); }
-		}
-
-		private IConnectionStringService _connectionString;
-		public IConnectionStringService ConnectionString
-		{
-			get { return _connectionString; }
-			set { _connectionString = value; }
 		}
 
 		private PurchaseOrderHeaderModel _purchaseOrder;
@@ -152,14 +143,14 @@ namespace RetailAppUI.ViewModels.Purchases
 
         //Constructor
         public AddNewPurchaseOrderViewModel(INavigationService navigation,
-                                            IConnectionStringService connectionString,
+											IAddNewPurchaseOrderManager addNewPurchaseOrderManager,
                                             IVendorManager vendorManager,
 											IProductsManager productsManager,
 											IStatusManager statusManager)
         {
 			Navigation = navigation;
-			ConnectionString = connectionString;
-			_vendorManager = vendorManager;
+			_addNewPurchaseOrderManager = addNewPurchaseOrderManager;
+            _vendorManager = vendorManager;
 			_productsManager = productsManager;
 			_statusManager = statusManager;
 
@@ -170,8 +161,7 @@ namespace RetailAppUI.ViewModels.Purchases
             GetOrderStatuses();
 
             //Purchase order
-            _purchaseOrderManager = new AddNewPurchaseOrderManager(ConnectionString.GetConnectionString());
-			PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
+			PurchaseOrder = new PurchaseOrderHeaderModel();
 			//Set Order status to open
 			PurchaseOrder.OrderStatus = OrderStatuses.FirstOrDefault(x => x.Status == "Open")!;
 			//Set Order date
@@ -227,8 +217,7 @@ namespace RetailAppUI.ViewModels.Purchases
 			{
                 try
                 {
-                    _purchaseOrderManager.Insert();
-                    PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
+                    PurchaseOrder =_addNewPurchaseOrderManager.Insert(PurchaseOrder);
                 }
                 catch (Exception ex)
                 {

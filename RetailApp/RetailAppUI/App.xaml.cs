@@ -3,9 +3,11 @@ using BussinessLogicLibrary.CompanyDetail;
 using BussinessLogicLibrary.Customers;
 using BussinessLogicLibrary.InventoryTransactions;
 using BussinessLogicLibrary.Products;
+using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.UnitPers;
+using BussinessLogicLibrary.VAT;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary;
 using DataAccessLibrary.CategoryRepository;
@@ -13,9 +15,12 @@ using DataAccessLibrary.CompanyDetailRepository;
 using DataAccessLibrary.CustomerRepository;
 using DataAccessLibrary.InventoryTransactionRepository;
 using DataAccessLibrary.ProductRepository;
+using DataAccessLibrary.PurchaseOrderDetailRepository;
+using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.ReceiptRepository;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.UnitsPerRepository;
+using DataAccessLibrary.VATRepository;
 using DataAccessLibrary.VendorRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -94,6 +99,9 @@ namespace RetailAppUI
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<IStatusRepository, StatusRepository>();
             services.AddTransient<IReceiptsRepository, ReceiptRepository>();
+            services.AddTransient<IPurchaseOrderDetailRepository, PurchaseOrderDetailRepository>();
+            services.AddTransient<IPurchaseOrderHeaderRepository, PurchaseOrderHeaderRepository>();
+            services.AddTransient<IVATRepository, VATRepository>();
 
             //Managers
             services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
@@ -107,6 +115,12 @@ namespace RetailAppUI
             services.AddTransient<IProductsManager, ProductsManager>();
             services.AddTransient<IStatusManager, StatusManager>();
             services.AddTransient<IReceiptManager, ReceiptManager>();
+            services.AddTransient<IVATManager, VATManager>();
+            services.AddTransient<IAddNewPurchaseOrderManager, AddNewPurchaseOrderManager>();
+            services.AddTransient<IGetPurchaseOrderManager, GetPurchaseOrderManager>();
+            services.AddTransient<IPurchaseOrdersListManager, PurchaseOrdersListManager>();
+            services.AddTransient<IUpdatePurchaseOrderManager, UpdatePurchaseOrderManager>();
+            services.AddTransient<IPurchaseOrderManager, PurchaseOrderManager>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

@@ -1,23 +1,20 @@
-﻿using BussinessLogicLibrary.Products;
-using BussinessLogicLibrary.Receipts;
-using BussinessLogicLibrary.Statuses;
-using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.PurchaseOrderDetailRepository;
-using DataAccessLibrary.PurchaseOrderHeaderRepository;
-using DataAccessLibrary.StatusRepository;
-using DataAccessLibrary.VATRepository;
+﻿using BussinessLogicLibrary.Statuses;
+using BussinessLogicLibrary.VAT;
 using ModelsLibrary;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
-    public class UpdatePurchaseOrderManager
+    public class UpdatePurchaseOrderManager : IUpdatePurchaseOrderManager
     {
-        private readonly PurchaseOrderHeaderModel _originalPurchaseOrder;
-        private readonly PurchaseOrderHeaderModel _editedPurchaseOrder;
-        private readonly IVendorManager _vendorManager;
-        private readonly IProductsManager _productsManager;
+        private  PurchaseOrderHeaderModel _originalPurchaseOrder = new PurchaseOrderHeaderModel();
+        private PurchaseOrderHeaderModel _editedPurchaseOrder = new PurchaseOrderHeaderModel();
+
+        private readonly IGetPurchaseOrderManager _getPurchaseOrderManager;
+        private readonly IPurchaseOrderHeaderRepository _purchaseOrderHeaderRepository;
+        private readonly IPurchaseOrderDetailRepository _purchaseOrderDetailRepository;
         private readonly IStatusManager _statusManager;
-        private readonly IReceiptManager _receiptManager;
+        private readonly IVATManager _vatManager;
 
 
         private bool existingLinesAltered = false;
@@ -28,8 +25,6 @@ namespace BussinessLogicLibrary.Purchases
         private const int COMPLETED = 2;
         private const int FILLED = 3;
         private const int CANCELLED = 4;
-
-        private readonly string _connectionString;
 
         /// <summary>
         /// Creates a new instance of UpdatePurchaseOrderManager, 
@@ -42,26 +37,24 @@ namespace BussinessLogicLibrary.Purchases
         /// <param name="purchaseOrder">
         /// Takes in an existing purchase order model that has been edited
         /// </param>
-        public UpdatePurchaseOrderManager(string connectionString,
-                                          PurchaseOrderHeaderModel editedPurchaseOrder,
-                                          IVendorManager vendorManager,
-                                          IProductsManager productsManager,
+        public UpdatePurchaseOrderManager(IGetPurchaseOrderManager getPurchaseOrderManager,
+                                          IPurchaseOrderHeaderRepository purchaseOrderHeaderRepository,
+                                          IPurchaseOrderDetailRepository purchaseOrderDetailRepository,
                                           IStatusManager statusManager,
-                                          IReceiptManager receiptManager)
+                                          IVATManager vatManager)
         {
-            _connectionString = connectionString;
-            _vendorManager = vendorManager;
-            _productsManager = productsManager;
+            _getPurchaseOrderManager = getPurchaseOrderManager;
+            _purchaseOrderHeaderRepository = purchaseOrderHeaderRepository;
+            _purchaseOrderDetailRepository = purchaseOrderDetailRepository;
             _statusManager = statusManager;
-            _receiptManager = receiptManager;
-
-            _editedPurchaseOrder = editedPurchaseOrder;
-            _originalPurchaseOrder = new GetPurchaseOrderManager(_connectionString, _vendorManager, _productsManager, _statusManager, _receiptManager).GetByID(_editedPurchaseOrder.PurchaseOrderID);
-            Update();
+            _vatManager = vatManager;
         }
 
-        private void Update()
+        public void Update(PurchaseOrderHeaderModel purchase)
         {
+            _editedPurchaseOrder = purchase;
+            _originalPurchaseOrder = _getPurchaseOrderManager.GetByID(_editedPurchaseOrder.PurchaseOrderID);
+
             //validate order lines
             //Will throw execption as needed
             ValidateLines();
@@ -102,7 +95,7 @@ namespace BussinessLogicLibrary.Purchases
                 int index = _originalPurchaseOrder.PurchaseOrderDetails.FindIndex(x => x.ProductID == orderLine.ProductID);
                 if (index == -1)
                 {
-                    string errorMessage = new PurchaseOrderDetailRepository(_connectionString).Insert(orderLine);
+                    string errorMessage = _purchaseOrderDetailRepository.Insert(orderLine);
                     if (errorMessage != null)
                     {
                         string message = $"Error saving line {index + 1} to the database.\r\n";
@@ -119,7 +112,7 @@ namespace BussinessLogicLibrary.Purchases
                 int index = _originalPurchaseOrder.PurchaseOrderDetails.FindIndex(x => x.ProductID == orderLine.ProductID);
                 if (index != -1)
                 {
-                    string errorMessage = new PurchaseOrderDetailRepository(_connectionString).Update(orderLine);
+                    string errorMessage = _purchaseOrderDetailRepository.Update(orderLine);
                     if (errorMessage != null)
                     {
                         string message = $"Error saving line {index + 1} to the database.\r\n";
@@ -131,7 +124,7 @@ namespace BussinessLogicLibrary.Purchases
 
         private void UpdateHeader()
         {
-            string errorMessage = new PurchaseOrderHeaderRepository(_connectionString).Update(_editedPurchaseOrder);
+            string errorMessage = _purchaseOrderHeaderRepository.Update(_editedPurchaseOrder);
             if (errorMessage != null)
             {
                 throw new Exception(errorMessage);
@@ -172,17 +165,14 @@ namespace BussinessLogicLibrary.Purchases
                 }
                 else
                 {
-                    //Add VAT Percentage
-                    Tuple<VatModel, string> vat = new VATRepository(_connectionString).Get().ToTuple();
-                    if (vat.Item2 == null)
+                    try
                     {
-                        //No errors
-                        _editedPurchaseOrder.VATPercentage = vat.Item1.VatDecimal;
+                        _editedPurchaseOrder.VATPercentage = _vatManager.Get().VatDecimal;
                         _editedPurchaseOrder.VATAmount = _editedPurchaseOrder.OrderAmount * _editedPurchaseOrder.VATPercentage;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        throw new Exception(vat.Item2);
+                        throw new Exception(ex.Message);
                     }
                 }
 
@@ -435,7 +425,7 @@ namespace BussinessLogicLibrary.Purchases
                             _editedPurchaseOrder.OrderStatusID = _editedPurchaseOrder.OrderStatus.StatusID;
                             headerDetailsAltered = true;
                         }
-                        
+
                     }
                     else if (!lineCompleted && !lineFilled && lineCancelled)
                     {
@@ -461,7 +451,7 @@ namespace BussinessLogicLibrary.Purchases
                             headerDetailsAltered = true;
                         }
 
-                        
+
                     }
                 }
                 else
@@ -717,7 +707,7 @@ namespace BussinessLogicLibrary.Purchases
                 {
                     ValidateOrderLineStatus(editedLine, originalLine);
                     lineChanged = true;
-                }                
+                }
             }
             else if (lineChanged)
             {

@@ -7,11 +7,11 @@ namespace DataAccessLibrary.VATRepository
 {
     public class VATRepository : IVATRepository
     {
-        private string? _connectionString;
+        private readonly IRelationalDataAccess _sqlDataAccess;
 
-        public VATRepository(string? connectionString)
+        public VATRepository(IRelationalDataAccess sqlDataAccess)
         {
-            _connectionString = connectionString;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public (VatModel, string) Get()
@@ -19,14 +19,14 @@ namespace DataAccessLibrary.VATRepository
             VatModel vat = new VatModel();
             string? errorMessage = null;
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (_sqlDataAccess.SQLConnection())
             {
                 using (SqlCommand command = new SqlCommand())
                 {
-                    command.Connection = connection;
+                    command.Connection = _sqlDataAccess.SQLConnection();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetVat";
-                    connection.Open();
+                    command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {

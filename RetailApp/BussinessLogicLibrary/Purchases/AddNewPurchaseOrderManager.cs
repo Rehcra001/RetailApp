@@ -1,33 +1,33 @@
-﻿using DataAccessLibrary.PurchaseOrderDetailRepository;
-using DataAccessLibrary.PurchaseOrderHeaderRepository;
-using DataAccessLibrary.VATRepository;
+﻿using BussinessLogicLibrary.VAT;
 using ModelsLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ModelsLibrary.RepositoryInterfaces;
 
 namespace BussinessLogicLibrary.Purchases
 {
-    public class AddNewPurchaseOrderManager
+    public class AddNewPurchaseOrderManager : IAddNewPurchaseOrderManager
     {
-        private string _connectionString;
+        private readonly IPurchaseOrderHeaderRepository _purchaseOrderHeaderRepository;
+        private readonly IPurchaseOrderDetailRepository _purchaseOrderDetailRepository;
+        private readonly IVATManager _vatManager;
 
-        public PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
+        //public PurchaseOrderHeaderModel PurchaseOrder { get; set; } = new PurchaseOrderHeaderModel();
 
-        public AddNewPurchaseOrderManager(string connectionString)
+        public AddNewPurchaseOrderManager(IPurchaseOrderHeaderRepository purchaseOrderHeaderRepository,
+                                          IPurchaseOrderDetailRepository purchaseOrderDetailRepository,
+                                          IVATManager vatManager)
         {
-            _connectionString = connectionString;
+            _purchaseOrderHeaderRepository = purchaseOrderHeaderRepository;
+            _purchaseOrderDetailRepository = purchaseOrderDetailRepository;
+            _vatManager = vatManager;
         }
 
         /// <summary>
         /// Inserts this PurchaseOrder property into the database
         /// </summary>
-        public void Insert()
+        public PurchaseOrderHeaderModel Insert(PurchaseOrderHeaderModel purchaseOrder)
         {
             //Check each purchase order detail in the list of purchase order details
-            if (PurchaseOrder.PurchaseOrderDetails.Count == 0)
+            if (purchaseOrder.PurchaseOrderDetails.Count == 0)
             {
                 //no order details exist
                 throw new Exception("A purchase order must contain at least one order line.");
@@ -36,7 +36,7 @@ namespace BussinessLogicLibrary.Purchases
             {
                 //Does contain at least one order line
                 //Validate each order line
-                foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
+                foreach (PurchaseOrderDetailModel orderLine in purchaseOrder.PurchaseOrderDetails)
                 {
                     //check if the product in the order is not null
                     if (orderLine.Product != default)
@@ -64,10 +64,10 @@ namespace BussinessLogicLibrary.Purchases
                 //update purchase order header
 
                 //Check Vendor
-                if (PurchaseOrder.Vendor != default)
+                if (purchaseOrder.Vendor != default)
                 {
                     //Vendor not null
-                    PurchaseOrder.VendorID = PurchaseOrder.Vendor.VendorID;
+                    purchaseOrder.VendorID = purchaseOrder.Vendor.VendorID;
                 }
                 else
                 {
@@ -75,10 +75,10 @@ namespace BussinessLogicLibrary.Purchases
                 }
 
                 //Check Order status
-                if (PurchaseOrder.OrderStatus != default)
+                if (purchaseOrder.OrderStatus != default)
                 {
                     //Order status not null
-                    PurchaseOrder.OrderStatusID = PurchaseOrder.OrderStatus.StatusID;
+                    purchaseOrder.OrderStatusID = purchaseOrder.OrderStatus.StatusID;
                 }
                 else
                 {
@@ -87,51 +87,48 @@ namespace BussinessLogicLibrary.Purchases
                 }
 
                 //Add total order amount excluding VAT
-                PurchaseOrder.OrderAmount = PurchaseOrder.PurchaseOrderDetails.Sum(x => x.QuantityOrdered * (x.UnitCost + x.UnitFreightCost));
+                purchaseOrder.OrderAmount = purchaseOrder.PurchaseOrderDetails.Sum(x => x.QuantityOrdered * (x.UnitCost + x.UnitFreightCost));
 
                 //Check if import
-                if (!PurchaseOrder.IsImport)
+                if (!purchaseOrder.IsImport)
                 {
                     //Calculate Vat amount
-                    if (PurchaseOrder.VATPercentage != default)
+                    if (purchaseOrder.VATPercentage != default)
                     {
-                        PurchaseOrder.VATAmount = PurchaseOrder.OrderAmount * PurchaseOrder.VATPercentage;
+                        purchaseOrder.VATAmount = purchaseOrder.OrderAmount * purchaseOrder.VATPercentage;
                     }
                     else
                     {
-                        //Add VAT Percentage
-                        Tuple<VatModel, string> vat = new VATRepository(_connectionString).Get().ToTuple();
-                        if (vat.Item2 == null)
+                        try
                         {
-                            //No errors
-                            PurchaseOrder.VATPercentage = vat.Item1.VatDecimal;
-                            PurchaseOrder.VATAmount = PurchaseOrder.OrderAmount * PurchaseOrder.VATPercentage;
+                            purchaseOrder.VATPercentage = _vatManager.Get().VatDecimal;
+                            purchaseOrder.VATAmount = purchaseOrder.OrderAmount * purchaseOrder.VATPercentage;
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            throw new Exception(vat.Item2);
+                            throw new Exception(ex.Message);
                         }
                     }
 
                     //Add Total Amount
-                    PurchaseOrder.TotalAmount = PurchaseOrder.OrderAmount + PurchaseOrder.VATAmount;
+                    purchaseOrder.TotalAmount = purchaseOrder.OrderAmount + purchaseOrder.VATAmount;
                 }
                 else
                 {
                     //No vat if imported
-                    PurchaseOrder.TotalAmount = PurchaseOrder.OrderAmount;
+                    purchaseOrder.TotalAmount = purchaseOrder.OrderAmount;
                 }
 
                 //Validate purchase order header before saving to database
-                if (PurchaseOrder.Validate())
+                if (purchaseOrder.Validate())
                 {
-                    Tuple<PurchaseOrderHeaderModel, string> purchaseHeader = new PurchaseOrderHeaderRepository(_connectionString).Insert(PurchaseOrder).ToTuple();
+                    Tuple<PurchaseOrderHeaderModel, string> purchaseHeader = _purchaseOrderHeaderRepository.Insert(purchaseOrder).ToTuple();
                     //Check for errors
                     if (purchaseHeader.Item2 == null)
                     {
                         //no errors
                         //add purchase order id
-                        PurchaseOrder.PurchaseOrderID = purchaseHeader.Item1.PurchaseOrderID;
+                        purchaseOrder.PurchaseOrderID = purchaseHeader.Item1.PurchaseOrderID;
                     }
                     else
                     {
@@ -142,18 +139,18 @@ namespace BussinessLogicLibrary.Purchases
                 else
                 {
                     //Validation errors
-                    throw new Exception(PurchaseOrder.ValidationMessage);
+                    throw new Exception(purchaseOrder.ValidationMessage);
                 }
 
                 //Update each order line with the purchase order ID and save
-                foreach (PurchaseOrderDetailModel orderLine in PurchaseOrder.PurchaseOrderDetails)
+                foreach (PurchaseOrderDetailModel orderLine in purchaseOrder.PurchaseOrderDetails)
                 {
-                    orderLine.PurchaseOrderID = PurchaseOrder.PurchaseOrderID;
+                    orderLine.PurchaseOrderID = purchaseOrder.PurchaseOrderID;
 
                     //Validate and save order line
                     if (orderLine.ValidateAll())
                     {
-                        string errorMessage = new PurchaseOrderDetailRepository(_connectionString).Insert(orderLine);
+                        string errorMessage = _purchaseOrderDetailRepository.Insert(orderLine);
                         //Check for errors
                         if (errorMessage != null)
                         {
@@ -168,6 +165,7 @@ namespace BussinessLogicLibrary.Purchases
                     }
                 }
             }
+            return purchaseOrder;
         }
     }
 }

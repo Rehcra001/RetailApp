@@ -1,52 +1,41 @@
-﻿using DataAccessLibrary.StatusRepository;
-using DataAccessLibrary.PurchaseOrderHeaderRepository;
-using DataAccessLibrary.VendorRepository;
+﻿using BussinessLogicLibrary.Statuses;
+using BussinessLogicLibrary.Vendors;
 using ModelsLibrary;
 using ModelsLibrary.RepositoryInterfaces;
-using BussinessLogicLibrary.Vendors;
-using BussinessLogicLibrary.Statuses;
 
 namespace BussinessLogicLibrary.Purchases
 {
-    public class PurchaseOrdersListManager
+    public class PurchaseOrdersListManager : IPurchaseOrdersListManager
     {
-        private string _connectionString;
+        private IPurchaseOrderHeaderRepository _purchaseOrderHeaderRepository;
         private readonly IVendorManager _vendorManager;
         private readonly IStatusManager _statusManager;
-        private PurchaseOrderHeaderRepository _purchaseOrderHeaderRepository;
 
-        /// <summary>
-        /// Holds the list of retrieved purchase orders
-        /// </summary>
-        public IEnumerable<PurchaseOrderHeaderModel> PurchaseOrders { get; set; } = new List<PurchaseOrderHeaderModel>();
-
-        public PurchaseOrdersListManager(string connectionString,
+        public PurchaseOrdersListManager(IPurchaseOrderHeaderRepository purchaseOrderHeaderRepository,
                                          IVendorManager vendorManager,
                                          IStatusManager statusManager)
         {
-            _connectionString = connectionString;
+            _purchaseOrderHeaderRepository = purchaseOrderHeaderRepository;
             _vendorManager = vendorManager;
             _statusManager = statusManager;
-
-            _purchaseOrderHeaderRepository = new PurchaseOrderHeaderRepository(_connectionString);
         }
 
         /// <summary>
         /// Populates the PurchaseOrders List with all purchase orders in the database"
         /// </summary>
-        public void GetAll()
+        public IEnumerable<PurchaseOrderHeaderModel> GetAll()
         {
             Tuple<IEnumerable<PurchaseOrderHeaderModel>, string> purchaseOrders = _purchaseOrderHeaderRepository.GetALL().ToTuple();
 
             //Check for errors
             if (purchaseOrders.Item2 == null)
             {
-                //No error retrieving
-                PurchaseOrders = purchaseOrders.Item1;
                 //Add vendor to each order
-                GetVendors();
+                GetVendors(purchaseOrders.Item1);
                 //Add OrderStatus to each order
-                GetOrderStatus();
+                GetOrderStatus(purchaseOrders.Item1);
+
+                return purchaseOrders.Item1;
             }
             else
             {
@@ -59,19 +48,19 @@ namespace BussinessLogicLibrary.Purchases
         /// Populates the PurchaseOrders List by order status
         /// </summary>
         /// <param name="orderStatus"></param>
-        public void GetByOrderStatusID(int id)
+        public IEnumerable<PurchaseOrderHeaderModel> GetByOrderStatusID(int id)
         {
             Tuple<IEnumerable<PurchaseOrderHeaderModel>, string> purchaseOrders = _purchaseOrderHeaderRepository.GetByOrderStatusID(id).ToTuple();
 
             //Check for errors
             if (purchaseOrders.Item2 == null)
             {
-                //No error retrieving
-                PurchaseOrders = purchaseOrders.Item1;
                 //Add vendor to each order
-                GetVendors();
+                GetVendors(purchaseOrders.Item1);
                 //Add OrderStatus to each order
-                GetOrderStatus();
+                GetOrderStatus(purchaseOrders.Item1);
+
+                return purchaseOrders.Item1;
             }
             else
             {
@@ -85,19 +74,19 @@ namespace BussinessLogicLibrary.Purchases
         /// </summary>
         /// <param name="id"></param>
         /// <exception cref="Exception"></exception>
-        public void GetByVendorID(int id)
+        public IEnumerable<PurchaseOrderHeaderModel> GetByVendorID(int id)
         {
             Tuple<IEnumerable<PurchaseOrderHeaderModel>, string> purchaseOrders = _purchaseOrderHeaderRepository.GetByVendorID(id).ToTuple();
 
             //Check for errors
             if (purchaseOrders.Item2 == null)
             {
-                //No error retrieving
-                PurchaseOrders = purchaseOrders.Item1;
                 //Add vendor to each order
-                GetVendors();
+                GetVendors(purchaseOrders.Item1);
                 //Add OrderStatus to each order
-                GetOrderStatus();
+                GetOrderStatus(purchaseOrders.Item1);
+
+                return purchaseOrders.Item1;
             }
             else
             {
@@ -106,11 +95,11 @@ namespace BussinessLogicLibrary.Purchases
             }
         }
 
-        private void GetOrderStatus()
+        private void GetOrderStatus(IEnumerable<PurchaseOrderHeaderModel> purchases)
         {
             try
             {
-                AddOrderStatus(_statusManager.GetAll());
+                AddOrderStatus(_statusManager.GetAll(), purchases);
             }
             catch (Exception ex)
             {
@@ -118,19 +107,19 @@ namespace BussinessLogicLibrary.Purchases
             }
         }
 
-        private void AddOrderStatus(IEnumerable<StatusModel> orderStatuses)
+        private void AddOrderStatus(IEnumerable<StatusModel> orderStatuses, IEnumerable<PurchaseOrderHeaderModel> purchases)
         {
-            foreach (PurchaseOrderHeaderModel order in PurchaseOrders)
+            foreach (PurchaseOrderHeaderModel order in purchases)
             {
                 order.OrderStatus = orderStatuses.First(x => x.StatusID == order.OrderStatusID);
             }
         }
 
-        private void GetVendors()
+        private void GetVendors(IEnumerable<PurchaseOrderHeaderModel> purchases)
         {
             try
             {
-                AddVendor(_vendorManager.GetAll());
+                AddVendor(_vendorManager.GetAll(), purchases);
             }
             catch (Exception ex)
             {
@@ -138,9 +127,9 @@ namespace BussinessLogicLibrary.Purchases
             }
         }
 
-        private void AddVendor(IEnumerable<VendorModel> vendors)
+        private void AddVendor(IEnumerable<VendorModel> vendors, IEnumerable<PurchaseOrderHeaderModel> purchases)
         {
-            foreach (PurchaseOrderHeaderModel order in PurchaseOrders)
+            foreach (PurchaseOrderHeaderModel order in purchases)
             {
                 order.Vendor = vendors.First(x => x.VendorID == order.VendorID);
             }

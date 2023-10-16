@@ -1,11 +1,7 @@
-﻿using BussinessLogicLibrary.Categories;
-using BussinessLogicLibrary.Products;
+﻿using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Statuses;
-using BussinessLogicLibrary.UnitPers;
-using BussinessLogicLibrary.Vendors;
-using DataAccessLibrary.StatusRepository;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
@@ -21,10 +17,7 @@ namespace RetailAppUI.ViewModels.Purchases
 {
     public class PurchaseOrderViewModel : BaseViewModel
     {
-        private PurchaseOrderManager _purchaseOrderManager;
-        private readonly IVendorManager _vendorManager;
-        private readonly ICategoryManager _categoryManager;
-        private readonly IUnitPerManager _unitPerManager;
+        private IPurchaseOrderManager _purchaseOrderManager;
         private readonly IProductsManager _productsManager;
         private readonly IStatusManager _statusManager;
         private readonly IReceiptManager _receiptManager;
@@ -37,13 +30,6 @@ namespace RetailAppUI.ViewModels.Purchases
         {
             get { return _navigation; }
             set { _navigation = value; OnPropertyChanged(); }
-        }
-
-        private IConnectionStringService _connectionString;
-        public IConnectionStringService ConnectionString
-        {
-            get { return _connectionString; }
-            set { _connectionString = value; }
         }
 
         private ISharedDataService _sharedData;
@@ -185,21 +171,15 @@ namespace RetailAppUI.ViewModels.Purchases
 
         //constructor
         public PurchaseOrderViewModel(INavigationService navigation,
-                                      IConnectionStringService connectionString,
                                       ISharedDataService sharedData,
-                                      IVendorManager vendorManager,
-                                      ICategoryManager categoryManager,
-                                      IUnitPerManager unitPerManager,
+                                      IPurchaseOrderManager purchaseOrderManager,
                                       IProductsManager productsManager,
                                       IStatusManager statusManager,
                                       IReceiptManager receiptManager)
         {
             Navigation = navigation;
-            ConnectionString = connectionString;
             SharedData = sharedData;
-            _vendorManager = vendorManager;
-            _categoryManager = categoryManager;
-            _unitPerManager = unitPerManager;
+            _purchaseOrderManager = purchaseOrderManager;
             _productsManager = productsManager;
             _statusManager = statusManager;
             _receiptManager = receiptManager;
@@ -310,7 +290,7 @@ namespace RetailAppUI.ViewModels.Purchases
             {
                 if (_state.Equals("Edit"))
                 {
-                    _purchaseOrderManager.SaveChanges();
+                    _purchaseOrderManager.SaveChanges(PurchaseOrder);
                     
                 }
                 else if (_state.Equals("Receipt"))
@@ -519,7 +499,7 @@ namespace RetailAppUI.ViewModels.Purchases
                 //check if a new line may be added
                 try
                 {
-                    _purchaseOrderManager.AddOrderLine();
+                    _purchaseOrderManager.AddOrderLine(PurchaseOrder);
                     PurchaseOrderLines.Refresh();
                 }
                 catch (Exception ex)
@@ -657,7 +637,7 @@ namespace RetailAppUI.ViewModels.Purchases
                     DateEnabled = true;
                     OrderStatusEnabled = true;
                     CanChangeImported = true;
-                    if (_purchaseOrderManager.CanEditOrderLines())
+                    if (_purchaseOrderManager.CanEditOrderLines(PurchaseOrder))
                     {
                         CanEditOrderLines = true;
                     }
@@ -670,12 +650,11 @@ namespace RetailAppUI.ViewModels.Purchases
         }
 
         private void GetPurchaseOrder()
-        {
-            _purchaseOrderManager = new PurchaseOrderManager(ConnectionString.GetConnectionString(), _vendorManager, _productsManager, _statusManager, _receiptManager);
+        {;
             //fill _purchaseOrderManager PurchaseOrder property
             try
             {
-                _purchaseOrderManager.GetByID((long)SharedData.SharedData);
+               PurchaseOrder = _purchaseOrderManager.GetByID((long)SharedData.SharedData);
             }
             catch (Exception ex)
             {
@@ -683,8 +662,6 @@ namespace RetailAppUI.ViewModels.Purchases
                 Navigation.NavigateTo<PurchaseOrdersSwitchboardViewModel>();
             }
 
-            //Set PurchaseOrder = _purchaseOrderManager.PurchaseOrder property
-            PurchaseOrder = _purchaseOrderManager.PurchaseOrder;
             //Add order lines to a collection view
             PurchaseOrderLines = CollectionViewSource.GetDefaultView(PurchaseOrder.PurchaseOrderDetails);
         }
