@@ -23,7 +23,7 @@
         public DateTime OrderDate { get; set; }
 
         /// <summary>
-        /// The total value of the products purchased
+        /// The total value of the order excl. VAT
         /// </summary>
         public decimal OrderAmount { get; set; }
 
