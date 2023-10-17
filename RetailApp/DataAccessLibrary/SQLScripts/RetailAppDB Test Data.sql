@@ -114,22 +114,22 @@ GO
 
 
 --Generate a goods issue
-DECLARE @IssueDate DATETIME = GETDATE();
-DECLARE @ProductID INT = 10001;
-DECLARE @IssueID INT;
+--DECLARE @IssueDate DATETIME = GETDATE();
+--DECLARE @ProductID INT = 10001;
+--DECLARE @IssueID INT;
 
-INSERT INTO dbo.Issues(SalesOrderID, ProductID, IssueDate, QuantityIssued,UnitCost)
-VALUES(8900000236, @ProductID, @IssueDate, -33, 80 )
+--INSERT INTO dbo.Issues(SalesOrderID, ProductID, IssueDate, QuantityIssued,UnitCost)
+--VALUES(8900000236, @ProductID, @IssueDate, -33, 80 )
 
-SELECT @IssueID = MAX(IssueID)
-FROM dbo.Issues;
+--SELECT @IssueID = MAX(IssueID)
+--FROM dbo.Issues;
 
---Update InventoryTransactions
-INSERT INTO dbo.InventoryTransactions (TransactionType, TransactionDate, ProductID, OrderID, Quantity)
-VALUES ('I', GETDATE(), @ProductID, @IssueID, -33);
+----Update InventoryTransactions
+--INSERT INTO dbo.InventoryTransactions (TransactionType, TransactionDate, ProductID, OrderID, Quantity)
+--VALUES ('I', GETDATE(), @ProductID, @IssueID, -33);
 
-EXECUTE dbo.usp_UpdateProductOnHand @ProductID;
-GO
+--EXECUTE dbo.usp_UpdateProductOnHand @ProductID;
+--GO
 
 --Insert Purchase orders
 INSERT INTO dbo.PurchaseOrderHeader

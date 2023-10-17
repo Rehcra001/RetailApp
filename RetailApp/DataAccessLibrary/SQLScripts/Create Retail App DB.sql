@@ -111,11 +111,15 @@ GO
 --SalesOrderHeader
 CREATE TABLE dbo.SalesOrderHeader
 (
-	SalesOrderID BIGINT IDENTITY(200000000, 1) PRIMARY KEY,
+	SalesOrderID BIGINT IDENTITY(890000000, 1) PRIMARY KEY,
 	CustomerID INT NOT NULL,
 	CustomerPurchaseOrder NVARCHAR(100) NULL,
-	OrderDate DATE NOT NULL,
+	OrderDate DATETIME NOT NULL,
 	OrderAmount MONEY NOT NULL,
+	VATPercentage DECIMAL(5,4) DEFAULT(0) NOT NULL,
+	VATAmount MONEY DEFAULT(0) NOT NULL,
+	TotalAmount MONEY DEFAULT(0) NOT NULL,
+	DeliveryDate DATETIME NOT NULL,
 	OrderStatusID INT DEFAULT(1) NOT NULL
 );
 GO
@@ -127,7 +131,9 @@ CREATE TABLE dbo.SalesOrderDetail
 	ProductID INT NOT NULL,
 	Quantity INT NOT NULL,
 	UnitPrice MONEY NOT NULL,
-	UnitCost MONEY NOT NULL,
+	UnitCost MONEY DEFAULT(0) NOT NULL,
+	Discount DECIMAL(3,2) DEFAULT(0) NOT NULL,
+	QuantityInvoiced INT DEFAULT(0) NOT NULL,
 	OrderLineStatusID INT DEFAULT(1) NOT NULL
 );
 GO
@@ -271,6 +277,26 @@ FOREIGN KEY (OrderLineStatusID)
 REFERENCES dbo.StatusLK(StatusID);
 GO
 
+ALTER TABLE dbo.SalesOrderDetail
+ADD CONSTRAINT CH_SalesOrderOrderDetail_SalesOrderID_GreaterThanZero
+CHECK (SalesOrderID > 0);
+GO
+
+ALTER TABLE dbo.SalesOrderDetail
+ADD CONSTRAINT CH_SalesOrderOrderDetail_ProductID_GreaterThanZero
+CHECK (ProductID > 0);
+GO
+
+ALTER TABLE dbo.SalesOrderDetail
+ADD CONSTRAINT CH_SalesOrderOrderDetail_Quantity_GreaterThanZero
+CHECK (Quantity > 0);
+GO
+
+ALTER TABLE dbo.SalesOrderDetail
+ADD CONSTRAINT CH_SalesOrderOrderDetail_UnitCost_GreaterThanZero
+CHECK (UnitCost > 0);
+GO
+
 --Products
 ALTER TABLE dbo.Products
 ADD CONSTRAINT FK_Products_Vendors_VendorID
@@ -352,7 +378,14 @@ ADD CONSTRAINT CH_PurchaseOrderDetail_UnitCost_GreaterThanZero
 CHECK (UnitCost > 0);
 GO
 
---Receipts
+--Goods issue
+ALTER TABLE dbo.Issues
+ADD CONSTRAINT FK_Receipts_SalesOrderDetail_SalesOrderID_ProductID
+FOREIGN KEY (SalesOrderID, ProductID)
+REFERENCES dbo.SalesOrderDetail(SalesOrderID, ProductID);
+GO
+
+--Goods Receipts
 ALTER TABLE dbo.Receipts
 ADD CONSTRAINT FK_Receipts_PurchaseOrderDetail_PurchaseOrderID_ProductID
 FOREIGN KEY (PurchaseOrderID, ProductID)

@@ -685,7 +685,7 @@ GO
 --Sums all Inventory transactions of ProductID
 CREATE PROCEDURE dbo.usp_UpdateProductOnHand
 (
-	@ProductID int
+	@ProductID INT
 )AS
 BEGIN
 	SET NOCOUNT ON;
@@ -703,9 +703,9 @@ BEGIN
 END;
 GO
 
---Updates the specified product's weighted unit cost
---of the stock on hand
---this is done on a first in first out basis
+--Update the specified product with a weighted unit cost 
+--of the products currently in stock
+--based on First In First Out Principle
 CREATE PROCEDURE dbo.usp_UpdateProductWeightedUnitCostFIFO
 (
 	@ProductID INT
@@ -761,9 +761,25 @@ BEGIN
 END;
 GO
 
---Update the specified product with a weighted unit cost 
---of the products currently in stock
---based on First In First Out Principle
+--Update the product sales demand based on open sales orders
+CREATE PROCEDURE dbo.usp_UpdateProductSalesDemand
+(
+	@ProductID INT
+)AS
+BEGIN
+	SET NOCOUNT ON;
+
+	DECLARE @SalesDemand INT;
+	SELECT @SalesDemand = ISNULL(SUM(SOD.Quantity - SOD.QuantityInvoiced),0)
+	FROM dbo.SalesOrderDetail AS SOD
+	WHERE SOD.ProductID = @ProductID AND SOD.OrderLineStatusID = 1;--OPEN
+
+	--Update product sales demand
+	UPDATE dbo.Products
+	SET SalesDemand = @SalesDemand
+	WHERE ProductID = @ProductID;
+END;
+GO
 
 
 --**********Units**********
@@ -1748,3 +1764,302 @@ BEGIN
 	END CATCH;
 END;
 GO
+
+--**********Sales Order Header**********
+
+---Insert new sales order
+--Returns the ID of the new sales order
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_InsertSalesOrderHeader
+(
+	@CustomerID INT,
+	@CustomerPurchaseOrder NVARCHAR(100),
+	@OrderDate DATETIME,
+	@OrderAmount MONEY,
+	@VATPercentage DECIMAL(5,4),
+	@VATAmount MONEY,
+	@TotalAmount MONEY,
+	@DeliveryDate DATETIME,
+	@OrderStatusID INT
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.SalesOrderHeader
+			(
+				CustomerID,
+				CustomerPurchaseOrder,
+				OrderDate,
+				OrderAmount,
+				VATPercentage,
+				VATAmount,
+				TotalAmount,
+				DeliveryDate,
+				OrderStatusID
+			)
+			VALUES
+			(
+				@CustomerID,
+				@CustomerPurchaseOrder,
+				@OrderDate,
+				@OrderAmount,
+				@VATPercentage,
+				@VATAmount,
+				@TotalAmount,
+				@DeliveryDate,
+				@OrderStatusID
+			);
+
+			SELECT SCOPE_IDENTITY() AS ID;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Update sales order header
+--Returns 'No Error' on success
+--or error message on failure
+CREATE PROCEDURE dbo.usp_UpdateSalesOrderHeader
+(
+	@SalesOrderID BIGINT,
+	@CustomerID INT,
+	@CustomerPurchaseOrder NVARCHAR(100),
+	@OrderDate DATETIME,
+	@OrderAmount MONEY,
+	@VATPercentage DECIMAL(5,4),
+	@VATAmount MONEY,
+	@TotalAmount MONEY,
+	@DeliveryDate DATETIME,
+	@OrderStatusID INT
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			UPDATE dbo.SalesOrderHeader
+			SET CustomerID = @CustomerID,
+				CustomerPurchaseOrder = @CustomerPurchaseOrder,
+				OrderDate = @OrderDate,
+				OrderAmount = @OrderAmount,
+				VATPercentage = @VATPercentage,
+				VATAmount = @VATAmount,
+				TotalAmount = @TotalAmount,
+				DeliveryDate = @DeliveryDate,
+				OrderStatusID = @OrderStatusID
+			WHERE SalesOrderID = @SalesOrderID;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Get all sales order headers
+--Returns a list Sales Order Headers
+---or an error message on failure
+CREATE PROCEDURE dbo.usp_GetAllSalesOrderHeaders AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT SalesOrderID, CustomerID, CustomerPurchaseOrder, OrderDate,
+			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
+			   DeliveryDate, OrderStatusID
+		FROM dbo.SalesOrderHeader;
+
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Get Sales order header by ID
+--Returns a Sales order header on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetSalesOrderHeaderByID
+(
+	@SalesOrderID BIGINT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT SalesOrderID, CustomerID, CustomerPurchaseOrder, OrderDate,
+			   OrderAmount, VATPercentage, VATAmount, TotalAmount,
+			   DeliveryDate, OrderStatusID
+		FROM dbo.SalesOrderHeader
+		WHERE SalesOrderID = @SalesOrderID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--**********Sales Order Detail**********
+
+--Insert a new sales order detail
+--Return 'No Error' on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_InsertSalesOrderDetail
+(
+	@SalesOrderID BIGINT,
+	@ProductID INT,
+	@Quantity INT,
+	@UnitPrice MONEY,
+	--@UnitCost MONEY, --Unit Cost to be determined on invoice? From weighted product unit cost FIFO
+	@Discount DECIMAL(3,2),
+	--@QuantityInvoiced INT, --To be added when invoiced?
+	@OrderLineStatusID INT
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			INSERT INTO dbo.SalesOrderDetail
+			(
+				SalesOrderID,
+				ProductID,
+				Quantity,
+				UnitPrice,
+				Discount,
+				OrderLineStatusID
+			)
+			VALUES
+			(
+				@SalesOrderID,
+				@ProductID,
+				@Quantity,
+				@UnitPrice,
+				@Discount,
+				@OrderLineStatusID
+			);
+
+			--Update sales demand for product
+			EXECUTE dbo.usp_UpdateProductSalesDemand @ProductID;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Update sales order detail
+--return 'No Error' on success
+--or error message on failure
+CREATE PROCEDURE dbo.usp_UpdateSalesOrderDetail
+(
+	@SalesOrderID BIGINT,
+	@ProductID INT,
+	@Quantity INT,
+	@UnitPrice MONEY,
+	@UnitCost MONEY, --Unit Cost to be determined on invoice? From weighted product unit cost FIFO
+	@Discount DECIMAL(3,2),
+	@QuantityInvoiced INT, --To be added when invoiced?
+	@OrderLineStatusID INT
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			UPDATE dbo.SalesOrderDetail
+			SET Quantity = @Quantity,
+				UnitPrice = @UnitPrice,
+				UnitCost = @UnitCost,
+				Discount = @Discount,
+				QuantityInvoiced = @QuantityInvoiced,
+				OrderLineStatusID = @OrderLineStatusID
+			WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+
+			--Update sales demand for product
+			EXECUTE dbo.usp_UpdateProductSalesDemand @ProductID;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Get all sales order detail
+--Returns a list of sales order detail
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetAllSalesOrderDetails AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT SalesOrderID, ProductID, Quantity, UnitPrice,
+			   UnitCost, Discount, QuantityInvoiced, OrderLineStatusID
+		FROM dbo.SalesOrderDetail;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Get all Sales order detail by SalesOrderID
+--Returns a list of sales order detail by SalesOrderID
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_GetSalesOrderDetailBySalesOrderID 
+(
+	@SalesOrderID BIGINT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
+
+		SELECT SalesOrderID, ProductID, Quantity, UnitPrice,
+			   UnitCost, Discount, QuantityInvoiced, OrderLineStatusID
+		FROM dbo.SalesOrderDetail
+		WHERE SalesOrderID = @SalesOrderID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Goods issued / invoiced
