@@ -18,6 +18,8 @@ using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.ReceiptRepository;
+using DataAccessLibrary.SalesOrderDetailRepository;
+using DataAccessLibrary.SalesOrderHeaderRepository;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VATRepository;
@@ -102,6 +104,8 @@ namespace RetailAppUI
             services.AddTransient<IPurchaseOrderDetailRepository, PurchaseOrderDetailRepository>();
             services.AddTransient<IPurchaseOrderHeaderRepository, PurchaseOrderHeaderRepository>();
             services.AddTransient<IVATRepository, VATRepository>();
+            services.AddTransient<ISalesOrderHeaderRepository, SalesOrderHeaderRepository>();
+            services.AddTransient<ISalesOrderDetailRepository, SalesOrderDetailRepository>();
 
             //Managers
             services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
