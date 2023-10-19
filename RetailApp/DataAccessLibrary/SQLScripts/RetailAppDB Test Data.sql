@@ -170,11 +170,46 @@ DECLARE @OrderLineStatusID INT = 1; --Open
 
 EXECUTE dbo.usp_InsertPurchaseOrderDetail @PurchaseOrderID, @ProductID, @Quantity, @UnitCost, @UnitFreightCost, @OrderLineStatusID
 
-EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 33, @UnitCost;
+EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 10, @UnitCost;
 DECLARE @ReceiptID INT;
 SELECT @ReceiptID = MAX(ReceiptID) FROM dbo.Receipts;
---Should only reverse once
-EXECUTE usp_ReverseReceiptByID @ReceiptID;
-EXECUTE usp_ReverseReceiptByID @ReceiptID;
+
+SELECT @ReceiptID = MAX(ReceiptID) FROM dbo.Receipts;
+EXECUTE dbo.usp_InsertReceipt @PurchaseOrderID, @ProductID, 7, @UnitCost;
+--DECLARE @ReceiptID INT;
+--SELECT @ReceiptID = MAX(ReceiptID) FROM dbo.Receipts;
+GO
+--****************************************************************************************************************
+
+--Insert a sales order
+    
+DECLARE @CustomerID INT = 10000;
+DECLARE @CustomerPurchaseOrder NVARCHAR(100) = '450000';
+DECLARE @OrderDate DATETIME = GETDATE();
+DECLARE @OrderAmount MONEY = 5500;
+DECLARE @VATPercentage DECIMAL(5,4) = 0.15
+DECLARE @VATAmount MONEY = 825;
+DECLARE @TotalAmount MONEY =6325
+DECLARE @DeliveryDate DATETIME = DATEADD(w, 2, @OrderDate);
+DECLARE @OrderStatusID INT = 1;
+
+EXECUTE dbo.usp_InsertSalesOrderHeader @CustomerID, @CustomerPurchaseOrder, @OrderDate, @OrderAmount, @VATPercentage, @VATAmount, @TotalAmount,@DeliveryDate, @OrderStatusID;
+	
+DECLARE @SalesOrderID BIGINT;
+SELECT @SalesOrderID = MAX(SalesOrderID) FROM dbo.SalesOrderHeader;
+--Insert order line
+DECLARE @ProductID INT = 10001;
+DECLARE @Quantity INT = 50;
+DECLARE @UnitPrice MONEY = 550;
+DECLARE @Discount DECIMAL(3,2) = 0;
+DECLARE @OrderLineStatusID INT = 1;
+
+EXECUTE dbo.usp_InsertSalesOrderDetail @SalesOrderID, @ProductID, @Quantity, @UnitPrice, @Discount, @OrderLineStatusID;
+
+
+
+EXECUTE dbo.usp_InsertGoodsIssued @SalesOrderID, @ProductID, @Quantity;
+
+
 GO
 --****************************************************************************************************************

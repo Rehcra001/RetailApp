@@ -189,7 +189,8 @@ CREATE TABLE dbo.Issues
 	ProductID INT NOT NULL,
 	IssueDate DATETIME DEFAULT(GETDATE()) NOT NULL, --No need to insert date but is allowed
 	QuantityIssued INT NOT NULL,
-	UnitCost MONEY NOT NULL
+	UnitCost MONEY NOT NULL,
+	ReverseReferenceID INT NULL
 );
 GO
 
@@ -292,10 +293,10 @@ ADD CONSTRAINT CH_SalesOrderOrderDetail_Quantity_GreaterThanZero
 CHECK (Quantity > 0);
 GO
 
-ALTER TABLE dbo.SalesOrderDetail
-ADD CONSTRAINT CH_SalesOrderOrderDetail_UnitCost_GreaterThanZero
-CHECK (UnitCost > 0);
-GO
+--ALTER TABLE dbo.SalesOrderDetail
+--ADD CONSTRAINT CH_SalesOrderOrderDetail_UnitCost_GreaterThanZero
+--CHECK (UnitCost > 0);
+--GO
 
 --Products
 ALTER TABLE dbo.Products
@@ -380,7 +381,7 @@ GO
 
 --Goods issue
 ALTER TABLE dbo.Issues
-ADD CONSTRAINT FK_Receipts_SalesOrderDetail_SalesOrderID_ProductID
+ADD CONSTRAINT FK_Issues_SalesOrderDetail_SalesOrderID_ProductID
 FOREIGN KEY (SalesOrderID, ProductID)
 REFERENCES dbo.SalesOrderDetail(SalesOrderID, ProductID);
 GO

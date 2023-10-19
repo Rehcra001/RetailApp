@@ -1984,9 +1984,9 @@ CREATE PROCEDURE dbo.usp_UpdateSalesOrderDetail
 	@ProductID INT,
 	@Quantity INT,
 	@UnitPrice MONEY,
-	@UnitCost MONEY, --Unit Cost to be determined on invoice? From weighted product unit cost FIFO
+	--@UnitCost MONEY, --Unit Cost to be determined on invoice / reverse? From weighted product unit cost FIFO
 	@Discount DECIMAL(3,2),
-	@QuantityInvoiced INT, --To be added when invoiced?
+	--@QuantityInvoiced INT, --To be added when invoiced?
 	@OrderLineStatusID INT
 )AS
 BEGIN
@@ -1997,9 +1997,9 @@ BEGIN
 			UPDATE dbo.SalesOrderDetail
 			SET Quantity = @Quantity,
 				UnitPrice = @UnitPrice,
-				UnitCost = @UnitCost,
+				--UnitCost = @UnitCost,
 				Discount = @Discount,
-				QuantityInvoiced = @QuantityInvoiced,
+				--QuantityInvoiced = @QuantityInvoiced,
 				OrderLineStatusID = @OrderLineStatusID
 			WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
 
@@ -2062,4 +2062,268 @@ BEGIN
 END;
 GO
 
+--Update the specified sales order with quantity invoiced/goods issued
+CREATE PROCEDURE dbo.usp_UpdateSalesOrderDetailQuantityInvoiced
+(
+	@SalesOrderID BIGINT,
+	@ProductID INT
+)AS
+BEGIN
+	DECLARE @QtyInvoiced INT;
+	SELECT @QtyInvoiced = ISNULL(SUM(QuantityIssued),0)
+	FROM dbo.Issues
+	WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+
+	--Update the associated sales order detail
+	UPDATE dbo.SalesOrderDetail
+	SET QuantityInvoiced = (@QtyInvoiced * -1)
+	WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+END;
+GO
+
+--Update Sales order detail to filled if qty invoiced = qty required by customer
+CREATE PROCEDURE dbo.usp_UpdateSalesOrderDetailToFilled
+(
+	@SalesOrderID BIGINT,
+	@ProductID INT
+)AS
+BEGIN
+	--SET NOCOUNT ON;
+
+	DECLARE @IsFilled BIT = 0;
+	--0 if the line is not filled 1 otherwise
+	SELECT @IsFilled = IIF(QuantityInvoiced < Quantity, 0, 1)
+	FROM dbo.SalesOrderDetail
+	WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+	
+	IF (@IsFilled = 1)--Line filled
+	BEGIN
+		UPDATE dbo.SalesOrderDetail
+		SET OrderLineStatusID = 3
+		WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID; 
+		
+		--A line has been altered to filled
+		--Check if all lines are filled 
+		--if yes then change the order header status to filled
+		EXECUTE dbo.UpdateSalesOrderHeaderToFilled @SalesOrderID;
+	END;
+END;
+GO
+
+--Update sales order header to filled if all lines filled
+CREATE PROCEDURE dbo.UpdateSalesOrderHeaderToFilled
+(
+	@SalesOrderID BIGINT
+)AS
+BEGIN
+	SET NOCOUNT ON;
+	--OPEN: 1
+	--COMPLETE: 2
+	--FILLED: 3
+	--CANCELLED: 4
+	DECLARE @NumLines INT;
+	DECLARE @NumLinesFilled INT;
+
+	--if num line = num filled lines then change order status to filled
+	SELECT @NumLines = ISNULL(COUNT(*),0)
+	FROM dbo.SalesOrderDetail
+	WHERE SalesOrderID = @SalesOrderID;
+
+	--Count the number of filled lines
+	SELECT @NumLinesFilled = ISNULL(COUNT(*),0)
+	FROM dbo.SalesOrderDetail
+	WHERE SalesOrderID = @SalesOrderID AND OrderLineStatusID = 3;
+
+	IF (@NumLines = @NumLinesFilled)
+	BEGIN
+		--All lines filled change order status to filled
+		UPDATE dbo.SalesOrderHeader
+		SET OrderStatusID = 3 --Filled
+		WHERE SalesOrderID = @SalesOrderID;
+	END;
+END;
+GO
+
+
+--**********Issues**********
 --Goods issued / invoiced
+
+--Insert new goods issued transaction
+--Returns a goods issue on success
+--or an error message on failure
+CREATE PROCEDURE dbo.usp_InsertGoodsIssued
+(
+	@SalesOrderID BIGINT,
+	@ProductID INT,
+	@QuantityIssued INT --Must be a positive value greater than zero
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+
+			DECLARE @IssueID INT;
+			DECLARE @UnitCost MONEY;	
+			
+			--Determine the weighted unit cost of goods beign issued and add to issue created
+			EXECUTE dbo.usp_ReturnGoodsIssuedWeightedUnitCostFIFO @ProductID, @QuantityIssued, @IssueUnitCost = @UnitCost OUTPUT;
+
+			--Check if any errors
+			IF (@UnitCost = -1)--Not enough stock to issued
+			BEGIN
+				;THROW 999999, 'Not enough stock to issued the amount passed in', 1;
+			END;
+
+			--Change quantity issued to negative
+			SET @QuantityIssued = @QuantityIssued * -1;
+
+			INSERT INTO dbo.Issues
+			(
+				SalesOrderID,
+				ProductID,
+				QuantityIssued,
+				UnitCost
+			)
+			VALUES
+			(
+				@SalesOrderID,
+				@ProductID,
+				@QuantityIssued,
+				@UnitCost
+			);
+
+			--Get id for issue
+			SELECT @IssueID = SCOPE_IDENTITY();
+
+			--Get issue date
+			DECLARE @IssueDate DATETIME;
+			SELECT @IssueDate = IssueDate
+			FROM Issues
+			WHERE IssueID = @IssueID;
+
+			--Add to Inventory transactions
+			EXECUTE dbo.usp_InsertInventoryTransactions 'I', @IssueDate, @ProductID, @IssueID, @QuantityIssued;
+
+			--update quantity of product on hand
+			EXECUTE dbo.usp_UpdateProductOnHand @ProductID;			
+
+			--Update the weighted unit cost of product still in stock
+			EXECUTE dbo.usp_UpdateProductWeightedUnitCostFIFO @ProductID;
+
+			--Update the associated sales order detail with the unit cost of goods issued
+			UPDATE dbo.SalesOrderDetail
+			SET UnitCost = @UnitCost
+			WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+
+			--Update the associated invoiced quantity for this sales order detail
+			EXECUTE dbo.usp_UpdateSalesOrderDetailQuantityInvoiced @SalesOrderID, @ProductID;
+
+			--Update quantity of sales demand for product
+			EXECUTE dbo.usp_UpdateProductSalesDemand @ProductID;
+
+			EXECUTE dbo.usp_UpdateSalesOrderDetailToFilled @SalesOrderID, @ProductID;
+
+			--Return the issue create
+			SELECT IssueID, SalesOrderID, ProductID,
+					IssueDate, QuantityIssued, UnitCost,
+					ReverseReferenceID
+			FROM dbo.Issues
+			WHERE IssueID = @IssueID;		
+
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Get by sales order id
+--Returns a list of goods issued for the specified sales order
+--or an error message on failure
+--CREATE PROCEDURE dbo.usp_GetIssuesBySalesOrderID
+--(
+--	@SalesOrderID BIGINT
+--)AS
+
+--Determines the unit cost of the product to be issued/invoiced 
+--Based on a First In First Out principle
+--Cannot be used to check an existing goods issue/ invoice
+--as it takes all previous goods issued into account
+CREATE PROCEDURE dbo.usp_ReturnGoodsIssuedWeightedUnitCostFIFO
+(
+	@ProductID INT,
+	@QtyToIssued INT,
+	@IssueUnitCost MONEY OUTPUT
+)AS
+BEGIN
+	--First check that their is enough stock on hand to issue
+	DECLARE @QtyOnHand INT;
+	SELECT @QtyOnHand = ISNULL(SUM(Quantity),0)
+	FROM dbo.InventoryTransactions
+	WHERE ProductID = @ProductID;
+
+	IF (@QtyOnHand < @QtyToIssued)
+	BEGIN
+		--Return -1 if not enough stock to issue
+		SET @IssueUnitCost = -1;
+	END;
+
+	ELSE
+	BEGIN
+		--Sum up all goods issued
+		;WITH SumIssued AS
+		(
+			--sum up all previous goods issued for this product
+			SELECT ISNULL(SUM(QuantityIssued),0) AS TotalIssued
+			FROM dbo.Issues
+			WHERE ProductID = @ProductID AND ReverseReferenceID IS NULL --Only non revered goods issues
+		),
+		--Retrieve the remaining receipts with stock left on them base on FIFO issued
+		ReceiptsWithRunningSum AS
+		(
+			SELECT ReceiptID, QuantityReceipted, UnitCost,
+				   SUM(QuantityReceipted) OVER(ORDER BY ReceiptID) AS RunningSumReceipted,
+				   TotalIssued,
+				   SUM(QuantityReceipted) OVER(ORDER BY ReceiptID) + TotalIssued AS QtyLeft
+			FROM dbo.Receipts
+			CROSS JOIN SumIssued
+			WHERE ProductID = @ProductID AND ReverseReferenceID IS NULL --Only non reversed receipts
+		),
+		--retrieve only the rows where QtyLeft is > 0 from ReceiptsWithRunningSum CTE and add row numbers
+		ReceiptsWithStock AS
+		(
+			SELECT *,
+				   ROW_NUMBER() OVER(ORDER BY ReceiptID) AS RowNum,
+				   QtyLeft - @QtyToIssued AS Balance
+			FROM ReceiptsWithRunningSum
+			WHERE QtyLeft > 0
+		),
+		--Find the first row that is greater than or equal to zero from ReceiptsWithStock
+		FirstPositiveRow AS
+		(
+			SELECT MIN(RowNum) AS MinRowNum
+			FROM ReceiptsWithStock
+			WHERE Balance >= 0
+		),
+		RowCosts AS
+		(
+			SELECT CASE WHEN RowNum = 1  AND Balance < 0 THEN QtyLeft * UnitCost 
+						WHEN RowNum = 1 AND Balance >= 0 THEN (QuantityReceipted - Balance) * UnitCost
+						WHEN RowNum <> 1 AND Balance < 0 THEN QuantityReceipted * UnitCost
+						WHEN RowNum <> 1 AND Balance >= 0 THEN (QuantityReceipted - Balance) * UnitCost
+						ELSE 0 END AS RowCost
+			FROM ReceiptsWithStock
+			WHERE RowNum <= (SELECT MinRowNum FROM FirstPositiveRow)
+		)
+		--Get weighted unit cost for quantity issued
+		SELECT @IssueUnitCost = ISNULL(SUM(RowCost),0) / @QtyToIssued
+		FROM RowCosts;		
+	END;
+END;
+GO
