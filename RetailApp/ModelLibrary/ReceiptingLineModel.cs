@@ -16,7 +16,7 @@ namespace ModelsLibrary
         public int QtyReceipted { get; set; }
         public decimal UnitCost { get; set; }
 
-        public string? ValidationMessage { get; set; }
+        public string? ValidationMessage { get; private set; }
 
         public bool Validate()
         {

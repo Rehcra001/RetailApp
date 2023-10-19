@@ -56,7 +56,7 @@ namespace ModelsLibrary
         /// <summary>
         /// Holds the Validation errors if any for this purchase order detail
         /// </summary>
-        public string? ValidationMessage { get; set; }
+        public string? ValidationMessage { get; private set; }
 
         /// <summary>
         /// Validates the data entered into this purchase order detail.

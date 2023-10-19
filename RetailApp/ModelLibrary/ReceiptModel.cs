@@ -53,7 +53,7 @@ namespace ModelsLibrary
         /// <summary>
         /// Holds validation error messages
         /// </summary>
-        public string? ValidationMessage { get; set; }
+        public string? ValidationMessage { get; private set; }
 
         public bool Validate()
         {

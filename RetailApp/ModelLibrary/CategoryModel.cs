@@ -18,7 +18,7 @@ namespace ModelsLibrary
         /// </summary>
         public string? CategoryName { get; set; }
 
-        public string? ValidationMessage { get; set; }
+        public string? ValidationMessage { get; private set; }
 
 
         /// <summary>

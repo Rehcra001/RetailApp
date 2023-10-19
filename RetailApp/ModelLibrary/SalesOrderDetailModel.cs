@@ -55,7 +55,7 @@
         /// <summary>
         /// Holds the validation error messages
         /// </summary>
-        public string ValidationMessage { get; set; } = string.Empty;
+        public string ValidationMessage { get; private set; } = string.Empty;
 
         /// <summary>
         /// Validates this model and fills the ValidationMessage property if any validation errors encountered
