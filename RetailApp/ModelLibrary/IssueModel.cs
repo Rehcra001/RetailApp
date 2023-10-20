@@ -18,6 +18,11 @@
         public int ProductID { get; set; }
 
         /// <summary>
+        /// Holds the date the goods issue was created
+        /// </summary>
+        public DateTime IssueDate { get; set; }
+
+        /// <summary>
         /// Holds the quantity issued from stock of this product
         /// </summary>
         public int QuantityIssued { get; set; }
