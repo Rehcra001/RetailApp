@@ -60,12 +60,17 @@
         /// <summary>
         /// Holds a list of Sales order lines associated with this order
         /// </summary>
-        public List<SalesOrderDetailModel> SalesOrderDetails { get; set; } = new List<SalesOrderDetailModel>();
+        public IEnumerable<SalesOrderDetailModel> SalesOrderDetails { get; set; } = new List<SalesOrderDetailModel>();
 
         /// <summary>
         /// Holds the Order status of this order
         /// </summary>
         public StatusModel OrderStatus { get; set; } = new StatusModel();
+
+        /// <summary>
+        /// Holds a list of issues associated with this sales order
+        /// </summary>
+        public IEnumerable<IssueModel> Issues { get; set; } = new List<IssueModel>();
 
         /// <summary>
         /// Holds any validation errors raised by Validate()
@@ -117,12 +122,7 @@
                 ValidationMessage += "VAT percentage is required.\r\n";
                 isValid = false;
             }
-            else if (VATPercentage < 0)
-            {
-                ValidationMessage += "VAT percentage may not be negative.\r\n";
-                isValid = false;
-            }
-            else if (VATPercentage > 1)
+            else if (VATPercentage < 0 && VATPercentage > 1)
             {
                 ValidationMessage += "VAT percentage must be between 0 and 1.\r\n";
                 isValid = false;

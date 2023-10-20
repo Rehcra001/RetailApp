@@ -5,6 +5,7 @@ using BussinessLogicLibrary.InventoryTransactions;
 using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
+using BussinessLogicLibrary.Sales;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.VAT;
@@ -127,6 +128,8 @@ namespace RetailAppUI
             services.AddTransient<IPurchaseOrdersListManager, PurchaseOrdersListManager>();
             services.AddTransient<IUpdatePurchaseOrderManager, UpdatePurchaseOrderManager>();
             services.AddTransient<IPurchaseOrderManager, PurchaseOrderManager>();
+            services.AddTransient<ISalesManager, SalesManager>();
+            services.AddTransient<IInsertSalesOrderManager, InsertSalesOrderManager>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

@@ -116,7 +116,7 @@
                 isValid = false;
             }
 
-            if (Discount > 1 || Discount < 0)
+            if (Discount < 0 || Discount > 1)
             {
                 ValidationMessage += "Discount may only be between 0 and 1.\r\n";
                 isValid = false;
