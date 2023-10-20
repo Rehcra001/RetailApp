@@ -2144,6 +2144,25 @@ BEGIN
 END;
 GO
 
+--Updates the specified sales order detail with the weighted cost of sales
+CREATE PROCEDURE dbo.usp_UpdateSalesOrderDetailWithWeightedUnitCost
+(
+	@SalesOrderID BIGINT,
+	@ProductID INT
+)AS
+BEGIN
+	--Determine the weighted cost of sales for the sales order detail
+	DECLARE @UnitCost MONEY;
+	SELECT @UnitCost = ISNULL(SUM(QuantityIssued * UnitCost) / SUM(QuantityIssued),0)
+	FROM dbo.Issues
+	WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID AND ReverseReferenceID IS NULL;
+
+	--Update the sales order detail UnitCost
+	UPDATE dbo.SalesOrderDetail
+	SET UnitCost = @UnitCost
+	WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+END;
+GO
 
 --**********Issues**********
 --Goods issued / invoiced
@@ -2211,9 +2230,7 @@ BEGIN
 			EXECUTE dbo.usp_UpdateProductWeightedUnitCostFIFO @ProductID;
 
 			--Update the associated sales order detail with the unit cost of goods issued
-			UPDATE dbo.SalesOrderDetail
-			SET UnitCost = @UnitCost
-			WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+			EXECUTE dbo.usp_UpdateSalesOrderDetailWithWeightedUnitCost @SalesOrderID, @ProductID;
 
 			--Update the associated invoiced quantity for this sales order detail
 			EXECUTE dbo.usp_UpdateSalesOrderDetailQuantityInvoiced @SalesOrderID, @ProductID;
@@ -2221,12 +2238,13 @@ BEGIN
 			--Update quantity of sales demand for product
 			EXECUTE dbo.usp_UpdateProductSalesDemand @ProductID;
 
+			--Change to filled status if the goods issued / invoice completes the line
 			EXECUTE dbo.usp_UpdateSalesOrderDetailToFilled @SalesOrderID, @ProductID;
 
 			--Return the issue create
 			SELECT IssueID, SalesOrderID, ProductID,
-					IssueDate, QuantityIssued, UnitCost,
-					ReverseReferenceID
+				   IssueDate, QuantityIssued, UnitCost,
+				   ReverseReferenceID
 			FROM dbo.Issues
 			WHERE IssueID = @IssueID;		
 
@@ -2246,11 +2264,161 @@ GO
 --Get by sales order id
 --Returns a list of goods issued for the specified sales order
 --or an error message on failure
---CREATE PROCEDURE dbo.usp_GetIssuesBySalesOrderID
---(
---	@SalesOrderID BIGINT
---)AS
+CREATE PROCEDURE dbo.usp_GetIssuesBySalesOrderID
+(
+	@SalesOrderID BIGINT
+)AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON;
 
+		SELECT IssueID, SalesOrderID, ProductID,
+			   IssueDate, QuantityIssued, UnitCost,
+			   ReverseReferenceID
+		FROM dbo.Issues
+		WHERE SalesOrderID = @SalesOrderID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Reverse a goods issued / invoice
+CREATE PROCEDURE dbo.usp_ReverseIssueByID
+(
+	@IssueID INT --goods issue to reverse
+)AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN
+			SET NOCOUNT ON;
+			--First ensure it has not been reversed before
+			DECLARE @IsReversed BIT;
+			DECLARE @SalesOrderID BIGINT;
+			DECLARE @ProductID INT;
+			DECLARE @QuantityIssued INT;
+			DECLARE @UnitCost MONEY;
+			DECLARE @ReversedIssueID INT;
+
+			SELECT @SalesOrderID = SalesOrderID,
+				   @ProductID = ProductID,
+				   @QuantityIssued = QuantityIssued,
+				   @UnitCost = UnitCost,
+				   @ReversedIssueID = ReverseReferenceID
+			FROM dbo.Issues
+			WHERE IssueID = @IssueID;
+
+			
+			IF (@ReversedIssueID IS NULL)--Not reversed previously
+			BEGIN				
+				--Generate the new reversed issue
+				INSERT INTO dbo.Issues
+				(
+					SalesOrderID,
+					ProductID,
+					QuantityIssued,
+					UnitCost,
+					ReverseReferenceID
+				)
+				VALUES
+				(
+					@SalesOrderID,
+					@ProductID,
+					@QuantityIssued * -1,
+					@UnitCost,
+					@IssueID
+				);
+
+				SET @ReversedIssueID = SCOPE_IDENTITY();
+				
+				--Add the issue id of the reversal to the original issue
+				UPDATE dbo.Issues
+				SET ReverseReferenceID = @ReversedIssueID
+				WHERE IssueID = @IssueID;
+
+				--Check if the Sales order line was filled or completed
+			--if yes then change to open
+			--OPEN: 1
+			--COMPLETE: 2
+			--FILLED: 3
+			--CANCELLED: 4
+			DECLARE @OrderLineStatusID INT;
+
+			SELECT @OrderLineStatusID = OrderLineStatusID
+			FROM dbo.SalesOrderDetail
+			WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+
+			IF (@OrderLineStatusID = 2 OR @OrderLineStatusID = 3)
+			BEGIN
+				UPDATE dbo.SalesOrderDetail
+				SET OrderLineStatusID = 1 --Open
+				WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID;
+			END;
+
+			--Check if the Sales order was filled or completed
+			--if yes then change to open
+			--OPEN: 1
+			--COMPLETE: 2
+			--FILLED: 3
+			--CANCELLED: 4
+			DECLARE @OrderStatusID INT;
+
+			SELECT @OrderStatusID = OrderStatusID
+			FROM dbo.SalesOrderHeader
+			WHERE SalesOrderID = @SalesOrderID;
+			
+			IF (@OrderStatusID = 2 OR @OrderStatusID = 3)
+			BEGIN
+				UPDATE dbo.SalesOrderHeader
+				SET OrderStatusID = 1 --Open
+				WHERE SalesOrderID = @SalesOrderID;
+			END;
+
+			--Inventory transaction
+			--Get the issue date
+			DECLARE @IssueDate DATETIME;
+			SELECT @IssueDate = IssueDate
+			FROM dbo.Issues
+			WHERE IssueID = @ReversedIssueID;
+
+			--change to negative value
+			SET @QuantityIssued = @QuantityIssued * -1;
+			
+			--Add to Inventory transactions
+			EXECUTE dbo.usp_InsertInventoryTransactions 'I', @IssueDate, @ProductID, @ReversedIssueID, @QuantityIssued;			
+
+			--Update Product On Hand
+			EXECUTE dbo.usp_UpdateProductOnHand @ProductID; --increase with a reversal
+
+			--Update the product weighted unit cost as there is more on hand
+			EXECUTE dbo.usp_UpdateProductWeightedUnitCostFIFO @ProductID;
+
+			--Update the associated sales order detail with the weight unit cost of sales of goods issued / invoiced
+			EXECUTE dbo.usp_UpdateSalesOrderDetailWithWeightedUnitCost @SalesOrderID, @ProductID;
+
+			--Update Sales order detail with quantity invoiced
+			EXECUTE dbo.usp_UpdateSalesOrderDetailQuantityInvoiced @SalesOrderID, @ProductID;
+
+			--Update the product sales demand
+			EXECUTE dbo.usp_UpdateProductSalesDemand @ProductID;
+
+			END;
+
+			SELECT 'No Error' AS Message;
+		COMMIT TRAN;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRAN;
+		END;
+		SELECT ERROR_MESSAGE() AS Message;		
+	END CATCH;
+END;
+GO
 --Determines the unit cost of the product to be issued/invoiced 
 --Based on a First In First Out principle
 --Cannot be used to check an existing goods issue/ invoice
