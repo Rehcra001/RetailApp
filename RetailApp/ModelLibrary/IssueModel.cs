@@ -1,6 +1,6 @@
 ﻿namespace ModelsLibrary
 {
-    public class IssuesModel
+    public class IssueModel
     {
         /// <summary>
         /// Holds the unique reference ID of this goods issued line
