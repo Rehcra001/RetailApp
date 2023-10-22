@@ -78,7 +78,8 @@
                         VerticalAlignment="Center">
                 <Button Content="Sales Orders"
                         Margin="10"
-                        Style="{StaticResource ButtonTheme}"/>
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding NavigateToSalesOrderAddNewViewCommand}"/>
 
                 <Button Content="Purchase Orders"
                         Margin="10"

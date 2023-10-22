@@ -21,6 +21,7 @@ namespace RetailAppUI.ViewModels.Purchases
 		private readonly IProductsManager _productsManager;
 		private readonly IStatusManager _statusManager;
 
+        private string _state;
         public ICollectionView PurchaseOrderLines { get; set; }
 
         private INavigationService _navigation;
@@ -97,7 +98,7 @@ namespace RetailAppUI.ViewModels.Purchases
 		       
 
         private ObservableCollection<ProductModel> _products;
-        private string _state;
+        
 
         public ObservableCollection<ProductModel> Products
 		{

@@ -308,6 +308,7 @@
                             <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}" MinWidth="100"/>
                             <DataGridTextColumn Header="Unit Freight Cost" Binding="{Binding UnitFreightCost}" MinWidth="100"/>
                             <DataGridTextColumn Header="Line Status" Binding="{Binding OrderLineStatus.Status}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Demand" Binding="{Binding Product.SalesDemand}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="On Order" Binding="{Binding Product.OnOrder}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="On Hand" Binding="{Binding Product.OnHand}" IsReadOnly="True"/>
                         </DataGrid.Columns>

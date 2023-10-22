@@ -45,7 +45,7 @@
         /// <summary>
         /// Holds the delivery date to the customer
         /// </summary>
-        public DateTime DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; set; } = null;
 
         /// <summary>
         /// Holds the status id of the order
@@ -60,7 +60,7 @@
         /// <summary>
         /// Holds a list of Sales order lines associated with this order
         /// </summary>
-        public IEnumerable<SalesOrderDetailModel> SalesOrderDetails { get; set; } = new List<SalesOrderDetailModel>();
+        public List<SalesOrderDetailModel> SalesOrderDetails { get; set; } = new List<SalesOrderDetailModel>();
 
         /// <summary>
         /// Holds the Order status of this order
@@ -150,7 +150,7 @@
                 isValid = false;
             }
 
-            if (DeliveryDate == default)
+            if (DeliveryDate == null || DeliveryDate == default)
             {
                 ValidationMessage += "Delivery date is required.\r\n";
                 isValid = false;

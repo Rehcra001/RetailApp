@@ -115,7 +115,7 @@ namespace BussinessLogicLibrary.Sales
         private void CheckOrderAmount()
         {
             //Calculate the order amount including any discount
-            decimal amount = SalesOrder.SalesOrderDetails.Sum(x => (x.Quantity * x.UnitPrice) - (x.Quantity * x.UnitPrice * x.Discount));
+            decimal amount = SalesOrder.SalesOrderDetails.Sum(x => (x.QuantityOrdered * x.UnitPrice) - (x.QuantityOrdered * x.UnitPrice * x.Discount));
             //Add to the order amount
             SalesOrder.OrderAmount = amount;
         }

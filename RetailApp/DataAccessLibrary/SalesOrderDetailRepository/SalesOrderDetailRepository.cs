@@ -44,7 +44,7 @@ namespace DataAccessLibrary.SalesOrderDetailRepository
 
                                     salesOrderDetail.SalesOrderID = Convert.ToInt64(reader["SalesOrderID"]);
                                     salesOrderDetail.ProductID = Convert.ToInt32(reader["ProductID"]);
-                                    salesOrderDetail.Quantity = Convert.ToInt32(reader["Quantity"]);
+                                    salesOrderDetail.QuantityOrdered = Convert.ToInt32(reader["Quantity"]);
                                     salesOrderDetail.UnitPrice = Convert.ToDecimal(reader["UnitPrice"]);
                                     salesOrderDetail.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
                                     salesOrderDetail.Discount = Convert.ToDecimal(reader["Discount"]);
@@ -99,7 +99,7 @@ namespace DataAccessLibrary.SalesOrderDetailRepository
 
                                     salesOrderDetail.SalesOrderID = Convert.ToInt64(reader["SalesOrderID"]);
                                     salesOrderDetail.ProductID = Convert.ToInt32(reader["ProductID"]);
-                                    salesOrderDetail.Quantity = Convert.ToInt32(reader["Quantity"]);
+                                    salesOrderDetail.QuantityOrdered = Convert.ToInt32(reader["Quantity"]);
                                     salesOrderDetail.UnitPrice = Convert.ToDecimal(reader["UnitPrice"]);
                                     salesOrderDetail.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
                                     salesOrderDetail.Discount = Convert.ToDecimal(reader["Discount"]);
@@ -136,7 +136,7 @@ namespace DataAccessLibrary.SalesOrderDetailRepository
                     command.CommandText = "dbo.usp_InsertSalesOrderDetail";
                     command.Parameters.Add("@SalesOrderID", SqlDbType.BigInt).Value = salesOrderDetail.SalesOrderID;
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = salesOrderDetail.ProductID;
-                    command.Parameters.Add("@Quantity", SqlDbType.Int).Value = salesOrderDetail.Quantity;
+                    command.Parameters.Add("@Quantity", SqlDbType.Int).Value = salesOrderDetail.QuantityOrdered;
                     command.Parameters.Add("@UnitPrice", SqlDbType.Money).Value = salesOrderDetail.UnitPrice;
                     command.Parameters.Add("@Discount", SqlDbType.Decimal).Value = salesOrderDetail.Discount;
                     command.Parameters.Add("@OrderLineStatusID", SqlDbType.Int).Value = salesOrderDetail.OrderLineStatusID;
@@ -167,7 +167,7 @@ namespace DataAccessLibrary.SalesOrderDetailRepository
                     command.CommandText = "dbo.usp_UpdateSalesOrderDetail";
                     command.Parameters.Add("@SalesOrderID", SqlDbType.BigInt).Value = salesOrderDetail.SalesOrderID;
                     command.Parameters.Add("@ProductID", SqlDbType.Int).Value = salesOrderDetail.ProductID;
-                    command.Parameters.Add("@Quantity", SqlDbType.Int).Value = salesOrderDetail.Quantity;
+                    command.Parameters.Add("@Quantity", SqlDbType.Int).Value = salesOrderDetail.QuantityOrdered;
                     command.Parameters.Add("@UnitPrice", SqlDbType.Money).Value = salesOrderDetail.UnitPrice;
                     command.Parameters.Add("@Discount", SqlDbType.Decimal).Value = salesOrderDetail.Discount;
                     command.Parameters.Add("@OrderLineStatusID", SqlDbType.Int).Value = salesOrderDetail.OrderLineStatusID;

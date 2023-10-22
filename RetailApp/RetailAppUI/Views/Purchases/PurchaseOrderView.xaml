@@ -386,6 +386,7 @@
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Header="Qty Receipted" Binding="{Binding QuantityReceipted}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Demand" Binding="{Binding Product.SalesDemand}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="On Order" Binding="{Binding Product.OnOrder}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="On Hand" Binding="{Binding Product.OnHand}" IsReadOnly="True"/>
                                     </DataGrid.Columns>

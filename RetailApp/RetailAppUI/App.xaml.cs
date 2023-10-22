@@ -34,6 +34,7 @@ using RetailAppUI.ViewModels;
 using RetailAppUI.ViewModels.Adminstration;
 using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Purchases;
+using RetailAppUI.ViewModels.Sales;
 using RetailAppUI.Views;
 using System;
 using System.IO;
@@ -86,6 +87,7 @@ namespace RetailAppUI
             services.AddTransient<AddNewPurchaseOrderViewModel>();
             services.AddTransient<PurchaseOrdersSwitchboardViewModel>();
             services.AddTransient<PurchaseOrderViewModel>();
+            services.AddTransient<AddNewSalesOrderViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());

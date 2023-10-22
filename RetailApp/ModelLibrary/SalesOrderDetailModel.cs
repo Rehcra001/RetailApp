@@ -15,7 +15,7 @@
         /// <summary>
         /// Holds the quantity of product to be sold
         /// </summary>
-        public int Quantity { get; set; }
+        public int QuantityOrdered { get; set; }
 
         /// <summary>
         /// Holds the unit price of the product to be sold
@@ -88,12 +88,12 @@
                 isValid = false;
             }
 
-            if (Quantity == default)
+            if (QuantityOrdered == default)
             {
                 ValidationMessage += "Quantity is required.\r\n";
                 isValid = false;
             }
-            else if (Quantity < 0)
+            else if (QuantityOrdered < 0)
             {
                 ValidationMessage += "Quantity must be a positive value\r\b";
                 isValid = false;
