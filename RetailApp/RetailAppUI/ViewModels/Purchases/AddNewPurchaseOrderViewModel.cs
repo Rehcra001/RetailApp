@@ -97,8 +97,7 @@ namespace RetailAppUI.ViewModels.Purchases
 		}
 		       
 
-        private ObservableCollection<ProductModel> _products;
-        
+        private ObservableCollection<ProductModel> _products;        
 
         public ObservableCollection<ProductModel> Products
 		{

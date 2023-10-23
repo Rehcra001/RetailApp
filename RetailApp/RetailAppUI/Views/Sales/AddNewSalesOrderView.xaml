@@ -279,7 +279,7 @@
                               IsReadOnly="{Binding TextReadOnly}"
                               MaxHeight="300">
 
-                        <DataGrid.Columns>
+                        <DataGrid.Columns>                            
                             <DataGridTemplateColumn Header="Product" MinWidth="150">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -288,11 +288,18 @@
                                 </DataGridTemplateColumn.CellTemplate>
                                 <DataGridTemplateColumn.CellEditingTemplate>
                                     <DataTemplate>
-                                        <ComboBox  ItemsSource="{Binding RelativeSource={RelativeSource 
+                                        <ComboBox x:Name="prod"
+                                                  ItemsSource="{Binding RelativeSource={RelativeSource 
                                                                 Mode=FindAncestor,
                                                                 AncestorType={x:Type UserControl}},
                                                                 Path=DataContext.Products}"
-                                                   SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"                                                   
+                                                  SelectedItem="{Binding Product, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
+                                                  
+                                                  SelectedValue="{Binding RelativeSource={RelativeSource 
+                                                                Mode=FindAncestor,
+                                                                AncestorType={x:Type UserControl}},
+                                                                Path=DataContext.ProductID}"
+                                                  SelectedValuePath="ProductID"
                                                   IsReadOnly="True">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -303,8 +310,8 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellEditingTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityOrdered}" MinWidth="100"/>
-                            <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice}" MinWidth="100"/>
+                            <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityOrdered, UpdateSourceTrigger=LostFocus}" MinWidth="100"/>
+                            <DataGridTextColumn Header="Unit Price" Binding="{Binding Product.UnitPrice, StringFormat=N2}" MinWidth="100" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Discount" Binding="{Binding Discount}"/>
                             <DataGridTextColumn Header="Status" Binding="{Binding OrderLineStatus.Status}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Demand" Binding="{Binding Product.SalesDemand}" IsReadOnly="True"/>
