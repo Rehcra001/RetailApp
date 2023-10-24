@@ -108,7 +108,36 @@ namespace RetailAppUI.ViewModels.Sales
             set { _statusIndex = value; OnPropertyChanged(); }
         }
 
+        //properties to enable or disable
+        private bool _textReadOnly;
+        public bool TextReadOnly
+        {
+            get { return _textReadOnly; }
+            set { _textReadOnly = value; OnPropertyChanged(); }
+        }
 
+        private bool _dateEnabled;
+        public bool DateEnabled
+        {
+            get { return _dateEnabled; }
+            set { _dateEnabled = value; OnPropertyChanged(); }
+        }
+
+        private bool _customerEnabled;
+
+        public bool CustomerEnabled
+        {
+            get { return _customerEnabled; }
+            set { _customerEnabled = value; OnPropertyChanged(); }
+        }
+
+        private bool _orderStatusEnabled;
+
+        public bool OrderStatusEnabled
+        {
+            get { return _orderStatusEnabled; }
+            set { _orderStatusEnabled = value; OnPropertyChanged(); }
+        }
 
         //Commands
         public RelayCommand CloseViewCommand { get; set; }
@@ -148,15 +177,21 @@ namespace RetailAppUI.ViewModels.Sales
 
         private void SetState(string state)
         {
-            _state = state;
+           _state = state;
 
             switch (_state)
             {
-                case "Add":
-
+                case "View":
+                    TextReadOnly = true;
+                    DateEnabled = false;
+                    CustomerEnabled = false;
+                    OrderStatusEnabled = false;
                     break;
-                default:
-
+                case "Add":
+                    TextReadOnly = false;
+                    DateEnabled = true;
+                    OrderStatusEnabled = true;
+                    CustomerEnabled = true;
                     break;
             }
         }
@@ -241,17 +276,14 @@ namespace RetailAppUI.ViewModels.Sales
         {
             try
             {
-                //Add the unit price to each line
-                foreach (SalesOrderDetailModel orderLine in SalesOrder.SalesOrderDetails)
-                {
-                    orderLine.UnitPrice = orderLine.Product.UnitPrice;
-                }
+                //Add product unit price to the sales order detail
+                AddUnitPrice();
 
                 //Reload the saved sales order
                 SalesOrder = _salesManager.Insert(SalesOrder);
 
                 //Success message
-                MessageBox.Show("Sales Order save.\r\n\r\n",
+                MessageBox.Show("Sales Order saved.\r\n\r\n",
                                 "Saving Sales Order",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Information);
@@ -279,8 +311,7 @@ namespace RetailAppUI.ViewModels.Sales
 
         private void CloseView(object obj)
         {
-            Navigation.NavigateTo<HomeViewModel>();
-            // TODO - Change navigation to switch board once implemented
+            Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
         }
 
         private bool CanRemoveLine(object obj)
@@ -292,12 +323,26 @@ namespace RetailAppUI.ViewModels.Sales
 
         private void RemoveLine(object obj)
         {
-            throw new NotImplementedException();
+            if (SelectedOrderLineIndex == -1)
+            {
+                MessageBox.Show("Please select a line to remove.",
+                                "Remove Line",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Exclamation);
+                return;
+            }
+            else
+            {
+                SalesOrder.SalesOrderDetails.RemoveAt(SelectedOrderLineIndex);
+                UpdateProductList();
+                SalesOrderLines.Refresh();
+                SelectedOrderLineIndex = -1;
+            }
         }
 
         private bool CanAddNewLine(object obj)
         {
-            return _state.Equals("Add") && CheckIfCanAddNewLine();
+                return _state.Equals("Add") && CheckIfCanAddNewLine();
         }
 
         private bool CheckIfCanAddNewLine()
@@ -317,6 +362,12 @@ namespace RetailAppUI.ViewModels.Sales
                 if (SalesOrder.SalesOrderDetails[index].QuantityOrdered == default)
                 {
                     canAdd = false;//No quantity added
+                }
+
+                //No products left to add
+                if (Products.Count == 0)
+                {
+                    canAdd = false;
                 }
             }
 
@@ -357,10 +408,11 @@ namespace RetailAppUI.ViewModels.Sales
 
         private void AddUnitPrice()
         {
-            //add the unit price of the product to the sales order line
-            int index = SalesOrder.SalesOrderDetails.Count - 1;
-            decimal unitPrice = SalesOrder.SalesOrderDetails[index].Product.UnitPrice;
-            SalesOrder.SalesOrderDetails[index].UnitPrice = unitPrice;
+            //Add the unit price to each line
+            foreach (SalesOrderDetailModel orderLine in SalesOrder.SalesOrderDetails)
+            {
+                orderLine.UnitPrice = orderLine.Product.UnitPrice;
+            }
         }
 
 

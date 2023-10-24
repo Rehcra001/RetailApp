@@ -88,6 +88,7 @@ namespace RetailAppUI
             services.AddTransient<PurchaseOrdersSwitchboardViewModel>();
             services.AddTransient<PurchaseOrderViewModel>();
             services.AddTransient<AddNewSalesOrderViewModel>();
+            services.AddTransient<SalesOrderSwitchboardViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());
@@ -119,19 +120,28 @@ namespace RetailAppUI
             services.AddTransient<ICategoryManager, CategoryManager>();
             services.AddTransient<IUnitPerManager, UnitPerManager>();
             services.AddTransient<IInventoryTransactionsManager, InventoryTransactionsManager>();
-            services.AddTransient<IProductsManager, ProductsManager>();
-            services.AddTransient<IProductManager, ProductManager>();
-            services.AddTransient<IProductsManager, ProductsManager>();
             services.AddTransient<IStatusManager, StatusManager>();
             services.AddTransient<IReceiptManager, ReceiptManager>();
             services.AddTransient<IVATManager, VATManager>();
+
+            //Products
+            services.AddTransient<IProductsManager, ProductsManager>();
+            services.AddTransient<IProductManager, ProductManager>();
+            services.AddTransient<IProductsManager, ProductsManager>();
+
+            
+            //Purchase 
             services.AddTransient<IAddNewPurchaseOrderManager, AddNewPurchaseOrderManager>();
             services.AddTransient<IGetPurchaseOrderManager, GetPurchaseOrderManager>();
             services.AddTransient<IPurchaseOrdersListManager, PurchaseOrdersListManager>();
             services.AddTransient<IUpdatePurchaseOrderManager, UpdatePurchaseOrderManager>();
             services.AddTransient<IPurchaseOrderManager, PurchaseOrderManager>();
+
+            //Sales
             services.AddTransient<ISalesManager, SalesManager>();
             services.AddTransient<IInsertSalesOrderManager, InsertSalesOrderManager>();
+            services.AddTransient<IGetAllSalesOrderDetailsManager, GetAllSalesOrderDetailsManager>();
+            services.AddTransient<IGetAllSalesOrderManager, GetAllSalesOrderManager>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

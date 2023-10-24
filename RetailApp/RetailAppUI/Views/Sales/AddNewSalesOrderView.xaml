@@ -310,7 +310,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellEditingTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityOrdered, UpdateSourceTrigger=LostFocus}" MinWidth="100"/>
+                            <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityOrdered, UpdateSourceTrigger=PropertyChanged}" MinWidth="100"/>
                             <DataGridTextColumn Header="Unit Price" Binding="{Binding Product.UnitPrice, StringFormat=N2}" MinWidth="100" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Discount" Binding="{Binding Discount}"/>
                             <DataGridTextColumn Header="Status" Binding="{Binding OrderLineStatus.Status}" IsReadOnly="True"/>

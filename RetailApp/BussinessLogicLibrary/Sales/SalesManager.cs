@@ -5,10 +5,13 @@ namespace BussinessLogicLibrary.Sales
     public class SalesManager : ISalesManager
     {
         private readonly IInsertSalesOrderManager _insertSalesOrderManager;
+        private readonly IGetAllSalesOrderManager _getAllSalesOrderManager;
 
-        public SalesManager(IInsertSalesOrderManager insertSalesOrderManager)
+
+        public SalesManager(IInsertSalesOrderManager insertSalesOrderManager, IGetAllSalesOrderManager getAllSalesOrderManager)
         {
             _insertSalesOrderManager = insertSalesOrderManager;
+            _getAllSalesOrderManager = getAllSalesOrderManager;
         }
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace BussinessLogicLibrary.Sales
         }
 
         /// <summary>
-        /// Gets all sales orders
+        /// Gets all sales order headers with all details attached
         /// </summary>
         /// <returns>
         /// Returns an IEnumerable<SalesOrderHeaders>
@@ -58,9 +61,41 @@ namespace BussinessLogicLibrary.Sales
         /// <exception cref="Exception">
         /// Throws an exception if unable to retrieve the sales orders
         /// </exception>
-        public IEnumerable<SalesOrderHeaderModel> GetAll()
+        public IEnumerable<SalesOrderHeaderModel> GetAllWithSalesOrderDetails()
         {
-            throw new NotImplementedException();
+            List<SalesOrderHeaderModel> salesOrders = new List<SalesOrderHeaderModel>();
+            try
+            {
+                salesOrders = _getAllSalesOrderManager.GetAllWithSalesOrderDetails().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return salesOrders;
+        }
+
+        /// <summary>
+        /// Gets all sales order headers with no details attached
+        /// </summary>
+        /// <returns>
+        /// Returns an IEnumerable<SalesOrderHeaders>
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Throws an exception if unable to retrieve the sales orders
+        /// </exception>
+        public IEnumerable<SalesOrderHeaderModel> GetAllWithoutSalesOrderDetails()
+        {
+            List<SalesOrderHeaderModel> salesOrders = new List<SalesOrderHeaderModel>();
+            try
+            {
+                salesOrders = _getAllSalesOrderManager.GetAllWithoutSalesOrderDetails().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return salesOrders;
         }
 
         /// <summary>
@@ -81,6 +116,9 @@ namespace BussinessLogicLibrary.Sales
         /// <summary>
         /// Gets all sales orders for the given customer ID 
         /// </summary>
+        /// <param name="id">
+        /// Takes in an integer of CustomerID
+        /// </param>
         /// <returns>
         /// Returns an IEnumerable<SalesOrderHeaders> filtered by CustomerID
         /// </returns>
@@ -89,12 +127,24 @@ namespace BussinessLogicLibrary.Sales
         /// </exception>
         public IEnumerable<SalesOrderHeaderModel> GetByCustomerID(int id)
         {
-            throw new NotImplementedException();
+            List<SalesOrderHeaderModel> salesOrders = new List<SalesOrderHeaderModel>();
+            try
+            {
+                salesOrders = _getAllSalesOrderManager.GetAllWithoutSalesOrderDetails().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return salesOrders.Where(x => x.CustomerID == id);
         }
 
         /// <summary>
         /// Gets all sales orders for the given Order status ID 
         /// </summary>
+        /// <param name="id">
+        /// Takes in an integer of OrderStatusID
+        /// </param>
         /// <returns>
         /// Returns an IEnumerable<SalesOrderHeaders> filtered by OrderStatusID
         /// </returns>
@@ -103,7 +153,16 @@ namespace BussinessLogicLibrary.Sales
         /// </exception>
         public IEnumerable<SalesOrderHeaderModel> GetByOrderStatusID(int id)
         {
-            throw new NotImplementedException();
+            List<SalesOrderHeaderModel> salesOrders = new List<SalesOrderHeaderModel>();
+            try
+            {
+                salesOrders = _getAllSalesOrderManager.GetAllWithoutSalesOrderDetails().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return salesOrders.Where(x => x.OrderStatusID == id);
         }
     }
 }

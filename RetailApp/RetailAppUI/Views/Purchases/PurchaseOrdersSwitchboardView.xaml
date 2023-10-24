@@ -174,10 +174,10 @@
                         <DataGridTextColumn Header="Vendor Reference" Binding="{Binding Path=VendorReference}"/>
                         <DataGridTextColumn Header="Order Date" Binding="{Binding Path=OrderDate}"/>
                         <DataGridTextColumn Header="Required Date" Binding="{Binding Path=RequiredDate, StringFormat=d}"/>
-                        <DataGridTextColumn Header="Order Amount" Binding="{Binding Path=OrderAmount}"/>
-                        <DataGridTextColumn Header="VAT Percentage" Binding="{Binding Path=VATPercentage}"/>
-                        <DataGridTextColumn Header="VAT Amount" Binding="{Binding Path=VATAmount}"/>
-                        <DataGridTextColumn Header="Total Amount" Binding="{Binding Path=TotalAmount}"/>
+                        <DataGridTextColumn Header="Order Amount" Binding="{Binding Path=OrderAmount, StringFormat=N2}"/>
+                        <DataGridTextColumn Header="VAT Percentage" Binding="{Binding Path=VATPercentage, StringFormat=N2}"/>
+                        <DataGridTextColumn Header="VAT Amount" Binding="{Binding Path=VATAmount, StringFormat=N2}"/>
+                        <DataGridTextColumn Header="Total Amount" Binding="{Binding Path=TotalAmount, StringFormat=N2}"/>
                         <DataGridCheckBoxColumn Header="Imported" Binding="{Binding Path=IsImport}"/>
                     </DataGrid.Columns>
                 </DataGrid>
