@@ -225,8 +225,7 @@ namespace RetailAppUI.ViewModels.Sales
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
                 //Go back to the previous screen
-
-                // TODO - Add Navigation to SalesOrderSwitchboardView
+                Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
             }
         }
 
@@ -244,8 +243,7 @@ namespace RetailAppUI.ViewModels.Sales
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
                 //Go back to the previous screen
-
-                // TODO - Add Navigation to SalesOrderSwitchboardView
+                Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
             }
         }
 
@@ -262,8 +260,7 @@ namespace RetailAppUI.ViewModels.Sales
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
                 //Go back to the previous screen
-
-                // TODO - Add Navigation to SalesOrderSwitchboardView
+                Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
             }
         }
 
