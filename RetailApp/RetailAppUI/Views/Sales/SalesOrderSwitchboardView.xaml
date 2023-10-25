@@ -173,7 +173,7 @@
                         <DataGridTextColumn Header="Customer" Binding="{Binding Path= Customer.CompanyName}"/>
                         <DataGridTextColumn Header="Customer Reference" Binding="{Binding Path=CustomerPurchaseOrder}"/>
                         <DataGridTextColumn Header="Order Date" Binding="{Binding Path=OrderDate}"/>
-                        <DataGridTextColumn Header="Delivery Date" Binding="{Binding Path=DeliverydDate, StringFormat=d}"/>
+                        <DataGridTextColumn Header="Delivery Date" Binding="{Binding Path=DeliveryDate, StringFormat=d}"/>
                         <DataGridTextColumn Header="Order Amount" Binding="{Binding Path=OrderAmount, StringFormat=N2}"/>
                         <DataGridTextColumn Header="VAT Percentage" Binding="{Binding Path=VATPercentage}"/>
                         <DataGridTextColumn Header="VAT Amount" Binding="{Binding Path=VATAmount, StringFormat=N2}"/>

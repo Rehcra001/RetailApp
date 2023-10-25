@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Xps;
 
 namespace RetailAppUI.ViewModels.Sales
 {
@@ -18,6 +19,7 @@ namespace RetailAppUI.ViewModels.Sales
         private ISalesManager _salesManager;
         private IStatusManager _statusManager;
         private ICustomerManager _customerManager;
+        private string _groupState = string.Empty;
 
         //Collection view
         public ICollectionView SalesOrderCollectionView { get; set; }
@@ -44,6 +46,14 @@ namespace RetailAppUI.ViewModels.Sales
             get { return _currentView; }
             set { _currentView = value; }
         }
+
+        private ISharedDataService _sharedData;
+        public ISharedDataService SharedData
+        {
+            get { return _sharedData; }
+            set { _sharedData = value; }
+        }
+
 
         //Data Properties
         private SalesOrderHeaderModel _selectSalesOrder;
@@ -84,18 +94,24 @@ namespace RetailAppUI.ViewModels.Sales
         public RelayCommand GetAllSalesOrdersCommand { get; set; }
         public RelayCommand GetSalesOrderByOrderStatusCommand { get; set; }
         public RelayCommand GetSalesOrderByCustomerCommand { get; set; }
+        public RelayCommand GroupByOrderStatusCommand { get; set; }
+        public RelayCommand GroupByCustomerCommand { get; set; }
+        public RelayCommand ClearGroupByCommand { get; set; }
+        public RelayCommand NavigateToSalesOrderViewCommand { get; set; }
 
         public SalesOrderSwitchboardViewModel(INavigationService navigation,
                                               ICurrentViewService currentView,
                                               ISalesManager salesManager,
                                               IStatusManager statusManager,
-                                              ICustomerManager customerManager)
+                                              ICustomerManager customerManager,
+                                              ISharedDataService sharedData)
         {
             Navigation = navigation;
             CurrentView = currentView;
             _salesManager = salesManager;
             _statusManager = statusManager;
             _customerManager = customerManager;
+            SharedData = sharedData;
 
             //Instantiate SalesOrders
             SalesOrders = new ObservableCollection<SalesOrderHeaderModel>();
@@ -113,6 +129,67 @@ namespace RetailAppUI.ViewModels.Sales
             GetAllSalesOrdersCommand = new RelayCommand(GetAllSalesOrders, CanGetAllSalesOrders);
             GetSalesOrderByOrderStatusCommand = new RelayCommand(GetSalesOrderByOrderStatus, CanGetSalesOrderByOrderStatus);
             GetSalesOrderByCustomerCommand = new RelayCommand(GetSalesOrderByCustomer, CanGetSalesOrderByCustomer);
+            GroupByOrderStatusCommand = new RelayCommand(GroupByOrderStatus, CanGroupByOrderStatus);
+            GroupByCustomerCommand = new RelayCommand(GroupByCustomer, CanGroupByCustomer);
+            ClearGroupByCommand = new RelayCommand(ClearGroupBy, CanClearGroupBy);
+            NavigateToSalesOrderViewCommand = new RelayCommand(NavigateToSalesOrderView, CanNavigateToSalesOrderView);
+
+        }
+
+        private bool CanNavigateToSalesOrderView(object obj)
+        {
+            return SelectedSalesOrder != null;
+        }
+
+        private void NavigateToSalesOrderView(object obj)
+        {
+            SharedData.SharedData = SelectedSalesOrder.SalesOrderID;
+            // TODO -- Add navigate to Sales Order View
+        }
+
+        private bool CanClearGroupBy(object obj)
+        {
+            return !_groupState.Equals("Clear");
+        }
+
+        private void ClearGroupBy(object obj)
+        {
+            SetGroupState("Clear");
+        }
+
+        private bool CanGroupByCustomer(object obj)
+        {
+            return !_groupState.Equals("Customer");
+        }
+
+        private void GroupByCustomer(object obj)
+        {
+            SetGroupState("Customer");
+        }
+
+        private bool CanGroupByOrderStatus(object obj)
+        {
+            return !_groupState.Equals("OrderStatus");
+        }
+
+        private void GroupByOrderStatus(object obj)
+        {
+            SetGroupState("OrderStatus");
+        }
+
+        private void SetGroupState(string state)
+        {
+            _groupState = state;
+            SalesOrderCollectionView.GroupDescriptions.Clear();
+            switch (_groupState)
+            {                
+                case "OrderStatus":
+                    SalesOrderCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("OrderStatus.Status"));
+                    break;
+                case "Customer":
+                    SalesOrderCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Customer.CompanyName"));
+                    break;
+            }
         }
 
         private bool CanGetSalesOrderByCustomer(object obj)
@@ -140,6 +217,7 @@ namespace RetailAppUI.ViewModels.Sales
                     {
                         SalesOrders.Add(order);
                     }
+                    SetGroupState("OrderStatus");
                 }
                 catch (Exception ex)
                 {
@@ -174,6 +252,7 @@ namespace RetailAppUI.ViewModels.Sales
                     {
                         SalesOrders.Add(order);
                     }
+                    SetGroupState("Customer");
                 }
                 catch (Exception ex)
                 {
@@ -232,6 +311,7 @@ namespace RetailAppUI.ViewModels.Sales
                 {
                     SalesOrders.Add(order);
                 }
+                SetGroupState("OrderStatus");
             }
             catch (Exception ex)
             {
