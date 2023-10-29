@@ -98,6 +98,10 @@
                 ValidationMessage += "Quantity must be a positive value\r\b";
                 isValid = false;
             }
+            else if (QuantityOrdered < QuantityInvoiced)
+            {
+                ValidationMessage += "Quantity ordered cannot be less than invoice quantity";
+            }
 
             if (UnitPrice == default)
             {

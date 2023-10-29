@@ -142,6 +142,7 @@ namespace RetailAppUI
             services.AddTransient<IInsertSalesOrderManager, InsertSalesOrderManager>();
             services.AddTransient<IGetAllSalesOrderDetailsManager, GetAllSalesOrderDetailsManager>();
             services.AddTransient<IGetAllSalesOrderManager, GetAllSalesOrderManager>();
+            services.AddTransient<IGetSalesOrderDetailsByIDManager, GetSalesOrderDetailsByIDManager>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();
