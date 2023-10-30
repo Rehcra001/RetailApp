@@ -144,7 +144,7 @@ namespace RetailAppUI.ViewModels.Sales
         private void NavigateToSalesOrderView(object obj)
         {
             SharedData.SharedData = SelectedSalesOrder.SalesOrderID;
-            // TODO -- Add navigate to Sales Order View
+            Navigation.NavigateTo<SalesOrderViewModel>();
         }
 
         private bool CanClearGroupBy(object obj)

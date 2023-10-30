@@ -2,7 +2,7 @@
 
 namespace BussinessLogicLibrary.Sales
 {
-    public class ValidateSalesOrderDetails : IValidateSalesOrderDetails
+    public class ValidateExistingSalesOrderDetails : IValidateExistingSalesOrderDetails
     {
         private readonly IGetSalesOrderDetailsByIDManager _salesOrderDetailByIDManager;
         private bool newLinesAdded;
@@ -17,7 +17,7 @@ namespace BussinessLogicLibrary.Sales
         private const int FILLED = 3;
         private const int CANCELLED = 4;
 
-        public ValidateSalesOrderDetails(IGetSalesOrderDetailsByIDManager getSalesOrderDetailsByIDManager)
+        public ValidateExistingSalesOrderDetails(IGetSalesOrderDetailsByIDManager getSalesOrderDetailsByIDManager)
         {
             _salesOrderDetailByIDManager = getSalesOrderDetailsByIDManager;
         }
@@ -53,6 +53,7 @@ namespace BussinessLogicLibrary.Sales
             //Check if existing lines altered
             CheckIfExistingLinesAltered();
 
+            //if this part is reached then no exception or validation errors encounted            
             return (newLinesAdded, existingLinesAltered);
         }
         private void GetOriginalSalesOrderDetails()

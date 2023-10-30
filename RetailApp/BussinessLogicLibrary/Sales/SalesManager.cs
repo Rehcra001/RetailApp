@@ -6,12 +6,19 @@ namespace BussinessLogicLibrary.Sales
     {
         private readonly IInsertSalesOrderManager _insertSalesOrderManager;
         private readonly IGetAllSalesOrderManager _getAllSalesOrderManager;
+        private readonly IUpdateSalesOrderManager _updateSalesOrderManager;
+        private readonly IGetFullSalesOrderByID _getFullSalesOrderByID;
 
 
-        public SalesManager(IInsertSalesOrderManager insertSalesOrderManager, IGetAllSalesOrderManager getAllSalesOrderManager)
+        public SalesManager(IInsertSalesOrderManager insertSalesOrderManager,
+                            IGetAllSalesOrderManager getAllSalesOrderManager,
+                            IUpdateSalesOrderManager updateSalesOrderManager,
+                            IGetFullSalesOrderByID getFullSalesOrderByID)
         {
             _insertSalesOrderManager = insertSalesOrderManager;
             _getAllSalesOrderManager = getAllSalesOrderManager;
+            _updateSalesOrderManager = updateSalesOrderManager;
+            _getFullSalesOrderByID = getFullSalesOrderByID;
         }
 
         /// <summary>
@@ -49,7 +56,7 @@ namespace BussinessLogicLibrary.Sales
         /// </exception>
         public void Update(SalesOrderHeaderModel salesOrder)
         {
-            throw new NotImplementedException();
+            _updateSalesOrderManager.Update(salesOrder);
         }
 
         /// <summary>
@@ -110,7 +117,14 @@ namespace BussinessLogicLibrary.Sales
         /// </exception>
         public SalesOrderHeaderModel GetByID(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _getFullSalesOrderByID.GetByID(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         /// <summary>

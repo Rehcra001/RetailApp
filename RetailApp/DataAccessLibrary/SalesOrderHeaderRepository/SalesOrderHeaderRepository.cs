@@ -81,7 +81,7 @@ namespace DataAccessLibrary.SalesOrderHeaderRepository
                     command.Connection = connection;
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.usp_GetSalesOrderHeaderByID";
-                    command.Parameters.Add("@SalesOrderID", SqlDbType.BigInt);
+                    command.Parameters.Add("@SalesOrderID", SqlDbType.BigInt).Value = id;
                     command.Connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())

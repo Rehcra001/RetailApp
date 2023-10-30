@@ -79,6 +79,10 @@
                 <SalesView:SalesOrderSwitchboardView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type TypeName=SalesViewModel:SalesOrderViewModel}">
+                <SalesView:SalesOrderView/>
+            </DataTemplate>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/ButtonTheme.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxTheme.xaml"/>

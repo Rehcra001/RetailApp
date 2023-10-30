@@ -48,7 +48,7 @@ namespace DataAccessLibrary.IssuesRepository
                                 while (reader.Read())
                                 {
                                     IssueModel issue = new IssueModel();
-                                    issue.IssueID = Convert.ToInt32(reader["IssuedID"]);
+                                    issue.IssueID = Convert.ToInt32(reader["IssueID"]);
                                     issue.SalesOrderID = Convert.ToInt64(reader["SalesOrderID"]);
                                     issue.ProductID = Convert.ToInt32(reader["ProductID"]);
                                     issue.IssueDate = Convert.ToDateTime(reader["IssueDate"]);
@@ -108,7 +108,7 @@ namespace DataAccessLibrary.IssuesRepository
                                 //Only expecting one record returned
                                 reader.Read();
                                 //update the issue model with data returned
-                                issue.IssueID = Convert.ToInt32(reader["IssuedID"]);
+                                issue.IssueID = Convert.ToInt32(reader["IssueID"]);
                                 issue.IssueDate = Convert.ToDateTime(reader["IssueDate"]);
                                 issue.UnitCost = Convert.ToDecimal(reader["UnitCost"]);
                             }

@@ -2,7 +2,7 @@
 
 namespace BussinessLogicLibrary.Sales
 {
-    public interface IValidateSalesOrderDetails
+    public interface IValidateExistingSalesOrderHeader
     {
         (bool, bool) Validate(SalesOrderHeaderModel salesOrder);
     }

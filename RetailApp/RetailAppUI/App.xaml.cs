@@ -2,6 +2,7 @@
 using BussinessLogicLibrary.CompanyDetail;
 using BussinessLogicLibrary.Customers;
 using BussinessLogicLibrary.InventoryTransactions;
+using BussinessLogicLibrary.Issues;
 using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
@@ -89,6 +90,7 @@ namespace RetailAppUI
             services.AddTransient<PurchaseOrderViewModel>();
             services.AddTransient<AddNewSalesOrderViewModel>();
             services.AddTransient<SalesOrderSwitchboardViewModel>();
+            services.AddTransient<SalesOrderViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());
@@ -123,6 +125,7 @@ namespace RetailAppUI
             services.AddTransient<IStatusManager, StatusManager>();
             services.AddTransient<IReceiptManager, ReceiptManager>();
             services.AddTransient<IVATManager, VATManager>();
+            services.AddTransient<IIssuesManager, IssuesManager>();
 
             //Products
             services.AddTransient<IProductsManager, ProductsManager>();
@@ -143,6 +146,12 @@ namespace RetailAppUI
             services.AddTransient<IGetAllSalesOrderDetailsManager, GetAllSalesOrderDetailsManager>();
             services.AddTransient<IGetAllSalesOrderManager, GetAllSalesOrderManager>();
             services.AddTransient<IGetSalesOrderDetailsByIDManager, GetSalesOrderDetailsByIDManager>();
+            services.AddTransient<IGetSalesOrderHeaderByIDManager, GetSalesOrderHeaderByIDManager>();
+            services.AddTransient<IValidateExistingSalesOrderDetails, ValidateExistingSalesOrderDetails>();
+            services.AddTransient<IValidateExistingSalesOrderHeader, ValidateExistingSalesOrderHeader>();
+            services.AddTransient<IUpdateSalesOrderManager, UpdateSalesOrderManager>();
+            services.AddTransient<IGetFullSalesOrderByID, GetFullSalesOrderByID>();
+
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();
