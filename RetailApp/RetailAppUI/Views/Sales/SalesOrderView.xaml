@@ -250,13 +250,13 @@
                                        Margin="255,0,10,0"/>
 
                                 <ComboBox Width="120"
-                                      FontSize="14"
-                                      Style="{StaticResource ComboBoxTheme}"
-                                      ItemsSource="{Binding OrderStatuses}"
-                                      SelectedItem="{Binding SelectedOrderStatus, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
-                                      ToolTip="Select a status from the drop down list."
-                                      Foreground="White"
-                                      IsEnabled="{Binding OrderStatusEnabled}">
+                                          FontSize="14"
+                                          Style="{StaticResource ComboBoxTheme}"
+                                          ItemsSource="{Binding OrderStatuses}"                                          
+                                          SelectedItem="{Binding SelectedOrderStatus}"
+                                          ToolTip="Select a status from the drop down list."
+                                          Foreground="White"
+                                          IsEnabled="{Binding OrderStatusEnabled}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Status}"/>
@@ -338,14 +338,14 @@
                                                                             Mode=FindAncestor,
                                                                             AncestorType={x:Type UserControl}},
                                                                             Path=DataContext.Products}"
-                                                              SelectedItem="{Binding Product, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
-                                  
-                                                              SelectedValue="{Binding RelativeSource={RelativeSource 
-                                                                            Mode=FindAncestor,
-                                                                            AncestorType={x:Type UserControl}},
-                                                                            Path=DataContext.ProductID}"
+                                                              SelectedItem="{Binding Product, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"                                  
+                                                              SelectedValue="{Binding ProductID}"
                                                               SelectedValuePath="ProductID"
-                                                              IsReadOnly="True">
+                                                              IsReadOnly="True"
+                                                              IsEnabled="{Binding RelativeSource={RelativeSource 
+                                                                          Mode=FindAncestor,
+                                                                          AncestorType={x:Type UserControl}},
+                                                                          Path=DataContext.CanChangeProduct}">
                                                         <ComboBox.ItemTemplate>
                                                             <DataTemplate>
                                                                 <TextBlock Text="{Binding ProductName}"/>
@@ -358,7 +358,37 @@
                                         <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityOrdered, UpdateSourceTrigger=PropertyChanged}" MinWidth="100"/>
                                         <DataGridTextColumn Header="Unit Price" Binding="{Binding Product.UnitPrice, StringFormat=N2}" MinWidth="100" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Discount" Binding="{Binding Discount}"/>
-                                        <DataGridTextColumn Header="Status" Binding="{Binding OrderLineStatus.Status}" IsReadOnly="True"/>
+                                        <DataGridTemplateColumn Header="Status">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding OrderLineStatus.Status}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox x:Name="status"
+                                                              ItemsSource="{Binding RelativeSource={RelativeSource
+                                                                            Mode=FindAncestor,
+                                                                            AncestorType={x:Type UserControl}},
+                                                                            Path=DataContext.OrderLineStatuses}"
+                                                              SelectedItem="{Binding OrderLineStatus, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
+                                                              SelectedValue="{Binding OrderLineStatusID}"
+                                                              SelectedValuePath="StatusID" 
+                                                              IsReadOnly="True"
+                                                              IsEnabled="{Binding RelativeSource={RelativeSource 
+                                                                        Mode=FindAncestor,
+                                                                        AncestorType={x:Type UserControl}},
+                                                                        Path=DataContext.CanChangeOrderLineStatus}">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding Status}"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>                                                        
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="Qyt Invoiced" Binding="{Binding QuantityInvoiced}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Demand" Binding="{Binding Product.SalesDemand}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="On Order" Binding="{Binding Product.OnOrder}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="On Hand" Binding="{Binding Product.OnHand}" IsReadOnly="True"/>
@@ -688,7 +718,7 @@
                     Width="75"
                     Style="{StaticResource ButtonTheme}"
                     Margin="5"
-                    Command="{Binding SaveCommand}"/>
+                    Command="{Binding SaveActionCommand}"/>
 
                 <Button Content="Cancel"
                     Width="75"

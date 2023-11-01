@@ -81,10 +81,10 @@ namespace BussinessLogicLibrary.Sales
                 int index = SalesOrder.SalesOrderDetails.FindIndex(x => x.SalesOrderID == orderLine.SalesOrderID && x.ProductID == orderLine.ProductID);
                 if (index != -1) // existing
                 {
-                    if (ExistingLineChanged(orderLine))
+                    if (ExistingLineChanged(SalesOrder.SalesOrderDetails[index]))
                     {
                         //Validate existing line
-                        ValidateExistingLine(orderLine);
+                        ValidateExistingLine(SalesOrder.SalesOrderDetails[index]);
                         existingLinesAltered = true;
                     }
                 }

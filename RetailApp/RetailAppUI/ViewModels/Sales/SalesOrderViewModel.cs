@@ -4,11 +4,13 @@ using BussinessLogicLibrary.Statuses;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
+using RetailAppUI.ViewModels.Purchases;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Data;
 
@@ -19,7 +21,9 @@ namespace RetailAppUI.ViewModels.Sales
         private readonly ISalesManager _salesManager;
         private readonly IStatusManager _statusManager;
         private readonly IProductsManager _productsManager;
+        private readonly IGetSalesOrderDetailsByIDManager _getSalesOrderDetailsByIDManager;
         private string _state;
+        private const int OPEN = 1;
 
 
         private INavigationService _navigation;
@@ -44,16 +48,13 @@ namespace RetailAppUI.ViewModels.Sales
         }
 
         private StatusModel _selectedOrderStatus;
+
         public StatusModel SelectedOrderStatus
         {
             get { return _selectedOrderStatus; }
-            set
-            {
-                _selectedOrderStatus = value;
-                SalesOrder.OrderStatus = _selectedOrderStatus;
-                OnPropertyChanged();
-            }
+            set { _selectedOrderStatus = value; SalesOrder.OrderStatus = _selectedOrderStatus; OnPropertyChanged(); }
         }
+
 
         private ObservableCollection<StatusModel> _orderStatuses;
         public ObservableCollection<StatusModel> OrderStatuses
@@ -72,13 +73,14 @@ namespace RetailAppUI.ViewModels.Sales
 
 
 
-        private int _selectedOrderLineIndex;
+        private int _selectedOrderLineIndex = -1;
         public int SelectedOrderLineIndex
         {
             get { return _selectedOrderLineIndex; }
-            set { _selectedOrderLineIndex = value; OnPropertyChanged(); }
+            set { _selectedOrderLineIndex = value; ProductEnabled(); OrderLineStatusEnabled(); OnPropertyChanged(); }
         }
 
+        
 
         private ObservableCollection<StatusModel> _orderLineStatuses;
         public ObservableCollection<StatusModel> OrderLineStatuses
@@ -87,37 +89,58 @@ namespace RetailAppUI.ViewModels.Sales
             set { _orderLineStatuses = value; OnPropertyChanged(); }
         }
 
-        private bool _dateEnabled;
+        public IEnumerable<SalesOrderDetailModel> OriginalOrderLines { get; set; }
 
+        private bool _dateEnabled;
         public bool DateEnabled
         {
             get { return _dateEnabled; }
             set { _dateEnabled = value; OnPropertyChanged(); }
         }
-        private bool _textReadOnly;
 
+        private bool _textReadOnly;
         public bool TextReadOnly
         {
             get { return _textReadOnly; }
             set { _textReadOnly = value; OnPropertyChanged(); }
         }
-        private bool _orderStatusEnabled;
 
+        private bool _orderStatusEnabled;
         public bool OrderStatusEnabled
         {
             get { return _orderStatusEnabled; }
             set { _orderStatusEnabled = value; OnPropertyChanged(); }
         }
 
+        private bool _canChangeProduct;
+        public bool CanChangeProduct
+        {
+            get { return _canChangeProduct; }
+            set { _canChangeProduct = value; OnPropertyChanged(); }
+        }
 
-        public ICollectionView SalesOrderLines { get; set; }
+        private bool _canChangeOrderLineStatus;
+        public bool CanChangeOrderLineStatus
+        {
+            get { return _canChangeOrderLineStatus; }
+            set { _canChangeOrderLineStatus = value; OnPropertyChanged(); }
+        }
+
+
+        private ICollectionView _salesOrderLines;
+        public ICollectionView SalesOrderLines
+        {
+            get { return _salesOrderLines; }
+            set { _salesOrderLines = value; OnPropertyChanged(); }
+        }
+
 
         //Commands
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand EditCommand { get; set; }
         public RelayCommand InvoiceCommand { get; set; }
         public RelayCommand ReverseInvoiceCommand { get; set; }
-        public RelayCommand SaveCommand { get; set; }
+        public RelayCommand SaveActionCommand { get; set; }
         public RelayCommand CancelActionCommand { get; set; }
         public RelayCommand AddNewLineCommand { get; set; }
         public RelayCommand RemoveLineCommand { get; set; }
@@ -126,13 +149,15 @@ namespace RetailAppUI.ViewModels.Sales
                                    INavigationService navigationService,
                                    ISharedDataService sharedData,
                                    IStatusManager statusManager,
-                                   IProductsManager productsManager)
+                                   IProductsManager productsManager,
+                                   IGetSalesOrderDetailsByIDManager getSalesOrderDetailsByIDManager)
         {
             _salesManager = salesManager;
             Navigation = navigationService;
             SharedData = sharedData;
             _statusManager = statusManager;
             _productsManager = productsManager;
+            _getSalesOrderDetailsByIDManager = getSalesOrderDetailsByIDManager;
 
             LoadSalesOrder();
 
@@ -142,12 +167,161 @@ namespace RetailAppUI.ViewModels.Sales
 
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
+            AddNewLineCommand = new RelayCommand(AddNewLine, CanAddNewLine);
+            RemoveLineCommand = new RelayCommand(RemoveLine, CanRemoveLine);
+            EditCommand = new RelayCommand(EditOrder, canEditOrder);
+            SaveActionCommand = new RelayCommand(SaveAction, CanSaveAction);
+            CancelActionCommand = new RelayCommand(CancelAction, CanCancelAction);
+            InvoiceCommand = new RelayCommand(Invoice, CanInvoice);
+            ReverseInvoiceCommand = new RelayCommand(ReverseInvoice, CanReverseInvoice);
 
-            SetState("view");
-            
+            SetState("View");
+
+        }
+        private void OrderLineStatusEnabled()
+        {
+            if (SelectedOrderLineIndex > OriginalOrderLines.Count() - 1)
+            {
+                CanChangeOrderLineStatus = false;
+            }
+            else
+            {
+                CanChangeOrderLineStatus = true;
+            }
         }
 
+        private void ProductEnabled()
+        {
+            if (SelectedOrderLineIndex > OriginalOrderLines.Count() - 1)
+            {
+                CanChangeProduct = true;
+            }
+            else
+            {
+                CanChangeProduct = false;
+            }
+        }
 
+        private bool CanReverseInvoice(object obj)
+        {
+            return false;
+        }
+
+        private void ReverseInvoice(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool CanInvoice(object obj)
+        {
+            return false;
+        }
+
+        private void Invoice(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool CanCancelAction(object obj)
+        {
+            return !_state.Equals("View");
+        }
+
+        private void CancelAction(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool CanSaveAction(object obj)
+        {
+            return !_state.Equals("View");
+        }
+
+        private void SaveAction(object obj)
+        {
+            if (_state.Equals("Edit"))
+            {
+                try
+                {
+                    _salesManager.Update(SalesOrder);
+                    //Get the update sales order from database
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unable to save the sales order.\r\n\r\n" + ex.Message, "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+            
+
+            try
+            {
+                //Re-loaded the sales order view
+                //Make sure the shared data has the sales order ID
+                SharedData.SharedData = SalesOrder.SalesOrderID;
+                Navigation.NavigateTo<SalesOrderViewModel>();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\r\n Reloading Sales Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
+                Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
+            }
+        }
+
+        private bool canEditOrder(object obj)
+        {
+            return _state.Equals("View");
+        }
+
+        private void EditOrder(object obj)
+        {
+            SetState("Edit");
+        }
+
+        private bool CanRemoveLine(object obj)
+        {
+            return !_state.Equals("View") && SelectedOrderLineIndex > OriginalOrderLines.Count() - 1;
+        }
+
+        private void RemoveLine(object obj)
+        {
+            MessageBoxResult result = MessageBox.Show($"Are you sure you want to remove line {SelectedOrderLineIndex + 1}?",
+                                                      "Remove Line",
+                                                      MessageBoxButton.YesNo,
+                                                      MessageBoxImage.Question,
+                                                      MessageBoxResult.No);
+            if (result == MessageBoxResult.Yes)
+            {
+                SalesOrder.SalesOrderDetails.RemoveAt(SelectedOrderLineIndex);
+                SalesOrderLines.Refresh();
+            }
+        }
+
+        private bool CanAddNewLine(object obj)
+        {
+            //Find the last line
+            bool canAdd = false;
+            int index = SalesOrder.SalesOrderDetails.Count - 1;
+            if (SalesOrder.SalesOrderDetails[index].ProductID > 0 &&
+                SalesOrder.SalesOrderDetails[index].QuantityOrdered > 0 &&
+                SalesOrder.SalesOrderDetails[index].OrderLineStatusID > 0)
+            {
+                canAdd = true;
+            }
+
+            return !_state.Equals("View") && Products.Count > 0 && canAdd;
+        }
+
+        private void AddNewLine(object obj)
+        {
+            SalesOrder.SalesOrderDetails.Add(new SalesOrderDetailModel());
+            int index = SalesOrder.SalesOrderDetails.Count - 1;
+            SalesOrder.SalesOrderDetails[index].OrderLineStatusID = OPEN;
+            SalesOrder.SalesOrderDetails[index].OrderLineStatus = OrderLineStatuses.First(x => x.StatusID == OPEN);
+
+            SalesOrderLines.Refresh();
+        }
 
         private bool CanCloseView(object obj)
         {
@@ -177,7 +351,7 @@ namespace RetailAppUI.ViewModels.Sales
             {
                 Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
             }
-            
+
         }
         private void SetState(string state)
         {
@@ -210,7 +384,8 @@ namespace RetailAppUI.ViewModels.Sales
                 long id = (long)SharedData.SharedData;
                 SalesOrder = _salesManager.GetByID(id);
                 SalesOrderLines = CollectionViewSource.GetDefaultView(SalesOrder.SalesOrderDetails);
-    }
+                OriginalOrderLines = _getSalesOrderDetailsByIDManager.GetByID(SalesOrder.SalesOrderID);
+            }
             catch (Exception ex)
             {
                 MessageBox.Show("Unable to retrieve sales order.\r\n\r\n" + ex.Message,
@@ -227,7 +402,7 @@ namespace RetailAppUI.ViewModels.Sales
             try
             {
                 Products = new ObservableCollection<ProductModel>(_productsManager.GetAll().OrderBy(x => x.ProductName));
-                foreach(SalesOrderDetailModel orderline in SalesOrder.SalesOrderDetails)
+                foreach (SalesOrderDetailModel orderline in SalesOrder.SalesOrderDetails)
                 {
                     Products.Remove(Products.First(x => x.ProductID == orderline.ProductID));
                 }
