@@ -4,13 +4,11 @@ using BussinessLogicLibrary.Statuses;
 using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
-using RetailAppUI.ViewModels.Purchases;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Data;
 
@@ -48,19 +46,30 @@ namespace RetailAppUI.ViewModels.Sales
         }
 
         private StatusModel _selectedOrderStatus;
-
         public StatusModel SelectedOrderStatus
         {
             get { return _selectedOrderStatus; }
-            set { _selectedOrderStatus = value; SalesOrder.OrderStatus = _selectedOrderStatus; OnPropertyChanged(); }
+            set
+            {
+                _selectedOrderStatus = value;
+                SalesOrder.OrderStatus = _selectedOrderStatus;
+                SalesOrder.OrderStatusID = _selectedOrderStatus.StatusID;
+                OnPropertyChanged();
+            }
         }
-
 
         private ObservableCollection<StatusModel> _orderStatuses;
         public ObservableCollection<StatusModel> OrderStatuses
         {
             get { return _orderStatuses; }
             set { _orderStatuses = value; OnPropertyChanged(); }
+        }
+
+        private IEnumerable<ProductModel> _fullProductList;
+        public IEnumerable<ProductModel> FullProductList
+        {
+            get { return _fullProductList; }
+            set { _fullProductList = value; }
         }
 
 
@@ -71,16 +80,19 @@ namespace RetailAppUI.ViewModels.Sales
             set { _products = value; OnPropertyChanged(); }
         }
 
-
-
         private int _selectedOrderLineIndex = -1;
         public int SelectedOrderLineIndex
         {
             get { return _selectedOrderLineIndex; }
-            set { _selectedOrderLineIndex = value; ProductEnabled(); OrderLineStatusEnabled(); OnPropertyChanged(); }
+            set
+            {
+                _selectedOrderLineIndex = value;
+                ProductEnabled();
+                OrderLineStatusEnabled();
+                UpdateProductsList();
+                OnPropertyChanged();
+            }
         }
-
-        
 
         private ObservableCollection<StatusModel> _orderLineStatuses;
         public ObservableCollection<StatusModel> OrderLineStatuses
@@ -229,7 +241,21 @@ namespace RetailAppUI.ViewModels.Sales
 
         private void CancelAction(object obj)
         {
-            throw new NotImplementedException();
+            MessageBoxResult result = MessageBox.Show($"Are you want to cancel this {_state}?",
+                                                      $"Cancel {_state}",
+                                                      MessageBoxButton.YesNo,
+                                                      MessageBoxImage.Question,
+                                                      MessageBoxResult.No);
+            if (result == MessageBoxResult.Yes)
+            {
+                //reload view
+                SharedData.SharedData = SalesOrder.SalesOrderID;
+                Navigation.NavigateTo<SalesOrderViewModel>();
+            }
+            else
+            {
+                return;
+            }
         }
 
         private bool CanSaveAction(object obj)
@@ -253,7 +279,7 @@ namespace RetailAppUI.ViewModels.Sales
                     return;
                 }
             }
-            
+
 
             try
             {
@@ -294,6 +320,7 @@ namespace RetailAppUI.ViewModels.Sales
             if (result == MessageBoxResult.Yes)
             {
                 SalesOrder.SalesOrderDetails.RemoveAt(SelectedOrderLineIndex);
+                UpdateProductsList();
                 SalesOrderLines.Refresh();
             }
         }
@@ -401,11 +428,8 @@ namespace RetailAppUI.ViewModels.Sales
             //Retrieve all products not already in the details
             try
             {
-                Products = new ObservableCollection<ProductModel>(_productsManager.GetAll().OrderBy(x => x.ProductName));
-                foreach (SalesOrderDetailModel orderline in SalesOrder.SalesOrderDetails)
-                {
-                    Products.Remove(Products.First(x => x.ProductID == orderline.ProductID));
-                }
+                FullProductList = _productsManager.GetAll();
+                UpdateProductsList();
             }
             catch (Exception ex)
             {
@@ -416,6 +440,17 @@ namespace RetailAppUI.ViewModels.Sales
                 Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
             }
         }
+
+        private void UpdateProductsList()
+        {
+            Products = new ObservableCollection<ProductModel>(FullProductList.OrderBy(x => x.ProductName));
+            foreach (SalesOrderDetailModel orderline in SalesOrder.SalesOrderDetails)
+            {
+                Products.Remove(Products.First(x => x.ProductID == orderline.ProductID));
+            }
+        }
+
+
         private void GetStatuses()
         {
             try

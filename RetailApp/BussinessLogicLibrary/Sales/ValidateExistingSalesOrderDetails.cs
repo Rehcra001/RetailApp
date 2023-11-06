@@ -116,6 +116,7 @@ namespace BussinessLogicLibrary.Sales
             }
             CheckProductID(orderLine);
             CheckOrderLineStatus(orderLine);
+            CheckUnitPrice(orderLine);
 
             //Do model validation
             if (!orderLine.Validate())

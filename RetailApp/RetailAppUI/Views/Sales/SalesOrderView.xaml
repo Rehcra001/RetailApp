@@ -328,7 +328,7 @@
                                         <DataGridTemplateColumn Header="Product" MinWidth="150">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <TextBlock Text="{Binding Product.ProductName}"/>
+                                                    <TextBlock Text="{Binding Product.ProductName, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                             <DataGridTemplateColumn.CellEditingTemplate>
@@ -338,9 +338,9 @@
                                                                             Mode=FindAncestor,
                                                                             AncestorType={x:Type UserControl}},
                                                                             Path=DataContext.Products}"
-                                                              SelectedItem="{Binding Product, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"                                  
+                                                              SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"                                  
                                                               SelectedValue="{Binding ProductID}"
-                                                              SelectedValuePath="ProductID"
+                                                              SelectedValuePath="ProductID"                                                              
                                                               IsReadOnly="True"
                                                               IsEnabled="{Binding RelativeSource={RelativeSource 
                                                                           Mode=FindAncestor,
@@ -422,7 +422,7 @@
                             </DataGrid>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="2" >
+                        <!--<StackPanel Grid.Row="2" >
                             <TextBlock Text="Reverse Invoice"
                                    Foreground="White"
                                    VerticalAlignment="Center"/>
@@ -447,7 +447,7 @@
                                     <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </StackPanel>
+                        </StackPanel>-->
                     </Grid>
 
 
