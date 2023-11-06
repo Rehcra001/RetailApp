@@ -1,4 +1,5 @@
-﻿using BussinessLogicLibrary.Products;
+﻿using BussinessLogicLibrary.Issues;
+using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Sales;
 using BussinessLogicLibrary.Statuses;
 using ModelsLibrary;
@@ -20,6 +21,7 @@ namespace RetailAppUI.ViewModels.Sales
         private readonly IStatusManager _statusManager;
         private readonly IProductsManager _productsManager;
         private readonly IGetSalesOrderDetailsByIDManager _getSalesOrderDetailsByIDManager;
+        private readonly IIssuesManager _issuesManager;
         private string _state;
         private const int OPEN = 1;
 
@@ -110,6 +112,15 @@ namespace RetailAppUI.ViewModels.Sales
             set { _dateEnabled = value; OnPropertyChanged(); }
         }
 
+        private ObservableCollection<InvoicingLineModel> _invoicingLines;
+
+        public ObservableCollection<InvoicingLineModel> InvoicingLines
+        {
+            get { return _invoicingLines; }
+            set { _invoicingLines = value; OnPropertyChanged(); }
+        }
+
+
         private bool _textReadOnly;
         public bool TextReadOnly
         {
@@ -146,6 +157,7 @@ namespace RetailAppUI.ViewModels.Sales
             set { _salesOrderLines = value; OnPropertyChanged(); }
         }
 
+        public ICollectionView InvoicedLinesCollectionView { get; set; }
 
         //Commands
         public RelayCommand CloseViewCommand { get; set; }
@@ -162,7 +174,8 @@ namespace RetailAppUI.ViewModels.Sales
                                    ISharedDataService sharedData,
                                    IStatusManager statusManager,
                                    IProductsManager productsManager,
-                                   IGetSalesOrderDetailsByIDManager getSalesOrderDetailsByIDManager)
+                                   IGetSalesOrderDetailsByIDManager getSalesOrderDetailsByIDManager,
+                                   IIssuesManager issuesManager)
         {
             _salesManager = salesManager;
             Navigation = navigationService;
@@ -170,12 +183,17 @@ namespace RetailAppUI.ViewModels.Sales
             _statusManager = statusManager;
             _productsManager = productsManager;
             _getSalesOrderDetailsByIDManager = getSalesOrderDetailsByIDManager;
+            _issuesManager = issuesManager;
 
             LoadSalesOrder();
 
             GetStatuses();
 
             GetProducts();
+
+            //Invoicing lines
+            InvoicingLines = new ObservableCollection<InvoicingLineModel>();
+            InvoicedLinesCollectionView = CollectionViewSource.GetDefaultView(InvoicingLines);
 
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
@@ -226,12 +244,36 @@ namespace RetailAppUI.ViewModels.Sales
 
         private bool CanInvoice(object obj)
         {
-            return false;
+            bool containsOpenLine = SalesOrder.SalesOrderDetails.Exists(x => x.OrderLineStatusID == OPEN);
+            return _state.Equals("View") && containsOpenLine;
         }
 
         private void Invoice(object obj)
         {
-            throw new NotImplementedException();
+            InvoicingLines.Clear();
+
+            foreach (SalesOrderDetailModel orderLine in SalesOrder.SalesOrderDetails)
+            {
+                if (orderLine.OrderLineStatusID == OPEN)
+                {
+                    InvoicingLineModel invoiceLine = new InvoicingLineModel
+                    {
+                        ProductName = orderLine.Product.ProductName,
+                        SalesOrderID = orderLine.SalesOrderID,
+                        ProductID = orderLine.ProductID,
+                        QuantityOrdered = orderLine.QuantityOrdered,
+                        QtyInvoiced = orderLine.QuantityInvoiced,
+                        QtyToInvoice = 0,
+                        UnitPrice = orderLine.UnitPrice,
+                        Discount = orderLine.Discount
+                    };
+
+                    //Add to InvoicingLines
+                    InvoicingLines.Add(invoiceLine);
+                }
+            }
+            InvoicedLinesCollectionView.Refresh();
+            SetState("Invoice");
         }
 
         private bool CanCancelAction(object obj)
@@ -277,6 +319,34 @@ namespace RetailAppUI.ViewModels.Sales
                 {
                     MessageBox.Show("Unable to save the sales order.\r\n\r\n" + ex.Message, "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
+                }
+            }
+            else if (_state.Equals("Invoice"))
+            {
+                //only qty greater than zero may be invoiced
+                List<InvoicingLineModel> invoices = new List<InvoicingLineModel>();
+                foreach (InvoicingLineModel invoicingLine in InvoicingLines)
+                {
+                    if (invoicingLine.QtyToInvoice != 0)
+                    {
+                        //Remove line
+                        invoices.Add(invoicingLine);
+                    }
+                }
+
+                //If count of lines to invoice is greater than zero then save
+                if (invoices.Count > 0)
+                {
+                    try
+                    {
+                        _issuesManager.Insert(invoices);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Unable to save the invoices.\r\n\r\n" + ex.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    
                 }
             }
 

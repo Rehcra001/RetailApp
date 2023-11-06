@@ -30,5 +30,53 @@ namespace BussinessLogicLibrary.Issues
             }
         }
 
+        public void Insert(IEnumerable<InvoicingLineModel> invoiceLines)
+        {
+            List<IssueModel> issues = new List<IssueModel>();
+
+            
+            foreach(InvoicingLineModel invoice in invoiceLines)
+            {
+                //Validate each line
+                if (!invoice.Validate())
+                {
+                    throw new Exception(invoice.ValidationMessage);
+                }
+
+                //create issued for invoice
+                IssueModel issue = new IssueModel
+                {
+                    SalesOrderID = invoice.SalesOrderID,
+                    ProductID = invoice.ProductID,
+                    QuantityIssued = invoice.QtyToInvoice
+                };
+
+                //validate issue
+                if (!issue.Validate())
+                {
+                    throw new Exception(issue.ValidationMessage);
+                }
+                //Add to list
+                issues.Add(issue);
+            }
+
+            //Save issues
+            foreach (IssueModel issueModel in issues)
+            {
+                Tuple<IssueModel, string> issued = _issueRepository.Insert(issueModel).ToTuple();
+                //Check for errors
+                if (issued.Item2 != null)
+                {
+                    //Error raised
+                    throw new Exception(issued.Item2);
+                }
+            }
+        }
+
+        public void Reverse(int id)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

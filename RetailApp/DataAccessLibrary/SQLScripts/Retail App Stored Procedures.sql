@@ -2190,7 +2190,7 @@ BEGIN
 			--Check if any errors
 			IF (@UnitCost = -1)--Not enough stock to issued
 			BEGIN
-				;THROW 999999, 'Not enough stock to issued the amount passed in', 1;
+				;THROW 999999, 'Not enough stock to issue the amount passed in', 1;
 			END;
 
 			--Change quantity issued to negative
@@ -2482,7 +2482,7 @@ BEGIN
 		RowCosts AS
 		(
 			SELECT CASE WHEN RowNum = 1  AND Balance < 0 THEN QtyLeft * UnitCost 
-						WHEN RowNum = 1 AND Balance >= 0 THEN (QuantityReceipted - Balance) * UnitCost
+						WHEN RowNum = 1 AND Balance >= 0 THEN (QtyLeft - Balance) * UnitCost
 						WHEN RowNum <> 1 AND Balance < 0 THEN QuantityReceipted * UnitCost
 						WHEN RowNum <> 1 AND Balance >= 0 THEN (QuantityReceipted - Balance) * UnitCost
 						ELSE 0 END AS RowCost
