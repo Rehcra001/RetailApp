@@ -229,7 +229,7 @@ namespace RetailAppUI.ViewModels.Purchases
 
         private bool CanReceiptOrderLine(object obj)
         {
-            return _state.Equals("View") && PurchaseOrder.PurchaseOrderDetails.Where(x => x.OrderLineStatus.Status!.Equals("Open")).Any();
+            return _state.Equals("View") && PurchaseOrder.PurchaseOrderDetails.Exists(x => x.OrderLineStatus.Status!.Equals("Open"));
         }
 
         private void ReceiptOrderLine(object obj)

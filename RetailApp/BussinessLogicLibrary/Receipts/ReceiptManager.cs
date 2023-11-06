@@ -43,7 +43,7 @@ namespace BussinessLogicLibrary.Receipts
             }
 
 
-
+            //Save each receipt
             foreach (ReceiptModel receipt in receipts)
             {
                 //Insert the receipt
