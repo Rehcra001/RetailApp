@@ -120,6 +120,13 @@ namespace RetailAppUI.ViewModels.Sales
             set { _invoicingLines = value; OnPropertyChanged(); }
         }
 
+        
+        private int _selectedReverseIssueIndex = -1;
+        public int SelectedReverseIssueIndex
+        {
+            get { return _selectedReverseIssueIndex; }
+            set { _selectedReverseIssueIndex = value; OnPropertyChanged(); }
+        }
 
         private bool _textReadOnly;
         public bool TextReadOnly
@@ -158,6 +165,15 @@ namespace RetailAppUI.ViewModels.Sales
         }
 
         public ICollectionView InvoicedLinesCollectionView { get; set; }
+
+        private ICollectionView _reverseIssues;
+
+        public ICollectionView ReverseIssues
+        {
+            get { return _reverseIssues; }
+            set { _reverseIssues = value; OnPropertyChanged(); }
+        }
+
 
         //Commands
         public RelayCommand CloseViewCommand { get; set; }
@@ -234,12 +250,17 @@ namespace RetailAppUI.ViewModels.Sales
 
         private bool CanReverseInvoice(object obj)
         {
-            return false;
+            bool canReverse = SalesOrder.Issues.Where(x => x.ReverseReferenceID == 0).Any();
+            return _state.Equals("View") && canReverse;
         }
 
         private void ReverseInvoice(object obj)
         {
-            throw new NotImplementedException();
+            //Load the valid issues
+            ReverseIssues = CollectionViewSource.GetDefaultView(SalesOrder.Issues.Where(x => x.ReverseReferenceID == 0));
+
+            //Set view state
+            SetState("Reverse");
         }
 
         private bool CanInvoice(object obj)
@@ -347,6 +368,44 @@ namespace RetailAppUI.ViewModels.Sales
                         return;
                     }
                     
+                }
+            }
+            else if (_state.Equals("Reverse"))
+            {
+                //check if a line has been selected for reversal
+                if (SelectedReverseIssueIndex == -1)
+                {
+                    MessageBox.Show("Please select a line to reverse.", "Select Line", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                else
+                {
+                    //Make sure the selected line should be reversed
+                    MessageBoxResult result = MessageBox.Show($"Are you sure you want to reverse the invoice for line {SelectedReverseIssueIndex + 1}?",
+                                    "Reverse Invoice",
+                                    MessageBoxButton.YesNo,
+                                    MessageBoxImage.Question,
+                                    MessageBoxResult.No);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            int id = (ReverseIssues.CurrentItem as IssueModel)!.IssueID;
+                            _issuesManager.Reverse(id);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Unable to reverse the selected invoice.\r\n\r\n",
+                                            "Reversal Error",
+                                            MessageBoxButton.OK,
+                                            MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             }
 

@@ -68,6 +68,14 @@ namespace BussinessLogicLibrary.Sales
             SalesOrder.Issues = _issueManager.GetBySalesOrderID(SalesOrder.SalesOrderID);
         }
 
+        private void LoadProductNameToIssues(IEnumerable<ProductModel> products)
+        {
+            foreach (IssueModel issue in SalesOrder.Issues)
+            {
+                issue.ProductName = products.First(x => x.ProductID == issue.ProductID).ProductName;
+            }
+        }
+
         private void FillDetails()
         {
             //Get products
@@ -84,7 +92,12 @@ namespace BussinessLogicLibrary.Sales
             {
                 orderLine.Product = products.First(x => x.ProductID == orderLine.ProductID);
             }
+
+            // add product name to any goods issued
+            LoadProductNameToIssues(products);
         }
+
+        
 
         private void LoadLineStatus()
         {

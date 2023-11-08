@@ -2295,7 +2295,6 @@ BEGIN
 		BEGIN TRAN
 			SET NOCOUNT ON;
 			--First ensure it has not been reversed before
-			DECLARE @IsReversed BIT;
 			DECLARE @SalesOrderID BIGINT;
 			DECLARE @ProductID INT;
 			DECLARE @QuantityIssued INT;
@@ -2395,7 +2394,7 @@ BEGIN
 			--Update the product weighted unit cost as there is more on hand
 			EXECUTE dbo.usp_UpdateProductWeightedUnitCostFIFO @ProductID;
 
-			--Update the associated sales order detail with the weight unit cost of sales of goods issued / invoiced
+			--Update the associated sales order detail with the weighted unit cost of sales of goods issued / invoiced
 			EXECUTE dbo.usp_UpdateSalesOrderDetailWithWeightedUnitCost @SalesOrderID, @ProductID;
 
 			--Update Sales order detail with quantity invoiced

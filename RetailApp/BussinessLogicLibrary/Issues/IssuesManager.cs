@@ -75,7 +75,12 @@ namespace BussinessLogicLibrary.Issues
 
         public void Reverse(int id)
         {
-            throw new NotImplementedException();
+            string errorMessage = _issueRepository.ReverseByID(id);
+            if (errorMessage != null)
+            {
+                //Error raised
+                throw new Exception(errorMessage);
+            }
         }
 
     }

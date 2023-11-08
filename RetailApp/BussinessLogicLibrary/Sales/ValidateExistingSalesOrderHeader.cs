@@ -136,7 +136,8 @@ namespace BussinessLogicLibrary.Sales
 
         private void CheckOrderAmount()
         {
-            decimal orderAmount = SalesOrderHeader.SalesOrderDetails.Sum(x => x.UnitPrice * x.QuantityOrdered);
+            decimal orderAmount = SalesOrderHeader.SalesOrderDetails.Where(x => x.OrderLineStatusID != CANCELLED)
+                                                                    .Sum(x => x.UnitPrice * x.QuantityOrdered);
             if (SalesOrderHeader.OrderAmount != orderAmount)
             {
                 //update

@@ -422,7 +422,7 @@
                             </DataGrid>
                         </StackPanel>
 
-                        <!--<StackPanel Grid.Row="2" >
+                        <StackPanel Grid.Row="2" >
                             <TextBlock Text="Reverse Invoice"
                                    Foreground="White"
                                    VerticalAlignment="Center"/>
@@ -447,7 +447,7 @@
                                     <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </StackPanel>-->
+                        </StackPanel>
                     </Grid>
 
 
