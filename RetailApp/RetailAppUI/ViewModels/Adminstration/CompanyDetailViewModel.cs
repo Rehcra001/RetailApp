@@ -13,7 +13,6 @@ namespace RetailAppUI.ViewModels.Adminstration
         private readonly ICompanyDetailManager _companyDetailManager;
         private CompanyDetailModel? _companyDetail;
         private INavigationService _navigation;
-        private IConnectionStringService _connection;
         private string _state;
         private CompanyDetailModel undoCompanyDetailEdit;
         private bool _textReadOnly;

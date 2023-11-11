@@ -395,7 +395,7 @@ namespace RetailAppUI.ViewModels.Sales
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show("Unable to reverse the selected invoice.\r\n\r\n",
+                            MessageBox.Show("Unable to reverse the selected invoice.\r\n\r\n" + ex.Message,
                                             "Reversal Error",
                                             MessageBoxButton.OK,
                                             MessageBoxImage.Error);
