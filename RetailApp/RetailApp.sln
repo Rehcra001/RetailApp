@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BussinessLogicLibrary", "Bu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetailAppUI", "RetailAppUI\RetailAppUI.csproj", "{81F153D4-35B6-46A4-B4F4-8824A8C2EC66}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChartsLibrary", "ChartsLibrary\ChartsLibrary\ChartsLibrary.csproj", "{AB3ABEFC-AA38-452E-A308-25888179B2C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{81F153D4-35B6-46A4-B4F4-8824A8C2EC66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81F153D4-35B6-46A4-B4F4-8824A8C2EC66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81F153D4-35B6-46A4-B4F4-8824A8C2EC66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3ABEFC-AA38-452E-A308-25888179B2C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3ABEFC-AA38-452E-A308-25888179B2C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3ABEFC-AA38-452E-A308-25888179B2C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3ABEFC-AA38-452E-A308-25888179B2C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
