@@ -7,3 +7,8 @@ Vendors <br>
 Customers <br>
 Products <br>
 Purchase Orders <br>
+  -Receipt<br>
+  -Reverse Receipt<br>
+Sales Orders<br>
+  -Invoice<br>
+  -Reverse Invoice<br>
