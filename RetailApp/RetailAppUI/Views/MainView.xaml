@@ -99,7 +99,8 @@
                 
                 <Button Content="Reports"
                         Margin="10"
-                        Style="{StaticResource ButtonTheme}"/>
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding NavigateToReportsSwitchboardViewCommand}"/>
 
                 <Button Content="Administration"
                         Margin="10"

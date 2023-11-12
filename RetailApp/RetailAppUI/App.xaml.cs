@@ -35,6 +35,7 @@ using RetailAppUI.ViewModels;
 using RetailAppUI.ViewModels.Adminstration;
 using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Purchases;
+using RetailAppUI.ViewModels.Reports;
 using RetailAppUI.ViewModels.Sales;
 using RetailAppUI.Views;
 using System;
@@ -91,6 +92,7 @@ namespace RetailAppUI
             services.AddTransient<AddNewSalesOrderViewModel>();
             services.AddTransient<SalesOrderSwitchboardViewModel>();
             services.AddTransient<SalesOrderViewModel>();
+            services.AddTransient<ReportsSwitchboardViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());

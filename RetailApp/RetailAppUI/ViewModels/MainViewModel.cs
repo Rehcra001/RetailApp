@@ -3,7 +3,9 @@ using RetailAppUI.Services;
 using RetailAppUI.ViewModels.Adminstration;
 using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Purchases;
+using RetailAppUI.ViewModels.Reports;
 using RetailAppUI.ViewModels.Sales;
+using System;
 
 namespace RetailAppUI.ViewModels
 {
@@ -29,6 +31,7 @@ namespace RetailAppUI.ViewModels
         public RelayCommand NavigateToAdministrationSwitchboardViewCommand { get; set; }
         public RelayCommand NavigateToPurchaseOrderSwitchboardViewCommand { get; set; }
         public RelayCommand NavigateToSalesOrderSwitchboardViewCommand { get; set; }
+        public RelayCommand NavigateToReportsSwitchboardViewCommand { get; set; }
 
         public MainViewModel(INavigationService navigation, ICurrentViewService currentView)
         {
@@ -41,6 +44,18 @@ namespace RetailAppUI.ViewModels
             NavigateToAdministrationSwitchboardViewCommand = new RelayCommand(NavigateToAdministrationSwitchboardView, CanNavigateToAdministrationSwitchboardView);
             NavigateToPurchaseOrderSwitchboardViewCommand = new RelayCommand(NavigateToPurchaseOrderSwitchboardView, CanNavigateToPurchaseOrderSwitchboardView);
             NavigateToSalesOrderSwitchboardViewCommand = new RelayCommand(NavigateToSalesOrderSwitchboardView, CanNavigateToSalesOrderSwitchboardView);
+            NavigateToReportsSwitchboardViewCommand = new RelayCommand(NavigateToReportsSwitchboardView, CanNavigateToReportsSwitchboardView);
+        }
+
+        private bool CanNavigateToReportsSwitchboardView(object obj)
+        {
+            return !CurrentView.CurrentView!.Equals("Reports");
+        }
+
+        private void NavigateToReportsSwitchboardView(object obj)
+        {
+            CurrentView.CurrentView = "Reports";
+            Navigation.NavigateTo<ReportsSwitchboardViewModel>();
         }
 
         private bool CanNavigateToSalesOrderSwitchboardView(object obj)
