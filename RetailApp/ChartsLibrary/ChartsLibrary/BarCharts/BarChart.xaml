@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:ChartsLibrary.BarCharts"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             SizeChanged="BarChart_SizeChanged">
+             SizeChanged="BarChart_SizeChanged"
+             Loaded="BarChart_Loaded">
     <Canvas x:Name="BarChartCanvas">
             
     </Canvas>
