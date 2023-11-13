@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace ChartsLibrary.BarCharts
 {
@@ -153,6 +154,10 @@ namespace ChartsLibrary.BarCharts
 
         private void AddAxes()
         {
+
+            CalcChartTitleHeight();
+
+
             //CalcVerticalAxisWidth();
             //CalcHorizontalAxisHeight();
             //CalcChartAreaWidth();
@@ -163,7 +168,7 @@ namespace ChartsLibrary.BarCharts
             //AddHorizontalAxis();
         }
 
-        private (double height, double widht) CalcStringHeightAndWidth(string str, string fontFamily, int fontSize, Brush color)
+        private (double height, double width) CalcStringHeightAndWidth(string str, string fontFamily, int fontSize, Brush color)
         {
             FormattedText s = new FormattedText(str,
                                                 CultureInfo.GetCultureInfo("en-za"),
@@ -173,6 +178,25 @@ namespace ChartsLibrary.BarCharts
                                                 color,
                                                 1);
             return (s.Height, s.Width);
+        }
+
+        private void CalcChartTitleHeight()
+        {
+            double height = CalcStringHeightAndWidth(BarChartData.ChartTitle,
+                                                     TitlesFontFamily,
+                                                     ChartTitleFontSize,
+                                                     TitlesFontColor).height;
+            ChartTitleHeight = height + MARGIN * 2;
+        }
+
+        private void CalcVerticalAxisTitleWidth()
+        {
+            double height = CalcStringHeightAndWidth(BarChartData.VerticalAxisTitle,
+                                                                     TitlesFontFamily,
+                                                                     VerticalAxisTitleFontSize,
+                                                                     TitlesFontColor).height;
+            //height as the text is rotated 90°
+            VerticalAxisTitleWidth = height + MARGIN * 2;
         }
 
         private void AddVerticalAxis()
@@ -206,45 +230,31 @@ namespace ChartsLibrary.BarCharts
 
         private void AddChartTitle()
         {
-            FormattedText str = new FormattedText(BarChartData.ChartTitle,
-                                                  CultureInfo.GetCultureInfo("en-za"),
-                                                  FlowDirection.LeftToRight,
-                                                  new Typeface(TitlesFontFamily),
-                                                  ChartTitleFontSize,
-                                                  TitlesFontColor,
-                                                  1);
             TextBlock chartTitle = new TextBlock();
             chartTitle.FontFamily = new FontFamily(TitlesFontFamily);
             chartTitle.FontSize = ChartTitleFontSize;
             chartTitle.Foreground = TitlesFontColor;
-            chartTitle.Text = str.Text;
+            chartTitle.Text = BarChartData.ChartTitle;
 
             BarChartCanvas.Children.Add(chartTitle);
 
             //Position Chart Title
-            double height = str.Height;
-            double width = str.Width;
+            (double height, double width) = CalcStringHeightAndWidth(BarChartData.ChartTitle,
+                                                                     TitlesFontFamily,
+                                                                     ChartTitleFontSize,
+                                                                     TitlesFontColor);
             double left = (ChartWidth * 0.5) - width * 0.5;
             Canvas.SetTop(chartTitle, MARGIN);
             Canvas.SetLeft(chartTitle, left);
-
-            ChartTitleHeight = height + MARGIN * 2;
         }
 
         private void AddVerticalAxisTitle()
         {
-            FormattedText str = new FormattedText(BarChartData.VerticalAxisTitle,
-                                                  CultureInfo.GetCultureInfo("en-za"),
-                                                  0,
-                                                  new Typeface("NewTimesRoman"),
-                                                  VerticalAxisTitleFontSize,
-                                                  TitlesFontColor,
-                                                  1);
             TextBlock verticalAxisTitle = new TextBlock();
-            verticalAxisTitle.FontFamily = new FontFamily("NewTimeRoman");
+            verticalAxisTitle.FontFamily = new FontFamily(TitlesFontFamily);
             verticalAxisTitle.FontSize = VerticalAxisTitleFontSize;
             verticalAxisTitle.Foreground = TitlesFontColor;
-            verticalAxisTitle.Text = str.Text;
+            verticalAxisTitle.Text = BarChartData.ChartTitle;
             RotateTransform rotate = new RotateTransform();
             rotate.Angle = 270;
             verticalAxisTitle.RenderTransform = rotate;
@@ -252,13 +262,15 @@ namespace ChartsLibrary.BarCharts
             BarChartCanvas.Children.Add(verticalAxisTitle);
 
             //Position Vertical Axis Title
-            double height = str.Height;
-            double width = str.Width;
+            (double height, double width) = CalcStringHeightAndWidth(BarChartData.VerticalAxisTitle,
+                                                                     TitlesFontFamily,
+                                                                     VerticalAxisTitleFontSize,
+                                                                     TitlesFontColor);
             double top = (ChartHeight * 0.5) + width * 0.5;
             Canvas.SetTop(verticalAxisTitle, top);
             Canvas.SetLeft(verticalAxisTitle, MARGIN);
 
-            VerticalAxisTitleWidth = height + MARGIN * 2;
+            
         }
 
         private void AddHorizontalAxisTitle()
