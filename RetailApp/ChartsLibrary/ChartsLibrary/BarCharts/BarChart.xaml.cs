@@ -157,12 +157,23 @@ namespace ChartsLibrary.BarCharts
             //CalcHorizontalAxisHeight();
             //CalcChartAreaWidth();
             //CalcChartAreaHeight();
-            
+
 
             //AddVerticalAxis();
             //AddHorizontalAxis();
         }
 
+        private (double height, double widht) CalcStringHeightAndWidth(string str, string fontFamily, int fontSize, Brush color)
+        {
+            FormattedText s = new FormattedText(str,
+                                                CultureInfo.GetCultureInfo("en-za"),
+                                                FlowDirection.LeftToRight,
+                                                new Typeface(fontFamily),
+                                                fontSize,
+                                                color,
+                                                1);
+            return (s.Height, s.Width);
+        }
 
         private void AddVerticalAxis()
         {
@@ -172,8 +183,8 @@ namespace ChartsLibrary.BarCharts
         private void AddHorizontalAxis()
         {
             throw new NotImplementedException();
-        }      
-        
+        }
+
         private void CalcChartAreaHeight()
         {
             throw new NotImplementedException();
@@ -268,7 +279,7 @@ namespace ChartsLibrary.BarCharts
             BarChartCanvas.Children.Add(horizontalAxisTitle);
 
             //Position Horizontal Axis Title
-            double height = str.Height; 
+            double height = str.Height;
             double width = str.Width;
             double left = (ChartWidth * 0.5) - width * 0.5;
             double bottom = (ChartHeight - MARGIN) - height;
@@ -278,6 +289,6 @@ namespace ChartsLibrary.BarCharts
             HorizontalAxisTitleHeight = height + MARGIN * 2;
         }
 
-        
+
     }
 }
