@@ -106,7 +106,7 @@ namespace ChartsLibrary.BarCharts
             DependencyProperty.Register("ShowHorizontalAxisTitle", typeof(bool), typeof(BarChart), new PropertyMetadata(true));
 
 
-        public int HorizontalAxisFontSize
+        public int HorizontalAxisTitleFontSize
         {
             get { return (int)GetValue(HorizontalAxisFontSizeProperty); }
             set { SetValue(HorizontalAxisFontSizeProperty, value); }
@@ -156,7 +156,8 @@ namespace ChartsLibrary.BarCharts
         {
 
             CalcChartTitleHeight();
-
+            CalcVerticalAxisTitleWidth();
+            CalcHorizontalAxisTitleHeight();
 
             //CalcVerticalAxisWidth();
             //CalcHorizontalAxisHeight();
@@ -168,7 +169,7 @@ namespace ChartsLibrary.BarCharts
             //AddHorizontalAxis();
         }
 
-        private (double height, double width) CalcStringHeightAndWidth(string str, string fontFamily, int fontSize, Brush color)
+        private (double Height, double Width) CalcStringHeightAndWidth(string str, string fontFamily, int fontSize, Brush color)
         {
             FormattedText s = new FormattedText(str,
                                                 CultureInfo.GetCultureInfo("en-za"),
@@ -185,7 +186,7 @@ namespace ChartsLibrary.BarCharts
             double height = CalcStringHeightAndWidth(BarChartData.ChartTitle,
                                                      TitlesFontFamily,
                                                      ChartTitleFontSize,
-                                                     TitlesFontColor).height;
+                                                     TitlesFontColor).Height;
             ChartTitleHeight = height + MARGIN * 2;
         }
 
@@ -194,9 +195,18 @@ namespace ChartsLibrary.BarCharts
             double height = CalcStringHeightAndWidth(BarChartData.VerticalAxisTitle,
                                                                      TitlesFontFamily,
                                                                      VerticalAxisTitleFontSize,
-                                                                     TitlesFontColor).height;
+                                                                     TitlesFontColor).Height;
             //height as the text is rotated 90°
             VerticalAxisTitleWidth = height + MARGIN * 2;
+        }
+
+        private void CalcHorizontalAxisTitleHeight()
+        {
+            double height = CalcStringHeightAndWidth(BarChartData.ChartTitle,
+                                                                     TitlesFontFamily,
+                                                                     ChartTitleFontSize,
+                                                                     TitlesFontColor).Height;
+            HorizontalAxisTitleHeight = height + MARGIN * 2;
         }
 
         private void AddVerticalAxis()
@@ -218,10 +228,7 @@ namespace ChartsLibrary.BarCharts
             throw new NotImplementedException();
         }
 
-        private void CalcHorizontalAxisHeight()
-        {
-            throw new NotImplementedException();
-        }
+        
 
         private void CalcVerticalAxisWidth()
         {
@@ -275,30 +282,23 @@ namespace ChartsLibrary.BarCharts
 
         private void AddHorizontalAxisTitle()
         {
-            FormattedText str = new FormattedText(BarChartData.HorizontalAxisTitle,
-                                                  CultureInfo.GetCultureInfo("en-za"),
-                                                  0,
-                                                  new Typeface("NewTimesRoman"),
-                                                  HorizontalAxisFontSize,
-                                                  Brushes.Black,
-                                                  1);
             TextBlock horizontalAxisTitle = new TextBlock();
-            horizontalAxisTitle.FontFamily = new FontFamily("NewTimeRoman");
-            horizontalAxisTitle.FontSize = HorizontalAxisFontSize;
+            horizontalAxisTitle.FontFamily = new FontFamily(TitlesFontFamily);
+            horizontalAxisTitle.FontSize = HorizontalAxisTitleFontSize;
             horizontalAxisTitle.Foreground = TitlesFontColor;
-            horizontalAxisTitle.Text = str.Text;
+            horizontalAxisTitle.Text = BarChartData.HorizontalAxisTitle;
 
             BarChartCanvas.Children.Add(horizontalAxisTitle);
 
             //Position Horizontal Axis Title
-            double height = str.Height;
-            double width = str.Width;
+            (double height, double width) = CalcStringHeightAndWidth(BarChartData.HorizontalAxisTitle,
+                                                                     TitlesFontFamily,
+                                                                     HorizontalAxisTitleFontSize,
+                                                                     TitlesFontColor);
             double left = (ChartWidth * 0.5) - width * 0.5;
             double bottom = (ChartHeight - MARGIN) - height;
             Canvas.SetTop(horizontalAxisTitle, bottom);
             Canvas.SetLeft(horizontalAxisTitle, left);
-
-            HorizontalAxisTitleHeight = height + MARGIN * 2;
         }
 
 
