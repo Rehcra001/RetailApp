@@ -196,8 +196,7 @@ namespace ChartsLibrary.BarCharts
         {
             if (BarChartData is not null)
             {
-                ChartHeight = BarChartCanvas.ActualHeight;
-                ChartWidth = BarChartCanvas.ActualWidth;
+                CalcVariableDimensions();
 
                 BarChartCanvas.Children.Clear();
                 if (ShowChartTitle)
@@ -454,17 +453,31 @@ namespace ChartsLibrary.BarCharts
         {
             //These properties will may change as 
             //the view size is altered
+            ChartHeight = BarChartCanvas.ActualHeight;
+            ChartWidth = BarChartCanvas.ActualWidth;
 
+            CalcChartAreaWidth();
+            CalcChartAreaHeight();
+            CalcMaxBarWidth();
+        }
 
-        }
-        private void CalcChartAreaHeight()
-        {
-            throw new NotImplementedException();
-        }
         private void CalcChartAreaWidth()
         {
             throw new NotImplementedException();
         }
+
+        private void CalcChartAreaHeight()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CalcMaxBarWidth()
+        {
+            throw new NotImplementedException();
+        }
+
+        
+        
 
         private void AddVerticalAxis()
         {
