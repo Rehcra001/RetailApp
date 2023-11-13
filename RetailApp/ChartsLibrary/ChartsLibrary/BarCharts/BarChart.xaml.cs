@@ -30,6 +30,7 @@ namespace ChartsLibrary.BarCharts
         private string MaxValueDescriptionWidth { get; set; }
         private List<string> VerticalAxisLabels { get; set; }
         private decimal VerticalAxisDivisionValue { get; set; }
+        private double MaxBarWidth { get; set; }
 
         private const int MARGIN = 5;
 
@@ -139,7 +140,7 @@ namespace ChartsLibrary.BarCharts
             set { SetValue(NumberOfVerticalGridLinesProperty, value); }
         }
         public static readonly DependencyProperty NumberOfVerticalGridLinesProperty =
-            DependencyProperty.Register("NumberOfVerticalGridLines", typeof(int), typeof(BarChart), new PropertyMetadata(10));
+            DependencyProperty.Register("NumberOfVerticalGridLines", typeof(int), typeof(BarChart), new PropertyMetadata(5));
 
 
         public int VericalAxisLabelFontSize
@@ -161,6 +162,24 @@ namespace ChartsLibrary.BarCharts
             DependencyProperty.Register("VerticalAxisValueScale", typeof(int), typeof(BarChart), new PropertyMetadata(1));
         #endregion
 
+        #region Horizontal Axis DP
+        public bool ShowHorizontalAxis
+        {
+            get { return (bool)GetValue(ShowHorizontalAxisProperty); }
+            set { SetValue(ShowHorizontalAxisProperty, value); }
+        }
+        public static readonly DependencyProperty ShowHorizontalAxisProperty =
+            DependencyProperty.Register("ShowHorizontalAxis", typeof(bool), typeof(BarChart), new PropertyMetadata(true));
+
+
+        public int HorizontalAxisLabelFontSize
+        {
+            get { return (int)GetValue(HorizontalAxisLabelFontSizeProperty); }
+            set { SetValue(HorizontalAxisLabelFontSizeProperty, value); }
+        }
+        public static readonly DependencyProperty HorizontalAxisLabelFontSizeProperty =
+            DependencyProperty.Register("HorizontalAxisLabelFontSize", typeof(int), typeof(BarChart), new PropertyMetadata(12));
+        #endregion
 
         public BarChart()
         {
@@ -169,7 +188,8 @@ namespace ChartsLibrary.BarCharts
 
         private void BarChart_Loaded(object sender, RoutedEventArgs e)
         {
-            AddAxes();
+            CalcConstantDimensions();
+            CalcVariableDimensions();
         }
 
         private void BarChart_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -198,25 +218,24 @@ namespace ChartsLibrary.BarCharts
         }
 
 
-        private void AddAxes()
+        private void CalcConstantDimensions()
         {
+            //These properties will remain as calculated 
+            //Through out the life of the bar chart
 
             CalcChartTitleHeight();
+
             CalcVerticalAxisTitleWidth();
-            CalcHorizontalAxisTitleHeight();
+
+            CalcHorizontalTitleAxisHeight();
 
             GenerateVerticalAxisLabels();
+            CalcVerticalAxisWidth();
 
-            //CalcVerticalAxisWidth();
-            //CalcHorizontalAxisHeight();
-            //CalcChartAreaWidth();
-            //CalcChartAreaHeight();
-
-
-            //AddVerticalAxis();
-            //AddHorizontalAxis();
+            //Labels will be vertical
+            CalcHorizontalAxisHeight();
         }
-               
+
 
         private (double Height, double Width) CalcStringHeightAndWidth(string str, string fontFamily, int fontSize, Brush color)
         {
@@ -232,52 +251,73 @@ namespace ChartsLibrary.BarCharts
 
         private void CalcChartTitleHeight()
         {
-            double height = CalcStringHeightAndWidth(BarChartData.ChartTitle,
+            if (ShowChartTitle)
+            {
+                double height = CalcStringHeightAndWidth(BarChartData.ChartTitle,
                                                      TitlesFontFamily,
                                                      ChartTitleFontSize,
                                                      TitlesFontColor).Height;
-            ChartTitleHeight = height + MARGIN * 2;
+                ChartTitleHeight = height + MARGIN * 2;
+            }
+            else
+            {
+                ChartTitleHeight = 0;
+            }
+            
         }
 
         private void CalcVerticalAxisTitleWidth()
         {
-            double height = CalcStringHeightAndWidth(BarChartData.VerticalAxisTitle,
-                                                                     TitlesFontFamily,
-                                                                     VerticalAxisTitleFontSize,
-                                                                     TitlesFontColor).Height;
-            //height as the text is rotated 90°
-            VerticalAxisTitleWidth = height + MARGIN * 2;
+            if (ShowVerticalAxisTitle)
+            {
+                double height = CalcStringHeightAndWidth(BarChartData.VerticalAxisTitle,
+                                                                             TitlesFontFamily,
+                                                                             VerticalAxisTitleFontSize,
+                                                                             TitlesFontColor).Height;
+                //height as the text is rotated 90°
+                VerticalAxisTitleWidth = height + MARGIN * 2; 
+            }
+            else
+            {
+                VerticalAxisTitleWidth = 0;
+            }
         }
 
-        private void CalcHorizontalAxisTitleHeight()
+        private void CalcHorizontalTitleAxisHeight()
         {
-            double height = CalcStringHeightAndWidth(BarChartData.ChartTitle,
+            if (ShowHorizontalAxisTitle)
+            {
+                double height = CalcStringHeightAndWidth(BarChartData.ChartTitle,
                                                                      TitlesFontFamily,
                                                                      ChartTitleFontSize,
                                                                      TitlesFontColor).Height;
-            HorizontalAxisTitleHeight = height + MARGIN * 2;
+                HorizontalAxisTitleHeight = height + MARGIN * 2;
+            }
+            else
+            {
+                HorizontalAxisTitleHeight = 0;
+            }
+            
         }
 
         private void GenerateVerticalAxisLabels()
         {
-            //I need to know the max value in Values
-            //using the max value divide up the vertical axis
-            //by NumberOfVerticalGridLines 21360 / 10
-            //round down to lowest eg. 2136 => 2000
-            //every grid line will then increment by 2000 for this example
-            //Calculate the max verical axis label value
-            //2000 * 10 + 2000
-            //lowest grid line will always be zero
-
-            SetMaxValue();
-            CalcVerticalGridLineIncrementValue();
-            //generate labels
-            VerticalAxisLabels = new List<string>();
-
-            for (int i = 0; i <= NumberOfVerticalGridLines; i++)
+            if (ShowVerticalAxis)
             {
-                VerticalAxisLabels.Add((VerticalAxisDivisionValue * i).ToString());
-            }
+                //Get the max value from Values
+                SetMaxValue();
+                //Determine the increment value of each horizontal grid line
+                //given the number of grid lines required
+                CalcVerticalGridLineIncrementValue();
+
+                //generate labels
+                VerticalAxisLabels = new List<string>();
+
+                for (int i = 0; i <= NumberOfVerticalGridLines; i++)
+                {
+                    VerticalAxisLabels.Add((VerticalAxisDivisionValue * i).ToString());
+                }
+            }            
         }
 
         private void SetMaxValue()
@@ -290,10 +330,10 @@ namespace ChartsLibrary.BarCharts
 
         private void CalcVerticalGridLineIncrementValue()
         {
-            VerticalAxisDivisionValue = CalcMaxVerticalAxisValue() / NumberOfVerticalGridLines;
+            VerticalAxisDivisionValue = CalcMaxVerticalAxisLabelValue() / NumberOfVerticalGridLines;
         }
 
-        private decimal CalcMaxVerticalAxisValue()
+        private decimal CalcMaxVerticalAxisLabelValue()
         {
             decimal val = MaxValue; // divide by number of grid lines
             StringBuilder sb = new StringBuilder(val.ToString());
@@ -359,16 +399,64 @@ namespace ChartsLibrary.BarCharts
             return decimal.Parse(sb.ToString());
         }
 
-        private void AddVerticalAxis()
+        private void CalcVerticalAxisWidth()
         {
-            throw new NotImplementedException();
+            if (ShowVerticalAxis)
+            {
+                double maxWidth = 0;
+                foreach (string str in VerticalAxisLabels)
+                {
+                    double width = CalcStringHeightAndWidth(str, TitlesFontFamily, VericalAxisLabelFontSize, TitlesFontColor).Width;
+                    if (maxWidth < width)
+                    {
+                        maxWidth = width;
+                    }
+                }
+
+                VerticalAxisWidth = maxWidth + MARGIN * 2;
+            }
+            else
+            {
+                VerticalAxisWidth = 0;
+            }
+            
         }
 
-        private void AddHorizontalAxis()
+        private void CalcHorizontalAxisHeight()
         {
-            throw new NotImplementedException();
+            //Labels will be vertically placed
+            if (ShowHorizontalAxis)
+            {
+                double maxWidth = 0;
+                if (BarChartData.ValuesDescription is not null)
+                {
+                    foreach (string str in BarChartData.ValuesDescription)
+                    {
+                        double width = CalcStringHeightAndWidth(str, TitlesFontFamily, HorizontalAxisLabelFontSize, TitlesFontColor).Width;
+                        if (maxWidth < width)
+                        {
+                            maxWidth = width;
+                        }
+                    }
+                }
+
+                HorizontalAxisHeight = maxWidth + MARGIN * 2;
+            }
+            else
+            {
+                HorizontalAxisHeight = 0;
+            }
+            
         }
 
+
+        private void CalcVariableDimensions()
+        {
+            //These properties will may change as 
+            //the view size is altered
+
+
+        }
         private void CalcChartAreaHeight()
         {
             throw new NotImplementedException();
@@ -378,9 +466,12 @@ namespace ChartsLibrary.BarCharts
             throw new NotImplementedException();
         }
 
-        
+        private void AddVerticalAxis()
+        {
+            throw new NotImplementedException();
+        }
 
-        private void CalcVerticalAxisWidth()
+        private void AddHorizontalAxis()
         {
             throw new NotImplementedException();
         }
