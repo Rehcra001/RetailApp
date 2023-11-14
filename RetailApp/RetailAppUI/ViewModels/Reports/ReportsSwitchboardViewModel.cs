@@ -54,10 +54,10 @@ namespace RetailAppUI.ViewModels.Reports
             {
                 100,
                 120,
-                150,
+                312,
                 120,
-                145,
-                151
+                89,
+                256
             };
         }
     }

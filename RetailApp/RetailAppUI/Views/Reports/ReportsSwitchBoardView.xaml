@@ -12,12 +12,16 @@
         <viewModel:ReportsSwitchboardViewModel/>
     </UserControl.DataContext>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <barcharts:BarChart BarChartData="{Binding BarChartData}"
                             TitlesFontColor="White"
                             ChartTitleFontSize="24"
                             HorizontalAxisTitleFontSize="20"
                             VerticalAxisTitleFontSize="20"
                             HorizontalAxisLabelFontSize="16"
-                            VericalAxisLabelFontSize="16"/>
+                            VerticalAxisLabelFontSize="16"/>
     </Grid>
 </UserControl>
