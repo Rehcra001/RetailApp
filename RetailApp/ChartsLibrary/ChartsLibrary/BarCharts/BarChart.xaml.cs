@@ -217,10 +217,30 @@ namespace ChartsLibrary.BarCharts
             get { return (Brush)GetValue(HorizontalGridLineColorProperty); }
             set { SetValue(HorizontalGridLineColorProperty, value); }
         }
-
-        // Using a DependencyProperty as the backing store for HorizontalGridLineColor.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HorizontalGridLineColorProperty =
             DependencyProperty.Register("HorizontalGridLineColor", typeof(Brush), typeof(BarChart), new PropertyMetadata(Brushes.Aqua));
+
+
+        public int ScaleBarWidth
+        {
+            get { return (int)GetValue(ScaleBarWidthProperty); }
+            set { SetValue(ScaleBarWidthProperty, value); }
+        }
+        public static readonly DependencyProperty ScaleBarWidthProperty =
+            DependencyProperty.Register("ScaleBarWidth", typeof(int), typeof(BarChart), new PropertyMetadata(60));
+
+
+
+        public Brush BarColor
+        {
+            get { return (Brush)GetValue(BarColorProperty); }
+            set { SetValue(BarColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for BarColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty BarColorProperty =
+            DependencyProperty.Register("BarColor", typeof(Brush), typeof(BarChart), new PropertyMetadata(Brushes.DarkCyan));
+
         #endregion
 
 
@@ -241,7 +261,11 @@ namespace ChartsLibrary.BarCharts
 
         private void BarChart_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            DrawBarChart();
+            if (BarChartData.Values is not null)
+            {
+                DrawBarChart();
+            }
+            
         }
 
         private void DrawBarChart()
@@ -276,16 +300,17 @@ namespace ChartsLibrary.BarCharts
                     AddHorizontalAxis();
                 }
 
-                if (ShowChartAreaBorder)
-                {
-                    AddChartAreaBorder();
-                }
-
                 if (ShowHorizontalGridLines)
                 {
                     AddHorizontalGridLines();
                 }
+
                 AddBarsToChartArea();
+
+                if (ShowChartAreaBorder)
+                {
+                    AddChartAreaBorder();
+                }
             }
         }
 
@@ -726,7 +751,42 @@ namespace ChartsLibrary.BarCharts
 
         private void AddBarsToChartArea()
         {
+            double displayWidth = SetBarDisplayWidth();
+            double leftStart = VerticalAxisTitleWidth + VerticalAxisWidth + (MaxBarWidth - displayWidth) / 2;
+            decimal baseHeight = VerticalAxisDivisionValue * NumberOfVerticalGridLines;
+            int i = 0;
+            foreach (decimal value in BarChartData.Values!)
+            {
+                Rectangle bar = new Rectangle();
+                bar.Fill = BarColor;
+                bar.Width = displayWidth;
+                bar.Height = ChartAreaHeight * (double)(value / baseHeight);
+
+                BarChartCanvas.Children.Add(bar);
+
+                Canvas.SetLeft(bar, leftStart + MaxBarWidth * i);
+                Canvas.SetBottom(bar, HorizontalAxisTitleHeight + HorizontalAxisHeight);
+
+                i++;
+            }
             
+        }
+
+        private double SetBarDisplayWidth()
+        {
+            if (ScaleBarWidth <= 100 && ScaleBarWidth >= 25)
+            {
+                return MaxBarWidth * ((double)ScaleBarWidth / (double)100);
+            }
+            else
+            {
+                MessageBox.Show("Scale width of bar may only be between 25 and 100",
+                                "Scale Bar Width",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                ScaleBarWidth = 90;
+                return MaxBarWidth * ((double)ScaleBarWidth / (double)100);
+            }
             
         }
 
@@ -759,8 +819,12 @@ namespace ChartsLibrary.BarCharts
             rectangle.Width = ChartAreaWidth;
             rectangle.Stroke = ChartAreaBorderColor;
             rectangle.StrokeThickness = 1;
-            rectangle.RadiusX = 10;
-            rectangle.RadiusY = 10;
+            //if (ScaleBarWidth < 95)
+            //{
+            //    rectangle.RadiusX = 10;
+            //    rectangle.RadiusY = 10;
+            //}
+            
             BarChartCanvas.Children.Add(rectangle);
             Canvas.SetTop(rectangle, ChartTitleHeight);
             Canvas.SetLeft(rectangle, VerticalAxisTitleWidth + VerticalAxisWidth);
