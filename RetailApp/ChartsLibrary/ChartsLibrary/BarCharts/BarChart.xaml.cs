@@ -1,6 +1,5 @@
 ﻿using ModelsLibrary.ChartModels;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
+using System.Windows.Shapes;
 
 namespace ChartsLibrary.BarCharts
 {
@@ -31,6 +30,8 @@ namespace ChartsLibrary.BarCharts
         private List<string> VerticalAxisLabels { get; set; }
         private decimal VerticalAxisDivisionValue { get; set; }
         private double MaxBarWidth { get; set; }
+
+        private bool isLoaded = false;
 
         private const int MARGIN = 5;
 
@@ -190,11 +191,18 @@ namespace ChartsLibrary.BarCharts
         {
             CalcConstantDimensions();
             CalcVariableDimensions();
+            isLoaded = true;
+            DrawBarChart();
         }
 
         private void BarChart_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (BarChartData is not null)
+            DrawBarChart();
+        }
+
+        private void DrawBarChart()
+        {
+            if (isLoaded && BarChartData is not null)
             {
                 CalcVariableDimensions();
 
@@ -213,9 +221,11 @@ namespace ChartsLibrary.BarCharts
                 {
                     AddHorizontalAxisTitle();
                 }
+                AddVerticalAxis();
+                AddHorizontalAxis();
+                AddChartArea();
             }
         }
-
 
         private void CalcConstantDimensions()
         {
@@ -233,8 +243,20 @@ namespace ChartsLibrary.BarCharts
 
             //Labels will be vertical
             CalcHorizontalAxisHeight();
+
         }
 
+        private void CalcVariableDimensions()
+        {
+            //These properties will change as 
+            //the view size is altered
+            CalcChartHeight();
+            CalcChartWidth();
+
+            CalcChartAreaWidth();
+            CalcChartAreaHeight();
+            //CalcMaxBarWidth();
+        }
 
         private (double Height, double Width) CalcStringHeightAndWidth(string str, string fontFamily, int fontSize, Brush color)
         {
@@ -262,7 +284,7 @@ namespace ChartsLibrary.BarCharts
             {
                 ChartTitleHeight = 0;
             }
-            
+
         }
 
         private void CalcVerticalAxisTitleWidth()
@@ -274,7 +296,7 @@ namespace ChartsLibrary.BarCharts
                                                                              VerticalAxisTitleFontSize,
                                                                              TitlesFontColor).Height;
                 //height as the text is rotated 90°
-                VerticalAxisTitleWidth = height + MARGIN * 2; 
+                VerticalAxisTitleWidth = height + MARGIN * 2;
             }
             else
             {
@@ -296,7 +318,7 @@ namespace ChartsLibrary.BarCharts
             {
                 HorizontalAxisTitleHeight = 0;
             }
-            
+
         }
 
         private void GenerateVerticalAxisLabels()
@@ -316,7 +338,7 @@ namespace ChartsLibrary.BarCharts
                 {
                     VerticalAxisLabels.Add((VerticalAxisDivisionValue * i).ToString());
                 }
-            }            
+            }
         }
 
         private void SetMaxValue()
@@ -418,7 +440,7 @@ namespace ChartsLibrary.BarCharts
             {
                 VerticalAxisWidth = 0;
             }
-            
+
         }
 
         private void CalcHorizontalAxisHeight()
@@ -445,30 +467,27 @@ namespace ChartsLibrary.BarCharts
             {
                 HorizontalAxisHeight = 0;
             }
-            
+
         }
 
-
-        private void CalcVariableDimensions()
+        private void CalcChartHeight()
         {
-            //These properties will may change as 
-            //the view size is altered
             ChartHeight = BarChartCanvas.ActualHeight;
-            ChartWidth = BarChartCanvas.ActualWidth;
+        }
 
-            CalcChartAreaWidth();
-            CalcChartAreaHeight();
-            CalcMaxBarWidth();
+        private void CalcChartWidth()
+        {
+            ChartWidth = BarChartCanvas.ActualWidth;
         }
 
         private void CalcChartAreaWidth()
         {
-            throw new NotImplementedException();
+            ChartAreaWidth = ChartWidth - VerticalAxisTitleWidth - VerticalAxisWidth - (double)MARGIN * 2;
         }
 
         private void CalcChartAreaHeight()
         {
-            throw new NotImplementedException();
+            ChartAreaHeight = ChartHeight - ChartTitleHeight - HorizontalAxisTitleHeight - HorizontalAxisHeight;
         }
 
         private void CalcMaxBarWidth()
@@ -476,18 +495,6 @@ namespace ChartsLibrary.BarCharts
             throw new NotImplementedException();
         }
 
-        
-        
-
-        private void AddVerticalAxis()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void AddHorizontalAxis()
-        {
-            throw new NotImplementedException();
-        }
 
         private void AddChartTitle()
         {
@@ -531,7 +538,7 @@ namespace ChartsLibrary.BarCharts
             Canvas.SetTop(verticalAxisTitle, top);
             Canvas.SetLeft(verticalAxisTitle, MARGIN);
 
-            
+
         }
 
         private void AddHorizontalAxisTitle()
@@ -554,7 +561,52 @@ namespace ChartsLibrary.BarCharts
             Canvas.SetTop(horizontalAxisTitle, bottom);
             Canvas.SetLeft(horizontalAxisTitle, left);
         }
+        private void AddVerticalAxis()
+        {
+            // TODO - Delete testing rectangle
+            // For testing draw rectangle in this area
+            Rectangle rectangle = new Rectangle();
+            rectangle.Height = ChartAreaHeight;
+            rectangle.Width = VerticalAxisWidth;
+            rectangle.Stroke = Brushes.Aqua;
+            rectangle.StrokeThickness = 1;
+            BarChartCanvas.Children.Add(rectangle);
+            Canvas.SetTop(rectangle, ChartTitleHeight);
+            Canvas.SetLeft(rectangle, VerticalAxisTitleWidth);
 
-        
+            //throw new NotImplementedException();
+        }
+
+        private void AddHorizontalAxis()
+        {
+            // TODO - Delete testing rectangle
+            // For testing draw rectangle in this area
+            Rectangle rectangle = new Rectangle();
+            rectangle.Height = HorizontalAxisHeight;
+            rectangle.Width = ChartAreaWidth;
+            rectangle.Stroke = Brushes.Aqua;
+            rectangle.StrokeThickness = 1;
+            BarChartCanvas.Children.Add(rectangle);
+            Canvas.SetTop(rectangle, ChartTitleHeight + ChartAreaHeight);
+            Canvas.SetLeft(rectangle, VerticalAxisTitleWidth + VerticalAxisWidth);
+
+            //throw new NotImplementedException();
+        }
+
+        private void AddChartArea()
+        {
+            // TODO - Create separate method for the chart are border with option to show or not show
+            // For testing draw rectangle in this area
+            Rectangle rectangle = new Rectangle();
+            rectangle.Height = ChartAreaHeight;
+            rectangle.Width = ChartAreaWidth;
+            rectangle.Stroke = Brushes.Aqua;
+            rectangle.StrokeThickness = 1;
+            rectangle.RadiusX = 10;
+            rectangle.RadiusY = 10;
+            BarChartCanvas.Children.Add(rectangle);
+            Canvas.SetTop(rectangle, ChartTitleHeight);
+            Canvas.SetLeft(rectangle, VerticalAxisTitleWidth + VerticalAxisWidth);
+        }
     }
 }

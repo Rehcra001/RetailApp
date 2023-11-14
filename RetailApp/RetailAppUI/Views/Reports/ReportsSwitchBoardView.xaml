@@ -13,6 +13,11 @@
     </UserControl.DataContext>
     <Grid>
         <barcharts:BarChart BarChartData="{Binding BarChartData}"
-                            TitlesFontColor="White"/>
+                            TitlesFontColor="White"
+                            ChartTitleFontSize="24"
+                            HorizontalAxisTitleFontSize="20"
+                            VerticalAxisTitleFontSize="20"
+                            HorizontalAxisLabelFontSize="16"
+                            VericalAxisLabelFontSize="16"/>
     </Grid>
 </UserControl>
