@@ -100,7 +100,8 @@ namespace BussinessLogicLibrary.Sales
             if (orderLine.ProductID == orderLine.ProductID
                 && orderLine.QuantityOrdered == original.QuantityOrdered
                 && orderLine.OrderLineStatusID == original.OrderLineStatusID
-                && orderLine.UnitPrice == original.UnitPrice)
+                && orderLine.UnitPrice == original.UnitPrice
+                && orderLine.Discount == original.Discount)
             {
                 return false;
             }
@@ -142,6 +143,7 @@ namespace BussinessLogicLibrary.Sales
             CheckProductID(orderLine);
             CheckOrderLineStatus(orderLine);
             CheckUnitPrice(orderLine);
+            CheckDiscount(orderLine);
             //Do model validation
             if (!orderLine.Validate())
             {
@@ -150,6 +152,7 @@ namespace BussinessLogicLibrary.Sales
             ValidateExistingOrderLineStatus(orderLine);
         }
 
+        
 
         private void ValidateExistingOrderLineStatus(SalesOrderDetailModel orderLine)
         {
@@ -216,6 +219,19 @@ namespace BussinessLogicLibrary.Sales
             }
 
         }
+
+        private void CheckDiscount(SalesOrderDetailModel orderLine)
+        {
+            if (orderLine.Discount != OriginalSalesOrderDetails.First(x => x.ProductID == orderLine.ProductID).Discount)
+            {
+                //Check if line filled
+                if (orderLine.OrderLineStatusID == FILLED || orderLine.QuantityInvoiced == orderLine.QuantityOrdered)
+                {
+                    throw new Exception("Discount may not be altered once line has been filled \r\nor where quantity ordered equals quantity invoiced");
+                }
+            }
+        }
+
         private void CheckUnitPrice(SalesOrderDetailModel orderLine)
         {
             if (orderLine.UnitPrice >= 0)
