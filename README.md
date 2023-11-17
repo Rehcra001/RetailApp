@@ -1,6 +1,12 @@
 # RetailApp
 ## Generic Sales and Inventory management app
 ## Current Functionality
+
+SQL server to store the data.
+Though there is no database in the repository
+it can be recreated using the scripts in
+the DataAccessLibray/SQLSricpts folder
+
 ### Add and Edit the following:
 Company Details <br>
 Vendors <br>
