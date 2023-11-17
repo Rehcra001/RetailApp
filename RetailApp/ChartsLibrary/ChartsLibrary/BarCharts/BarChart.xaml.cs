@@ -260,7 +260,7 @@ namespace ChartsLibrary.BarCharts
 
         private void BarChart_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (BarChartData.Values is not null)
+            if (_isLoaded && BarChartData.Values is not null)
             {
                 DrawBarChart();
             }
