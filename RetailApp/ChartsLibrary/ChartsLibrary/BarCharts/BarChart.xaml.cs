@@ -1,4 +1,4 @@
-﻿using ModelsLibrary.ChartModels;
+﻿using ChartModelsLibrary.ChartModels;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

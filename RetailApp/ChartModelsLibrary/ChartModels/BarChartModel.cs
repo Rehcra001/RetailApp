@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModelsLibrary.ChartModels
+namespace ChartModelsLibrary.ChartModels
 {
     public class BarChartModel
     {
