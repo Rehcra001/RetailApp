@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetailAppUI", "RetailAppUI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChartsLibrary", "ChartsLibrary\ChartsLibrary\ChartsLibrary.csproj", "{AB3ABEFC-AA38-452E-A308-25888179B2C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChartModelsLibrary", "ChartModelsLibrary\ChartModelsLibrary.csproj", "{58F3E7CD-0DCE-4FE6-8A02-AE5831BC4D25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChartModelsLibrary", "ChartModelsLibrary\ChartModelsLibrary.csproj", "{58F3E7CD-0DCE-4FE6-8A02-AE5831BC4D25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

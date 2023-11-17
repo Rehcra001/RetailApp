@@ -7,6 +7,7 @@ using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Sales;
+using BussinessLogicLibrary.SalesMetrics;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.VAT;
@@ -21,6 +22,7 @@ using DataAccessLibrary.ProductRepository;
 using DataAccessLibrary.PurchaseOrderDetailRepository;
 using DataAccessLibrary.PurchaseOrderHeaderRepository;
 using DataAccessLibrary.ReceiptRepository;
+using DataAccessLibrary.SalesMetricsRepository;
 using DataAccessLibrary.SalesOrderDetailRepository;
 using DataAccessLibrary.SalesOrderHeaderRepository;
 using DataAccessLibrary.StatusRepository;
@@ -36,6 +38,7 @@ using RetailAppUI.ViewModels.Adminstration;
 using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Purchases;
 using RetailAppUI.ViewModels.Reports;
+using RetailAppUI.ViewModels.Reports.SalesMetrics;
 using RetailAppUI.ViewModels.Sales;
 using RetailAppUI.Views;
 using System;
@@ -93,6 +96,7 @@ namespace RetailAppUI
             services.AddTransient<SalesOrderSwitchboardViewModel>();
             services.AddTransient<SalesOrderViewModel>();
             services.AddTransient<ReportsSwitchboardViewModel>();
+            services.AddTransient<SalesMetricsYTDViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());
@@ -116,6 +120,7 @@ namespace RetailAppUI
             services.AddTransient<ISalesOrderHeaderRepository, SalesOrderHeaderRepository>();
             services.AddTransient<ISalesOrderDetailRepository, SalesOrderDetailRepository>();
             services.AddTransient<IIssueRepository, IssuesRepository>();
+            services.AddTransient<ISalesMetricsYTDRepository, SalesMetricsYTDRepository>();
 
             //Managers
             services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
@@ -153,6 +158,11 @@ namespace RetailAppUI
             services.AddTransient<IValidateExistingSalesOrderHeader, ValidateExistingSalesOrderHeader>();
             services.AddTransient<IUpdateSalesOrderManager, UpdateSalesOrderManager>();
             services.AddTransient<IGetFullSalesOrderByID, GetFullSalesOrderByID>();
+
+            //Sales Metrics
+            services.AddTransient<ISalesMetricsManager, SalesMetricsManager>();
+            services.AddTransient<ITop10ProductsByRevenueYTDChart, Top10ProductsByRevenueYTDChart>();
+            services.AddTransient<IMonthlyRevenueYTDChart, MonthlyRevenueYTDChart>();
 
 
             //Services

@@ -1,60 +1,66 @@
-﻿using ChartModelsLibrary.ChartModels;
+﻿using BussinessLogicLibrary.SalesMetrics;
+using ChartModelsLibrary.ChartModels;
+using RetailAppUI.Commands;
+using RetailAppUI.Services;
+using RetailAppUI.ViewModels.Reports.SalesMetrics;
+using System;
 using System.Collections.Generic;
 
 namespace RetailAppUI.ViewModels.Reports
 {
     public class ReportsSwitchboardViewModel : BaseViewModel
     {
-        private BarChartModel _barChartData;
-        public BarChartModel BarChartData
+        private INavigationService _navigation;
+        public INavigationService Navigation
         {
-            get { return _barChartData; }
-            set { _barChartData = value; OnPropertyChanged(); }
+            get { return _navigation; }
+            set { _navigation = value; OnPropertyChanged(); }
         }
 
-        public ReportsSwitchboardViewModel()
+        private ICurrentViewService _currentView;
+
+        public ICurrentViewService CurrentView
         {
-            LoadBarChartData();
+            get { return _currentView; }
+            set { _currentView = value; }
         }
 
-        private void LoadBarChartData()
+
+        //commands
+        public RelayCommand CloseViewCommand { get; set; }
+        public RelayCommand NavigateToSalesDashboardYTDCommand { get; set; }
+
+        public ReportsSwitchboardViewModel(INavigationService navigation,
+                                           ICurrentViewService currentView)
         {
-            BarChartData = new BarChartModel
-            {
-                ChartTitle = "Sales Revenue",
-                VerticalAxisTitle = "Revenue",
-                HorizontalAxisTitle = "Months",
-                Values = LoadValues(),
-                ValuesDescription = LoadDescriptions()
-            };
+            Navigation = navigation;
+            CurrentView = currentView;
 
-
+            //Instantiate commands
+            CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
+            NavigateToSalesDashboardYTDCommand = new RelayCommand(NavigateToSalesDashboardYTD, CanNavigateToSalesDashboardYTD);
+        }
+        
+        private bool CanNavigateToSalesDashboardYTD(object obj)
+        {
+            return true;
         }
 
-        private IEnumerable<string>? LoadDescriptions()
+        private void NavigateToSalesDashboardYTD(object obj)
         {
-            return new List<string>
-            {
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June"
-            };
+            
+            Navigation.NavigateTo<SalesMetricsYTDViewModel>();
+        }
+        private bool CanCloseView(object obj)
+        {
+            return true;
         }
 
-        private IEnumerable<decimal>? LoadValues()
+        private void CloseView(object obj)
         {
-            return new List<decimal>
-            {
-                100,
-                120,
-                312,
-                120,
-                89,
-                256
-            };
+            CurrentView.CurrentView = "HomeView";
+            Navigation.NavigateTo<HomeViewModel>();
         }
+
     }
 }

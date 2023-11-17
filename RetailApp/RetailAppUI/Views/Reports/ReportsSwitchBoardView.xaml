@@ -8,20 +8,45 @@
              xmlns:viewModel="clr-namespace:RetailAppUI.ViewModels.Reports"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <viewModel:ReportsSwitchboardViewModel/>
-    </UserControl.DataContext>
-    <Grid>
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="3*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <barcharts:BarChart BarChartData="{Binding BarChartData}"
-                            TitlesFontColor="White"
-                            ChartTitleFontSize="24"
-                            HorizontalAxisTitleFontSize="20"
-                            VerticalAxisTitleFontSize="20"
-                            HorizontalAxisLabelFontSize="16"
-                            VerticalAxisLabelFontSize="16"/>
+
+        <TextBlock Text="Reports Switchboard"
+                   FontSize="25"
+                   Foreground="White"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Grid.ColumnSpan="3"/>
+
+        <Button Grid.Column="3"                    
+                Content="X"
+                Width="30"
+                Margin="5,0,5,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                HorizontalContentAlignment="Center"
+                Style="{StaticResource ButtonTheme}"
+                Command="{Binding CloseViewCommand}"/>
+
+        <Button Grid.Column="0"
+                Grid.Row="1"
+                Style="{StaticResource ButtonTheme}"
+                Width="150"
+                Command="{Binding NavigateToSalesDashboardYTDCommand}">
+            Sales YTD Dashboard
+        </Button>
     </Grid>
 </UserControl>

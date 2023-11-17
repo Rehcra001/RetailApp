@@ -174,7 +174,6 @@ namespace ChartsLibrary.BarCharts
         public static readonly DependencyProperty ShowHorizontalAxisProperty =
             DependencyProperty.Register("ShowHorizontalAxis", typeof(bool), typeof(BarChart), new PropertyMetadata(true));
 
-
         public int HorizontalAxisLabelFontSize
         {
             get { return (int)GetValue(HorizontalAxisLabelFontSizeProperty); }
@@ -182,6 +181,16 @@ namespace ChartsLibrary.BarCharts
         }
         public static readonly DependencyProperty HorizontalAxisLabelFontSizeProperty =
             DependencyProperty.Register("HorizontalAxisLabelFontSize", typeof(int), typeof(BarChart), new PropertyMetadata(12));
+
+        public bool ShowHorizontalAxisInChartArea
+        {
+            get { return (bool)GetValue(ShowHorizontalAxisInChartAreaProperty); }
+            set { SetValue(ShowHorizontalAxisInChartAreaProperty, value); }
+        }
+        public static readonly DependencyProperty ShowHorizontalAxisInChartAreaProperty =
+            DependencyProperty.Register("ShowHorizontalAxisInChartArea", typeof(bool), typeof(BarChart), new PropertyMetadata(false));
+
+
         #endregion
 
         #region Bar Chart Area DP
@@ -260,7 +269,7 @@ namespace ChartsLibrary.BarCharts
 
         private void BarChart_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_isLoaded && BarChartData.Values is not null)
+            if (_isLoaded)
             {
                 DrawBarChart();
             }
@@ -293,11 +302,6 @@ namespace ChartsLibrary.BarCharts
                 {
                     AddVerticalAxis();
                 }
-                
-                if (ShowHorizontalAxis)
-                {
-                    AddHorizontalAxis();
-                }
 
                 if (ShowHorizontalGridLines)
                 {
@@ -305,6 +309,11 @@ namespace ChartsLibrary.BarCharts
                 }
 
                 AddBarsToChartArea();
+
+                if (ShowHorizontalAxis)
+                {
+                    AddHorizontalAxis();
+                }
 
                 if (ShowChartAreaBorder)
                 {
@@ -614,7 +623,15 @@ namespace ChartsLibrary.BarCharts
 
         private void CalcChartAreaHeight()
         {
-            ChartAreaHeight = ChartHeight - ChartTitleHeight - HorizontalAxisTitleHeight - HorizontalAxisHeight;
+            if (ShowHorizontalAxisInChartArea)
+            {
+                ChartAreaHeight = ChartHeight - ChartTitleHeight - HorizontalAxisTitleHeight;
+            }
+            else
+            {
+                ChartAreaHeight = ChartHeight - ChartTitleHeight - HorizontalAxisTitleHeight - HorizontalAxisHeight;
+            }
+            
         }
 
         private void CalcMaxBarWidth()
@@ -736,10 +753,19 @@ namespace ChartsLibrary.BarCharts
 
                 //Rotate
                 label.RenderTransform = rotate;
-                double labelHeight = HorizontalAxisLabelHeights[i];
-                double labelWidth = HorizontalAxisLabelWidths[i];
+                
                 BarChartCanvas.Children.Add(label);
-                Canvas.SetTop(label, ChartTitleHeight + ChartAreaHeight + MARGIN + labelWidth);
+                if (ShowHorizontalAxisInChartArea)
+                {
+                    Canvas.SetTop(label, ChartTitleHeight + ChartAreaHeight - MARGIN);
+                }
+                else
+                {
+                    double labelHeight = HorizontalAxisLabelHeights[i];
+                    double labelWidth = HorizontalAxisLabelWidths[i];
+                    Canvas.SetTop(label, ChartTitleHeight + ChartAreaHeight + MARGIN + labelWidth);
+                }
+                
                 Canvas.SetLeft(label, leftStart + MaxBarWidth * i);
 
                 i++;
@@ -764,7 +790,15 @@ namespace ChartsLibrary.BarCharts
                 BarChartCanvas.Children.Add(bar);
 
                 Canvas.SetLeft(bar, leftStart + MaxBarWidth * i);
-                Canvas.SetBottom(bar, HorizontalAxisTitleHeight + HorizontalAxisHeight);
+                if (ShowHorizontalAxisInChartArea)
+                {
+                    Canvas.SetBottom(bar, HorizontalAxisTitleHeight);
+                }
+                else
+                {
+                    Canvas.SetBottom(bar, HorizontalAxisTitleHeight + HorizontalAxisHeight);
+                }
+                
 
                 i++;
             }
@@ -818,12 +852,6 @@ namespace ChartsLibrary.BarCharts
             rectangle.Width = ChartAreaWidth;
             rectangle.Stroke = ChartAreaBorderColor;
             rectangle.StrokeThickness = 1;
-            //if (ScaleBarWidth < 95)
-            //{
-            //    rectangle.RadiusX = 10;
-            //    rectangle.RadiusY = 10;
-            //}
-            
             BarChartCanvas.Children.Add(rectangle);
             Canvas.SetTop(rectangle, ChartTitleHeight);
             Canvas.SetLeft(rectangle, VerticalAxisTitleWidth + VerticalAxisWidth);

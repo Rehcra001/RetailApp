@@ -12,7 +12,9 @@
              xmlns:SalesViewModel="clr-namespace:RetailAppUI.ViewModels.Sales"
              xmlns:SalesView="clr-namespace:RetailAppUI.Views.Sales"
              xmlns:ReportViewModel="clr-namespace:RetailAppUI.ViewModels.Reports"
-             xmlns:ReportView="clr-namespace:RetailAppUI.Views.Reports">
+             xmlns:ReportView="clr-namespace:RetailAppUI.Views.Reports"
+             xmlns:SalesMetricsYTDView="clr-namespace:RetailAppUI.Views.Reports.SalesMetrics"
+             xmlns:SalesMetricsYTDViewModel="clr-namespace:RetailAppUI.ViewModels.Reports.SalesMetrics">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -87,6 +89,10 @@
 
             <DataTemplate DataType="{x:Type TypeName=ReportViewModel:ReportsSwitchboardViewModel}">
                 <ReportView:ReportsSwitchBoardView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type TypeName=SalesMetricsYTDViewModel:SalesMetricsYTDViewModel}">
+                <SalesMetricsYTDView:SalesMetricsYTDView/>
             </DataTemplate>
 
             <ResourceDictionary.MergedDictionaries>

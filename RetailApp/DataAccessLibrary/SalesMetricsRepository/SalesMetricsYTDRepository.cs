@@ -1,19 +1,20 @@
 ﻿using ChartModelsLibrary.ChartModels;
+using ModelsLibrary;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace DataAccessLibrary.SalesMetricsRepository
 {
-    public class SalesMetricsYTD : ISalesMetricsYTD
+    public class SalesMetricsYTDRepository : ISalesMetricsYTDRepository
     {
         IRelationalDataAccess _sqlDataAccess;
 
-        public SalesMetricsYTD(IRelationalDataAccess sqlDataAccess)
+        public SalesMetricsYTDRepository(IRelationalDataAccess sqlDataAccess)
         {
             this._sqlDataAccess = sqlDataAccess;
         }
 
-        public (BarChartModel, string) GetMonthlyRevenueYTD()
+        public (BarChartModel, string) GetMonthlyRevenueYTDChart()
         {
             BarChartModel barChart = new BarChartModel();
             string? errorMessage = null;
@@ -60,7 +61,12 @@ namespace DataAccessLibrary.SalesMetricsRepository
             return (barChart, errorMessage); //error message will be null if no error raised
         }
 
-        public (BarChartModel, string) GetTop10ProductsByRevenueYTD()
+        public (ValueModel, string) GetRevenueYTD()
+        {
+            throw new NotImplementedException();
+        }
+
+        public (BarChartModel, string) GetTop10ProductsByRevenueYTDChart()
         {
             BarChartModel barChart = new BarChartModel();
             string? errorMessage = null;
