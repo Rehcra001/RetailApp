@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BussinessLogicLibrary\BussinessLogicLibrary.csproj" />
-    <ProjectReference Include="..\ChartModelsLibrary\ChartModelsLibrary.csproj" />
     <ProjectReference Include="..\ChartsLibrary\ChartsLibrary\ChartsLibrary.csproj" />
   </ItemGroup>
 

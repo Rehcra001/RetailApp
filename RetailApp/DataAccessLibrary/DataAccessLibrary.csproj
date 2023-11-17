@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ChartModelsLibrary\ChartModelsLibrary.csproj" />
     <ProjectReference Include="..\ModelLibrary\ModelsLibrary.csproj" />
   </ItemGroup>
 
