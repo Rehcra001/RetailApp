@@ -11,10 +11,6 @@ namespace RetailAppUI.Controls
     /// </summary>
     public partial class ValuesControl : UserControl
     {
-
-
-
-
         public ValueModel ValueData
         {
             get { return (ValueModel)GetValue(ValueDataProperty); }
@@ -193,7 +189,6 @@ namespace RetailAppUI.Controls
                     border.Background = BorderBackGroundColor;
                 }
                 
-
 
                 //Title properties
                 title.Text = ValueData.Title;

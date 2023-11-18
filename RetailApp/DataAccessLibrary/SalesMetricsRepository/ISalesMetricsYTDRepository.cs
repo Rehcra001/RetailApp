@@ -10,7 +10,7 @@ namespace DataAccessLibrary.SalesMetricsRepository
 {
     public interface ISalesMetricsYTDRepository
     {
-        (ValueModel, string) GetRevenueYTD();
+        (decimal, string) GetRevenueYTD();
         (BarChartModel, string) GetMonthlyRevenueYTDChart();
         (BarChartModel, string) GetTop10ProductsByRevenueYTDChart();
     }

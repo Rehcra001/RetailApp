@@ -1,5 +1,6 @@
 ﻿using BussinessLogicLibrary.SalesMetrics;
 using ChartModelsLibrary.ChartModels;
+using ModelsLibrary;
 using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
@@ -36,6 +37,15 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
             set { _top10ProductsByRevenue = value; OnPropertyChanged(); }
         }
 
+        private ValueModel _revenueYTD;
+
+        public ValueModel RevenueYTD
+        {
+            get { return _revenueYTD; }
+            set { _revenueYTD = value; OnPropertyChanged(); }
+        }
+
+
 
         //Commands
         public RelayCommand CloseViewCommand { get; set; }
@@ -49,10 +59,18 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
             LoadMonthlyRevenueYTD();
             //Add Bar Chart for YDT Top 10 Products by revenue
             LoadTop10ProductsByRevenue();
-
+            //Load ValueModel for revenue YTD
+            LoadRevenueYTD();
 
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
+        }
+
+        private void LoadRevenueYTD()
+        {
+            RevenueYTD = new ValueModel();
+            RevenueYTD.Title = "REVENUE YEAR TO DATE";
+            RevenueYTD.Value = _salesMetricsManager.GetSalesRevenueYTD();
         }
 
         private void LoadMonthlyRevenueYTD()

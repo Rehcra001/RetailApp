@@ -163,6 +163,7 @@ namespace RetailAppUI
             services.AddTransient<ISalesMetricsManager, SalesMetricsManager>();
             services.AddTransient<ITop10ProductsByRevenueYTDChart, Top10ProductsByRevenueYTDChart>();
             services.AddTransient<IMonthlyRevenueYTDChart, MonthlyRevenueYTDChart>();
+            services.AddTransient<ISalesRevenueYTD, SalesRevenueYTD>();
 
 
             //Services

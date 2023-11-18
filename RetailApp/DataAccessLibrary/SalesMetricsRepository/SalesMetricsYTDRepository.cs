@@ -61,9 +61,36 @@ namespace DataAccessLibrary.SalesMetricsRepository
             return (barChart, errorMessage); //error message will be null if no error raised
         }
 
-        public (ValueModel, string) GetRevenueYTD()
+        public (decimal, string) GetRevenueYTD()
         {
-            throw new NotImplementedException();
+            decimal value = 0; ;
+            string? errorMessage = null;
+
+            using (SqlConnection connection = _sqlDataAccess.SQLConnection())
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_SalesRevenueYearToDate";
+                    command.Connection.Open();
+
+                    string returned = command.ExecuteScalar().ToString()!;
+                    //Check for errors
+                    //expecting a decimal value back if no error
+                    if (decimal.TryParse(returned, out _))
+                    {
+                        //no error
+                        value = decimal.Parse(returned);
+                    }
+                    else
+                    {
+                        errorMessage = returned;
+                    }
+                }
+            }
+
+            return (value, errorMessage); //error message will be null if no error raised
         }
 
         public (BarChartModel, string) GetTop10ProductsByRevenueYTDChart()

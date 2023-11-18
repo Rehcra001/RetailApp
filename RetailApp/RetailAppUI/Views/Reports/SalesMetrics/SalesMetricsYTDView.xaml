@@ -16,7 +16,7 @@
         
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -40,7 +40,7 @@
                 Command="{Binding CloseViewCommand}"/>
 
         <barcharts:BarChart Grid.Column="1"
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Margin="5"
                             BarChartData="{Binding Top10ProductsByRevenue}"
                             ShowHorizontalAxisTitle="False"
@@ -49,7 +49,7 @@
                             TitlesFontColor="White"/>
 
         <barcharts:BarChart Grid.Column="0"
-                    Grid.Row="1"
+                    Grid.Row="2"
                     Margin="5"
                     BarChartData="{Binding SalesRevenueByMonth}"
                     ShowHorizontalAxisTitle="False"
@@ -57,9 +57,11 @@
                     ShowHorizontalAxisInChartArea="True"
                     TitlesFontColor="White"/>
 
-        <controls:ValuesControl Grid.Column="0"
-                                Grid.Row="2"
+        <controls:ValuesControl ValueData="{Binding RevenueYTD}"
+                                Grid.Column="0"
+                                Grid.Row="1"
                                 ShowBorder="True"
-                                BorderCornerRadius="10"/>
+                                BorderCornerRadius="10"
+                                Padding="15,0"/>
     </Grid>
 </UserControl>

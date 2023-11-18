@@ -12,12 +12,15 @@ namespace BussinessLogicLibrary.SalesMetrics
     {
         private ITop10ProductsByRevenueYTDChart _top10ProductSalesRevenueYTDChart;
         private IMonthlyRevenueYTDChart _monthlyRevenueYTDChart;
+        private ISalesRevenueYTD _salesRevenueYTD;
 
         public SalesMetricsManager(ITop10ProductsByRevenueYTDChart top10ProductSalesRevenueYTD,
-                                   IMonthlyRevenueYTDChart monthlyRevenueYTDChart)
+                                   IMonthlyRevenueYTDChart monthlyRevenueYTDChart,
+                                   ISalesRevenueYTD salesRevenueYTD)
         {
             _top10ProductSalesRevenueYTDChart = top10ProductSalesRevenueYTD;
             _monthlyRevenueYTDChart = monthlyRevenueYTDChart;
+            _salesRevenueYTD = salesRevenueYTD;
         }
 
         public BarChartModel GetTop10ProductsRevenueYTDChart()
@@ -27,7 +30,7 @@ namespace BussinessLogicLibrary.SalesMetrics
 
         public decimal GetSalesRevenueYTD()
         {
-            throw new NotImplementedException();
+            return _salesRevenueYTD.GetRevenueYTD();
         }
 
         public BarChartModel GetMonthlyRevenueYTDChart()
