@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RetailAppUI.Views.Reports.SalesMetrics" 
-             xmlns:barcharts="clr-namespace:ChartsLibrary.BarCharts;assembly=ChartsLibrary"
+             xmlns:barcharts="clr-namespace:ChartsLibrary.BarCharts;assembly=ChartsLibrary" 
+             xmlns:controls="clr-namespace:RetailAppUI.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="740" d:DesignWidth="830">
     <Grid Margin="20">
@@ -55,5 +56,10 @@
                     ShowVerticalAxisTitle="False"
                     ShowHorizontalAxisInChartArea="True"
                     TitlesFontColor="White"/>
+
+        <controls:ValuesControl Grid.Column="0"
+                                Grid.Row="2"
+                                ShowBorder="True"
+                                BorderCornerRadius="10"/>
     </Grid>
 </UserControl>
