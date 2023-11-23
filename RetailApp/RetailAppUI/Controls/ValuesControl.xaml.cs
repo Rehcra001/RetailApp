@@ -11,6 +11,7 @@ namespace RetailAppUI.Controls
     /// </summary>
     public partial class ValuesControl : UserControl
     {
+        #region ValueData Model DP
         public ValueModel ValueData
         {
             get { return (ValueModel)GetValue(ValueDataProperty); }
@@ -18,6 +19,8 @@ namespace RetailAppUI.Controls
         }
         public static readonly DependencyProperty ValueDataProperty =
             DependencyProperty.Register("ValueData", typeof(ValueModel), typeof(ValuesControl), new PropertyMetadata(null));
+
+        #endregion
 
         #region Border DP
         //Border color
@@ -165,9 +168,43 @@ namespace RetailAppUI.Controls
         public static readonly DependencyProperty ValueCultureInfoProperty =
             DependencyProperty.Register("ValueCultureInfo", typeof(string), typeof(ValuesControl), new PropertyMetadata("en-za"));
 
+        //Display a prefix - default is false
+        public bool ShowValuePrefix
+        {
+            get { return (bool)GetValue(ShowValuePrefixProperty); }
+            set { SetValue(ShowValuePrefixProperty, value); }
+        }
+        public static readonly DependencyProperty ShowValuePrefixProperty =
+            DependencyProperty.Register("ShowValuePrefix", typeof(bool), typeof(ValuesControl), new PropertyMetadata(false));
+
+        //Display a suffix
+        public bool ShowValueSuffix
+        {
+            get { return (bool)GetValue(ShowValueSuffixProperty); }
+            set { SetValue(ShowValueSuffixProperty, value); }
+        }
+        public static readonly DependencyProperty ShowValueSuffixProperty =
+            DependencyProperty.Register("ShowValueSuffix", typeof(bool), typeof(ValuesControl), new PropertyMetadata(false));
+
+        //Value prefix symbol eg 'R' for Rand
 
 
+        public string ValuePrefix
+        {
+            get { return (string)GetValue(ValuePrefixProperty); }
+            set { SetValue(ValuePrefixProperty, value); }
+        }
+        public static readonly DependencyProperty ValuePrefixProperty =
+            DependencyProperty.Register("ValuePrefix", typeof(string), typeof(ValuesControl), new PropertyMetadata(""));
 
+        //Value suffix symbol eg '%' if value is a percentage
+        public string ValueSuffix
+        {
+            get { return (string)GetValue(ValueSuffixProperty); }
+            set { SetValue(ValueSuffixProperty, value); }
+        }
+        public static readonly DependencyProperty ValueSuffixProperty =
+            DependencyProperty.Register("ValueSuffix", typeof(string), typeof(ValuesControl), new PropertyMetadata(""));
 
         #endregion
 
@@ -201,8 +238,16 @@ namespace RetailAppUI.Controls
 
 
                 //Value properties
-                string numDecimals = "C" +ValueNumberOfDecimals.ToString();
+                string numDecimals = "N" + ValueNumberOfDecimals.ToString();
                 string str = ValueData.Value.ToString(numDecimals, CultureInfo.CreateSpecificCulture(ValueCultureInfo));
+                if (ShowValuePrefix)
+                {
+                    str = ValuePrefix + str;
+                }
+                if (ShowValueSuffix)
+                {
+                    str += ValueSuffix;
+                }
                 value.Text = str;
                 value.HorizontalAlignment = HorizontalAlignment.Center;
                 value.VerticalAlignment = VerticalAlignment.Center;
@@ -232,9 +277,17 @@ namespace RetailAppUI.Controls
 
 
                 //value.Text = "No Value Available";
-                decimal val = 200.00M;
-                string numDecimals = "C" + ValueNumberOfDecimals.ToString();
+                decimal val = 0M;
+                string numDecimals = "N" + ValueNumberOfDecimals.ToString();
                 string str = val.ToString(numDecimals, CultureInfo.CreateSpecificCulture(ValueCultureInfo));
+                if (ShowValuePrefix)
+                {
+                    str = ValuePrefix + str;
+                }
+                if (ShowValueSuffix)
+                {
+                    str += ValueSuffix;
+                }
                 value.Text = str;
                 //value.Text = "No Value Available";
                 value.Foreground = Brushes.Red;

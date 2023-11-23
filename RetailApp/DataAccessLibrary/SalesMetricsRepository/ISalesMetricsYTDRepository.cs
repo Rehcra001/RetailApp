@@ -13,5 +13,6 @@ namespace DataAccessLibrary.SalesMetricsRepository
         (decimal, string) GetRevenueYTD();
         (BarChartModel, string) GetMonthlyRevenueYTDChart();
         (BarChartModel, string) GetTop10ProductsByRevenueYTDChart();
+        (decimal, string) GetTop10ProductsRevenueYTD();
     }
 }

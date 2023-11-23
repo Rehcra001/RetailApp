@@ -13,11 +13,12 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
+
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -39,6 +40,30 @@
                 Style="{StaticResource ButtonTheme}"
                 Command="{Binding CloseViewCommand}"/>
 
+        <!--Year to Date Revenue-->
+        <controls:ValuesControl ValueData="{Binding RevenueYTD}"
+                                Grid.Column="0"
+                                Grid.Row="1"
+                                Padding="15,0"
+                                ShowValuePrefix="True"
+                                ValuePrefix="R"
+                                BorderBackGroundColor="#FF252424"
+                                BorderCornerRadius="10"
+                                ShowBorder="True"
+                                BorderColor="Transparent"
+                                Width="300"/>
+        
+        <barcharts:BarChart Grid.Column="0"
+                            Grid.Row="2"
+                            Margin="5"
+                            BarChartData="{Binding SalesRevenueByMonth}"
+                            ShowHorizontalAxisTitle="False"
+                            ShowVerticalAxisTitle="False"
+                            ShowHorizontalAxisInChartArea="True"
+                            ShowChartTitle="False"
+                            TitlesFontColor="White"/>
+
+        <!--Top 10 products YTD Revenue-->
         <barcharts:BarChart Grid.Column="1"
                             Grid.Row="2"
                             Margin="5"
@@ -46,22 +71,21 @@
                             ShowHorizontalAxisTitle="False"
                             ShowVerticalAxisTitle="False"
                             ShowHorizontalAxisInChartArea="True"
+                            ShowChartTitle="False"
                             TitlesFontColor="White"/>
 
-        <barcharts:BarChart Grid.Column="0"
-                    Grid.Row="2"
-                    Margin="5"
-                    BarChartData="{Binding SalesRevenueByMonth}"
-                    ShowHorizontalAxisTitle="False"
-                    ShowVerticalAxisTitle="False"
-                    ShowHorizontalAxisInChartArea="True"
-                    TitlesFontColor="White"/>
-
-        <controls:ValuesControl ValueData="{Binding RevenueYTD}"
-                                Grid.Column="0"
+        <controls:ValuesControl ValueData="{Binding Top10RevenueYTD}"
+                                Grid.Column="1"
                                 Grid.Row="1"
-                                ShowBorder="True"
+                                Padding="15,0"
+                                ShowValuePrefix="True"
+                                ValuePrefix="R"
+                                BorderBackGroundColor="#FF252424"
                                 BorderCornerRadius="10"
-                                Padding="15,0"/>
+                                ShowBorder="True"
+                                BorderColor="Transparent"
+                                Width="300"/>
+
+
     </Grid>
 </UserControl>

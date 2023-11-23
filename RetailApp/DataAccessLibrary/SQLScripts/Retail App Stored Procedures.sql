@@ -2564,7 +2564,7 @@ GO
 --Top 10 products and revenue generated as a percentage of revenue
 --Returns the percentage of the top 10 product revenues to total sales revenue YTD
 --or an error message on failure
-CREATE PROCEDURE dbo.usp_PercentageOfTop10ProductsRevenueToSalesRevenue AS
+CREATE PROCEDURE dbo.usp_PercentageOfTop10ProductsRevenueToSalesRevenueYTD AS
 BEGIN
 	BEGIN TRY
 		;WITH YearToDateSalesRevenue AS
@@ -2592,6 +2592,28 @@ BEGIN
 		SELECT CASE WHEN YTDR.YearToDateRevenue > 0 THEN (YTDP.YearToDateRevenue / YTDR.YearToDateRevenue) * 100 ELSE 0 END AS PercentageOfYTDRevenue
 		FROM YearToDateSalesRevenue AS YTDR
 		CROSS JOIN Top10ProductRevenue AS YTDP
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+CREATE PROCEDURE dbo.usp_Top10ProductsByRevenueYTD AS
+BEGIN
+	BEGIN TRY
+		WITH Top10 AS 
+		(
+			SELECT  TOP(10) PR.ProductName, ISNULL(SUM(SOD.QuantityInvoiced * (SOD.UnitPrice - (SOD.UnitPrice * SOD.Discount))),0) AS YearToDateRevenue
+			FROM SalesOrderDetail AS SOD
+			LEFT OUTER JOIN Issues AS I ON SOD.SalesOrderID = I.SalesOrderID AND I.ProductID = SOD.ProductID
+			LEFT OUTER JOIN Products AS PR ON I.ProductID = PR.ProductID
+			WHERE I.ReverseReferenceID IS NULL AND YEAR(GETDATE()) = YEAR(I.IssueDate)
+			GROUP BY PR.ProductName
+		)
+		SELECT ISNULL(SUM(YearToDateRevenue),0) AS YearToDateRevenue
+		FROM Top10;
 	END TRY
 
 	BEGIN CATCH

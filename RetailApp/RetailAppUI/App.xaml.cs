@@ -164,6 +164,7 @@ namespace RetailAppUI
             services.AddTransient<ITop10ProductsByRevenueYTDChart, Top10ProductsByRevenueYTDChart>();
             services.AddTransient<IMonthlyRevenueYTDChart, MonthlyRevenueYTDChart>();
             services.AddTransient<ISalesRevenueYTD, SalesRevenueYTD>();
+            services.AddTransient<ITop10ProductsRevenueYTD, Top10ProductsRevenueYTD>();
 
 
             //Services

@@ -38,11 +38,17 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
         }
 
         private ValueModel _revenueYTD;
-
         public ValueModel RevenueYTD
         {
             get { return _revenueYTD; }
             set { _revenueYTD = value; OnPropertyChanged(); }
+        }
+
+        private ValueModel _top10RevenueYTD;
+        public ValueModel Top10RevenueYTD
+        {
+            get { return _top10RevenueYTD; }
+            set { _top10RevenueYTD = value; OnPropertyChanged(); }
         }
 
 
@@ -61,9 +67,30 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
             LoadTop10ProductsByRevenue();
             //Load ValueModel for revenue YTD
             LoadRevenueYTD();
+            //Load ValueModel for Top 10 product revenue
+            LoadTop10ProductsRevenue();
 
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
+        }
+
+        private void LoadTop10ProductsByRevenue()
+        {
+            //Add Bar Chart for YDT Top 10 Products by revenue
+
+            try
+            {
+                Top10ProductsByRevenue = _salesMetricsManager.GetTop10ProductsRevenueYTDChart();
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show("Unable to load the Top 10 products by revenue YTD. \r\n\r\n" + ex.Message,
+                                "Retrieval Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                Navigation.NavigateTo<ReportsSwitchboardViewModel>();
+            }
         }
 
         private void LoadRevenueYTD()
@@ -90,18 +117,18 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
             }
         }
 
-        private void LoadTop10ProductsByRevenue()
-        {
-            //Add Bar Chart for YDT Top 10 Products by revenue
-
+        private void LoadTop10ProductsRevenue()
+        {         
             try
             {
-                Top10ProductsByRevenue = _salesMetricsManager.GetTop10ProductsRevenueYTDChart();
+                Top10RevenueYTD = new ValueModel();
+                Top10RevenueYTD.Title = "Top 10 Products Revenue YTD";
+                Top10RevenueYTD.Value = _salesMetricsManager.GetTop10ProductsRevenueYTD();
             }
             catch (Exception ex)
             {
 
-                MessageBox.Show("Unable to load the Top 10 products by revenue YTD. \r\n\r\n" + ex.Message,
+                MessageBox.Show("Unable to load the Top 10 products revenue YTD. \r\n\r\n" + ex.Message,
                                 "Retrieval Error",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);

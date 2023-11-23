@@ -141,5 +141,36 @@ namespace DataAccessLibrary.SalesMetricsRepository
 
             return (barChart, errorMessage); //error message will be null if no error raised
         }
+
+        public (decimal, string) GetTop10ProductsRevenueYTD()
+        {
+            decimal value = 0;
+            string? errorMessage = null;
+            using (SqlConnection connection = _sqlDataAccess.SQLConnection())
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_Top10ProductsByRevenueYTD";
+                    command.Connection.Open();
+
+                    string returnedString = command.ExecuteScalar().ToString()!;
+                    //Check for errors
+                    //Expecting a single decimal value
+                    if (decimal.TryParse(returnedString, out _))
+                    {
+                        //No error
+                        value = decimal.Parse(returnedString);
+                    }
+                    else
+                    {
+                        //Error raised
+                        errorMessage = returnedString;
+                    }
+                }
+            }
+            return (value, errorMessage); //error message will be null if no error raised
+        }
     }
 }

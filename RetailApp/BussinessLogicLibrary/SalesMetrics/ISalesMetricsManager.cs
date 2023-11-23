@@ -7,6 +7,7 @@ namespace BussinessLogicLibrary.SalesMetrics
         decimal GetSalesRevenueYTD();
         BarChartModel GetTop10ProductsRevenueYTDChart();
         BarChartModel GetMonthlyRevenueYTDChart();
+        decimal GetTop10ProductsRevenueYTD();
 
     }
 }
