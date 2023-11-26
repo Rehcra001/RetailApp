@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Windows;
 
 namespace RetailAppUI.ViewModels.Reports.SalesMetrics
@@ -51,6 +52,14 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
             set { _top10RevenueYTD = value; OnPropertyChanged(); }
         }
 
+        private HistogramModel _test;
+
+        public HistogramModel Test
+        {
+            get { return _test; }
+            set { _test = value; OnPropertyChanged(); }
+        }
+
 
 
         //Commands
@@ -70,9 +79,52 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
             //Load ValueModel for Top 10 product revenue
             LoadTop10ProductsRevenue();
 
+            //*******************************
+            //For Testing to be deleted
+            LoadTest();
+            // TODO - Delete test functions
+            //*******************************
+
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
         }
+
+        private void LoadTest()
+        {
+            Test = new HistogramModel
+            {
+                ChartTitle = "This is a Test",
+                VerticalAxisTitle = "Frequency",
+                HorizontalAxisTitle = "Days to close order",
+                Observations = LoadObservations()
+            };
+        }
+
+        private IEnumerable<decimal> LoadObservations()
+        {
+            Random random = new Random();
+            List<decimal> obs = new List<decimal>();
+            decimal mu = 500;
+            decimal sd = 100;
+
+            for (int i = 0; i < 100; i++)
+            {
+                decimal x = (decimal)random.Next(-5, 6);
+                obs.Add(x);
+            }
+            return obs;
+        }
+
+        //private decimal Normal(decimal x, decimal mu, decimal sd)
+        //{
+        //    double a = Math.Pow((double)(x - mu), 2);
+        //    double b = 2 * Math.Pow((double)sd, 2);
+        //    double c = -1 * (a / b);
+        //    double d = Math.Exp(c);
+        //    double e = 1 / ((double)sd * Math.Sqrt(2 * Math.PI));
+        //    double f = Math.Pow(e, d);
+        //    return (decimal)f;
+        //}
 
         private void LoadTop10ProductsByRevenue()
         {

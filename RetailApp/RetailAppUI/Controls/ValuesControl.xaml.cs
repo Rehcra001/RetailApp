@@ -79,7 +79,7 @@ namespace RetailAppUI.Controls
             set { SetValue(TitleFontFamilyProperty, value); }
         }
         public static readonly DependencyProperty TitleFontFamilyProperty =
-            DependencyProperty.Register("TitleFontFamily", typeof(FontFamily), typeof(ValuesControl), new PropertyMetadata(new FontFamily("New Times Roman")));
+            DependencyProperty.Register("TitleFontFamily", typeof(FontFamily), typeof(ValuesControl), new PropertyMetadata(new FontFamily("Courier")));
 
         //Title Font-Size
         public int TitleFontSize

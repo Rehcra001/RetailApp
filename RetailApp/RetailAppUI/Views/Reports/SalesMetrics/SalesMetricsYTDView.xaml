@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RetailAppUI.Views.Reports.SalesMetrics" 
              xmlns:barcharts="clr-namespace:ChartsLibrary.BarCharts;assembly=ChartsLibrary" 
-             xmlns:controls="clr-namespace:RetailAppUI.Controls"
+             xmlns:controls="clr-namespace:RetailAppUI.Controls" 
+             xmlns:histogram="clr-namespace:ChartsLibrary.Histogram;assembly=ChartsLibrary"
              mc:Ignorable="d" 
              d:DesignHeight="740" d:DesignWidth="830">
     <Grid Margin="20">
@@ -85,6 +86,10 @@
                                 ShowBorder="True"
                                 BorderColor="Transparent"
                                 Width="300"/>
+
+        <histogram:HistogramControl HistogramData="{Binding Test}"
+                                    Grid.Column="0"
+                                    Grid.Row="3"/>
 
 
     </Grid>

@@ -55,7 +55,7 @@ namespace ChartsLibrary.BarCharts
             set { SetValue(ChartTitleFontFamilyProperty, value); }
         }
         public static readonly DependencyProperty ChartTitleFontFamilyProperty =
-            DependencyProperty.Register("ChartTitleFontFamily", typeof(string), typeof(BarChart), new PropertyMetadata("NewTimesRoman"));
+            DependencyProperty.Register("ChartTitleFontFamily", typeof(string), typeof(BarChart), new PropertyMetadata("Courier"));
 
         public Brush TitlesFontColor
         {
