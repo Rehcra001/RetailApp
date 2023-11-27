@@ -48,7 +48,6 @@
                                 Padding="15,0"
                                 ShowValuePrefix="True"
                                 ValuePrefix="R"
-                                BorderBackGroundColor="#FF252424"
                                 BorderCornerRadius="10"
                                 ShowBorder="True"
                                 BorderColor="Transparent"
@@ -81,7 +80,6 @@
                                 Padding="15,0"
                                 ShowValuePrefix="True"
                                 ValuePrefix="R"
-                                BorderBackGroundColor="#FF252424"
                                 BorderCornerRadius="10"
                                 ShowBorder="True"
                                 BorderColor="Transparent"
@@ -89,8 +87,11 @@
 
         <histogram:HistogramControl HistogramData="{Binding Test}"
                                     Grid.Column="0"
-                                    Grid.Row="3"/>
-
+                                    Grid.Row="4"
+                                    Margin="5"
+                                    TitlesFontColor="White"
+                                    ShowHorizontalAxisTitle="False"
+                                    ShowVerticalAxisTitle="False"/>
 
     </Grid>
 </UserControl>

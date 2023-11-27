@@ -244,8 +244,6 @@ namespace ChartsLibrary.BarCharts
             get { return (Brush)GetValue(BarColorProperty); }
             set { SetValue(BarColorProperty, value); }
         }
-
-        // Using a DependencyProperty as the backing store for BarColor.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BarColorProperty =
             DependencyProperty.Register("BarColor", typeof(Brush), typeof(BarChart), new PropertyMetadata(Brushes.DarkCyan));
 

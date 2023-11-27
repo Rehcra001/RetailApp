@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              Loaded="HistogramControl_Loaded"
              SizeChanged="HistogramControl_SizeChanged">
-    <Canvas x:Name="histogram">
+    <Canvas x:Name="histogramCanvas">
             
     </Canvas>
 </UserControl>
