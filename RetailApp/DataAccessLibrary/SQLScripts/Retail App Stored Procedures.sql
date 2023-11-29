@@ -729,7 +729,7 @@ BEGIN
 		),
 		productReceipts AS 
 		(
-			--Create a record set of all vaild receipts for this product 
+			--CREATE a record set of all vaild receipts for this product 
 			SELECT QuantityReceipted, UnitCost, ReceiptDate,
 			       (ISNULL(SUM(QuantityReceipted) OVER(ORDER BY ReceiptDate),0) + p.SumIssued) AS QtyLeft			   
 			FROM dbo.Receipts AS r
@@ -1698,7 +1698,7 @@ BEGIN
 		SET OrderLineStatusID = 3
 		WHERE PurchaseOrderID = @PurchaseOrderID AND ProductID = @ProductID; 
 		
-		--A line has been altered to filled
+		--A line has been CREATEed to filled
 		--Check if all lines are filled 
 		--if yes then change the order header status to filled
 		EXECUTE dbo.usp_UpdatePurchaseOrderHeaderToFilled @PurchaseOrderID;
@@ -1859,6 +1859,9 @@ BEGIN
 				OrderStatusID = @OrderStatusID
 			WHERE SalesOrderID = @SalesOrderID;
 
+			--Update Sales order header status if needed
+			EXECUTE dbo.usp_UpdateSalesOrderHeaderStatus @SalesOrderID;
+
 			SELECT 'No Error' AS Message;
 		COMMIT TRAN;
 	END TRY
@@ -1915,6 +1918,141 @@ BEGIN
 	BEGIN CATCH
 		SELECT ERROR_MESSAGE() AS Message;
 	END CATCH;
+END;
+GO
+
+--Update sales order header to filled if all lines filled
+CREATE PROCEDURE dbo.UpdateSalesOrderHeaderToFilled
+(
+	@SalesOrderID BIGINT
+)AS
+BEGIN
+	SET NOCOUNT ON;
+	--OPEN: 1
+	--COMPLETE: 2
+	--FILLED: 3
+	--CANCELLED: 4
+	DECLARE @NumLines INT;
+	DECLARE @NumLinesFilled INT;
+
+	--if num line = num filled lines then change order status to filled
+	SELECT @NumLines = ISNULL(COUNT(*),0)
+	FROM dbo.SalesOrderDetail
+	WHERE SalesOrderID = @SalesOrderID;
+
+	--Count the number of filled lines
+	SELECT @NumLinesFilled = ISNULL(COUNT(*),0)
+	FROM dbo.SalesOrderDetail
+	WHERE SalesOrderID = @SalesOrderID AND OrderLineStatusID = 3;
+
+	IF (@NumLines = @NumLinesFilled)
+	BEGIN
+		--All lines filled change order status to filled
+		UPDATE dbo.SalesOrderHeader
+		SET OrderStatusID = 3 --Filled
+		WHERE SalesOrderID = @SalesOrderID;
+	END;
+END;
+GO
+
+--Will update the Sales order status based on the status of order lines
+CREATE PROCEDURE dbo.usp_UpdateSalesOrderHeaderStatus
+(
+	@SalesOrderID BIGINT
+)
+AS
+BEGIN
+	SET NOCOUNT ON;
+	
+	DECLARE @OrderStatus INT;
+	DECLARE @NumLines INT = 0;
+	DECLARE @NumLinesOpen INT = 0;
+	DECLARE @NumLinesCompleted INT = 0;
+	DECLARE @NumLinesFilled INT = 0;
+	DECLARE @NumLinesCancelled INT = 0;
+	
+	--OPEN: 1
+	--COMPLETE: 2
+	--FILLED: 3
+	--CANCELLED: 4
+
+	--Get the current status of the sales order header for comparison
+	SELECT @OrderStatus = OrderStatusID
+	FROM dbo.SalesOrderHeader
+	WHERE SalesOrderID = @SalesOrderID;
+
+	--Count total number of lines for each status in the sales order and add to variables
+	;WITH OrderLines AS
+	(
+		SELECT * 
+		FROM dbo.SalesOrderDetail
+		WHERE SalesOrderID = @SalesOrderID
+	),
+	LineCounts AS
+	(
+		SELECT SUM(1) AS NumLines,
+			   SUM(CASE WHEN OrderLineStatusID = 1 THEN 1 ELSE 0 END) AS OpenLines,
+			   SUM(CASE WHEN OrderLineStatusID = 2 THEN 1 ELSE 0 END) AS CompletedLines,
+			   SUM(CASE WHEN OrderLineStatusID = 3 THEN 1 ELSE 0 END) AS FilledLines,
+			   SUM(CASE WHEN OrderLineStatusID = 4 THEN 1 ELSE 0 END) AS CancelledLines
+		FROM OrderLines
+	)
+	SELECT @NumLines = NumLines, 
+		   @NumLinesOpen = OpenLines, 
+		   @NumLinesCompleted = CompletedLines,
+		   @NumLinesFilled = FilledLines,
+		   @NumLinesCancelled = CancelledLines
+	FROM LineCounts;
+
+	--OPEN: 1
+	--COMPLETE: 2
+	--FILLED: 3
+	--CANCELLED: 4
+
+	--open lines - If any lines are open then the status must be open
+	IF (@NumLinesOpen > 0 AND @OrderStatus <> 1)
+	BEGIN
+		--Update order status to open
+		UPDATE dbo.SalesOrderHeader
+		SET OrderStatusID = 1
+		WHERE SalesOrderID = @SalesOrderID;
+	END;
+
+	--cancelled lines - if all lines cancelled then the status must be cancelled
+	IF (@NumLinesOpen = 0 AND @NumLinesCancelled = @NumLines AND @OrderStatus <> 4)
+	BEGIN
+		--Update order status to cancelled
+		UPDATE dbo.SalesOrderHeader
+		SET OrderStatusID = 4
+		WHERE SalesOrderID = @SalesOrderID;
+	END;
+
+	--completed lines - if no lines open and one line is completed status must be completed
+	IF (@NumLinesOpen = 0 AND @NumLinesCompleted > 0 AND @OrderStatus <> 2)
+	BEGIN
+		--Update order status to completed
+		UPDATE dbo.SalesOrderHeader
+		SET OrderStatusID = 2
+		WHERE SalesOrderID = @SalesOrderID;
+	END;
+
+	--filled lines - if all lines filled then status must be filled. 
+	IF (@NumLinesOpen = 0 AND @NumLinesFilled = @NumLines AND @OrderStatus <> 3)
+	BEGIN
+		--Update order status to filled
+		UPDATE dbo.SalesOrderHeader
+		SET OrderStatusID = 3
+		WHERE SalesOrderID = @SalesOrderID;
+	END;
+
+	--filled lines - if no open lines and no completed lines and at least one line is filled the status must be filled
+	IF (@NumLinesOpen = 0 AND @NumLinesCompleted = 0 AND @NumLinesFilled > 0 AND @OrderStatus <> 3)
+	BEGIN
+		--Update order status to filled
+		UPDATE dbo.SalesOrderHeader
+		SET OrderStatusID = 3
+		WHERE SalesOrderID = @SalesOrderID;
+	END;
 END;
 GO
 
@@ -2102,7 +2240,7 @@ BEGIN
 		SET OrderLineStatusID = 3
 		WHERE SalesOrderID = @SalesOrderID AND ProductID = @ProductID; 
 		
-		--A line has been altered to filled
+		--A line has been CREATEed to filled
 		--Check if all lines are filled 
 		--if yes then change the order header status to filled
 		EXECUTE dbo.UpdateSalesOrderHeaderToFilled @SalesOrderID;
@@ -2110,39 +2248,7 @@ BEGIN
 END;
 GO
 
---Update sales order header to filled if all lines filled
-CREATE PROCEDURE dbo.UpdateSalesOrderHeaderToFilled
-(
-	@SalesOrderID BIGINT
-)AS
-BEGIN
-	SET NOCOUNT ON;
-	--OPEN: 1
-	--COMPLETE: 2
-	--FILLED: 3
-	--CANCELLED: 4
-	DECLARE @NumLines INT;
-	DECLARE @NumLinesFilled INT;
 
-	--if num line = num filled lines then change order status to filled
-	SELECT @NumLines = ISNULL(COUNT(*),0)
-	FROM dbo.SalesOrderDetail
-	WHERE SalesOrderID = @SalesOrderID;
-
-	--Count the number of filled lines
-	SELECT @NumLinesFilled = ISNULL(COUNT(*),0)
-	FROM dbo.SalesOrderDetail
-	WHERE SalesOrderID = @SalesOrderID AND OrderLineStatusID = 3;
-
-	IF (@NumLines = @NumLinesFilled)
-	BEGIN
-		--All lines filled change order status to filled
-		UPDATE dbo.SalesOrderHeader
-		SET OrderStatusID = 3 --Filled
-		WHERE SalesOrderID = @SalesOrderID;
-	END;
-END;
-GO
 
 --Updates the specified sales order detail with the weighted cost of sales
 CREATE PROCEDURE dbo.usp_UpdateSalesOrderDetailWithWeightedUnitCost
@@ -2184,7 +2290,7 @@ BEGIN
 			DECLARE @IssueID INT;
 			DECLARE @UnitCost MONEY;	
 			
-			--Determine the weighted unit cost of goods beign issued and add to issue created
+			--Determine the weighted unit cost of goods beign issued and add to issue CREATEd
 			EXECUTE dbo.usp_ReturnGoodsIssuedWeightedUnitCostFIFO @ProductID, @QuantityIssued, @IssueUnitCost = @UnitCost OUTPUT;
 
 			--Check if any errors
@@ -2241,7 +2347,7 @@ BEGIN
 			--Change to filled status if the goods issued / invoice completes the line
 			EXECUTE dbo.usp_UpdateSalesOrderDetailToFilled @SalesOrderID, @ProductID;
 
-			--Return the issue create
+			--Return the issue CREATE
 			SELECT IssueID, SalesOrderID, ProductID,
 				   IssueDate, QuantityIssued, UnitCost,
 				   ReverseReferenceID
@@ -2600,6 +2706,8 @@ BEGIN
 END;
 GO
 
+--Returns the top 10 products by revenue YTD
+--or an error message on failure
 CREATE PROCEDURE dbo.usp_Top10ProductsByRevenueYTD AS
 BEGIN
 	BEGIN TRY
@@ -2621,6 +2729,10 @@ BEGIN
 	END CATCH;
 END;
 GO
+
+--Count of days to close sales order
+--Only orders that have been filled or completed
+--CREATE PROCEDURE dbo.usp_DaysCountToCloseSalesOrder
 --number of open sales orders
 --number of orders
 

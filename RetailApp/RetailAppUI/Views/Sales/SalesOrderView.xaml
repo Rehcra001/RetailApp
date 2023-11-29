@@ -253,7 +253,7 @@
                                           FontSize="14"
                                           Style="{StaticResource ComboBoxTheme}"
                                           ItemsSource="{Binding OrderStatuses}"                                          
-                                          SelectedItem="{Binding SelectedOrderStatus}"
+                                          SelectedItem="{Binding SelectedOrderStatus, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
                                           ToolTip="Select a status from the drop down list."
                                           Foreground="White"
                                           IsEnabled="{Binding OrderStatusEnabled}">

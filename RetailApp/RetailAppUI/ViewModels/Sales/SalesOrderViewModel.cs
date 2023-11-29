@@ -419,7 +419,7 @@ namespace RetailAppUI.ViewModels.Sales
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\r\n Reloading Sales Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message + "\r\n Error reloading Sales Order from database.", "Save Changes", MessageBoxButton.OK, MessageBoxImage.Error);
                 Navigation.NavigateTo<SalesOrderSwitchboardViewModel>();
             }
         }
