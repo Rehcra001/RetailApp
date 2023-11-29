@@ -19,7 +19,6 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -85,13 +84,45 @@
                                 BorderColor="Transparent"
                                 Width="300"/>
 
-        <histogram:HistogramControl HistogramData="{Binding Test}"
+        <histogram:HistogramControl HistogramData="{Binding DaysCountToCloseOrderYTD}"
                                     Grid.Column="0"
-                                    Grid.Row="4"
+                                    Grid.Row="3"
                                     Margin="5"
                                     TitlesFontColor="White"
                                     ShowHorizontalAxisTitle="False"
-                                    ShowVerticalAxisTitle="False"/>
+                                    ShowVerticalAxisTitle="False"
+                                    ChartTitleContent="Days Count To Close Orders"/>
+
+        <Grid Grid.Column="2"
+              Grid.Row="3"
+              Margin="0,20,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <controls:ValuesControl ValueData="{Binding CountOfOrdersYTD}"
+                                    Grid.Row="0"
+                                    BorderLineWidth="0.5"
+                                    BorderCornerRadius="10"
+                                    ValueNumberOfDecimals="0"
+                                    Margin="10, 5, 10, 0"/>
+
+            <controls:ValuesControl ValueData="{Binding CountOfOpenOrdersYTD}"
+                        Grid.Row="1"
+                        BorderLineWidth="0.5"
+                        BorderCornerRadius="10"
+                        ValueNumberOfDecimals="0"
+                                    Margin="10, 5, 10, 0"/>
+
+            <controls:ValuesControl ValueData="{Binding CountOfCancelledOrdersYTD}"
+                        Grid.Row="2"
+                        BorderLineWidth="0.5"
+                        BorderCornerRadius="10"
+                        ValueNumberOfDecimals="0"
+                        Margin="10, 5, 10, 0"/>
+        </Grid>
 
     </Grid>
 </UserControl>

@@ -14,5 +14,9 @@ namespace DataAccessLibrary.SalesMetricsRepository
         (BarChartModel, string) GetMonthlyRevenueYTDChart();
         (BarChartModel, string) GetTop10ProductsByRevenueYTDChart();
         (decimal, string) GetTop10ProductsRevenueYTD();
+        (decimal, string) GetCountOfOrdersYTD();
+        (decimal, string) GetCountOfOpenSalesOrders();
+        (decimal, string) GetCountOfCancelledSalesOrders();
+        (HistogramModel, string) GetDaysCountToCloseOrdersYTD();
     }
 }

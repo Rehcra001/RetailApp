@@ -2732,8 +2732,75 @@ GO
 
 --Count of days to close sales order
 --Only orders that have been filled or completed
---CREATE PROCEDURE dbo.usp_DaysCountToCloseSalesOrder
---number of open sales orders
---number of orders
+CREATE PROCEDURE dbo.usp_GetDaysCountToCloseSalesOrderYTD AS
+BEGIN
+	BEGIN TRY
+		WITH ClosedOrders AS
+		(
+			SELECT SOH.SalesOrderID, SOH.OrderDate
+			FROM dbo.SalesOrderHeader AS SOH
+		),
+		MaxIssueDate AS
+		(
+			SELECT I.SalesOrderID, MAX(I.IssueDate) AS DateClosed
+			FROM dbo.Issues AS I
+			WHERE I.ReverseReferenceID IS NULL AND YEAR(I.IssueDate) = YEAR(GETDATE())
+			GROUP BY I.SalesOrderID
+		)
+		SELECT CAST(DATEDIFF(d, CO.OrderDate, DC.DateClosed) AS DECIMAL) AS DaysToClose
+		FROM ClosedOrders AS CO
+		INNER JOIN MaxIssueDate AS DC ON CO.SalesOrderID = DC.SalesOrderID;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Total Number of sales orders created this year
+CREATE PROCEDURE dbo.usp_GetCountOfSalesOrdersYTD AS
+BEGIN
+	BEGIN TRY
+		SELECT CAST(COUNT(*) AS DECIMAL) AS CountOfOrdersYTD
+		FROM dbo.SalesOrderHeader AS SOH
+		WHERE YEAR(SOH.OrderDate) = YEAR(GETDATE());
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Number of open sales orders to date
+CREATE PROCEDURE dbo.usp_GetCountOfOpenSalesOrdersYTD AS
+BEGIN
+	BEGIN TRY
+		SELECT CAST(COUNT(*) AS DECIMAL) AS CountOfOpenOrdersYTD
+		FROM dbo.SalesOrderHeader AS SOH
+		WHERE SOH.OrderStatusID = 1;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+--Number of cancelled sales orders YTD
+CREATE PROCEDURE dbo.usp_GetCountOfCancelledOrdersYTD AS
+BEGIN
+	BEGIN TRY
+		SELECT CAST(COUNT(*) AS DECIMAL) AS CountOfCancelledOrders
+		FROM dbo.SalesOrderHeader AS SOH
+		WHERE SOH.OrderStatusID = 4;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
 
 --Month to date

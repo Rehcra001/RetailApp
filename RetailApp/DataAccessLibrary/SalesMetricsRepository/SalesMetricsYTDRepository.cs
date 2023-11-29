@@ -14,6 +14,156 @@ namespace DataAccessLibrary.SalesMetricsRepository
             this._sqlDataAccess = sqlDataAccess;
         }
 
+        public (decimal, string) GetCountOfCancelledSalesOrders()
+        {
+            decimal count = 0;
+            string? errorMessage = null;
+
+            using (SqlConnection connection = _sqlDataAccess.SQLConnection())
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_GetCountOfCancelledOrdersYTD";
+                    command.Connection.Open();
+
+                    string returnedMessage = command.ExecuteScalar().ToString()!;
+
+                    //Check for errors
+                    //expecting a single row and column of either type
+                    //decimal if no error
+                    //or string if error
+                    if (decimal.TryParse(returnedMessage, out _))
+                    {
+                        //no error
+                        count = decimal.Parse(returnedMessage);
+                    }
+                    else
+                    {
+                        errorMessage = returnedMessage;
+                    }
+                }
+            }
+            return (count, errorMessage);//error message will be null if no error raised
+        }
+
+        public (decimal, string) GetCountOfOpenSalesOrders()
+        {
+            decimal count = 0;
+            string? errorMessage = null;
+
+            using (SqlConnection connection = _sqlDataAccess.SQLConnection())
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_GetCountOfOpenSalesOrdersYTD";
+                    command.Connection.Open();
+
+                    string returnedMessage = command.ExecuteScalar().ToString()!;
+
+                    //Check for errors
+                    //expecting a single row and column of either type
+                    //decimal if no error
+                    //or string if error
+                    if (decimal.TryParse(returnedMessage, out _))
+                    {
+                        //no error
+                        count = decimal.Parse(returnedMessage);
+                    }
+                    else
+                    {
+                        errorMessage = returnedMessage;
+                    }
+                }
+            }
+            return (count, errorMessage);//error message will be null if no error raised
+        }
+
+        public (decimal, string) GetCountOfOrdersYTD()
+        {
+            decimal count = 0;
+            string? errorMessage = null;
+
+            using (SqlConnection connection = _sqlDataAccess.SQLConnection())
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_GetCountOfSalesOrdersYTD";
+                    command.Connection.Open();
+
+                    string returnedMessage = command.ExecuteScalar().ToString()!;
+
+                    //Check for errors
+                    //expecting a single row and column of either type
+                    //decimal if no error
+                    //or string if error
+                    if (decimal.TryParse(returnedMessage, out _))
+                    {
+                        //no error
+                        count = decimal.Parse(returnedMessage);
+                    }
+                    else
+                    {
+                        errorMessage = returnedMessage;
+                    }
+                }
+            }
+            return (count, errorMessage);//error message will be null if no error raised
+        }
+
+        public (HistogramModel, string) GetDaysCountToCloseOrdersYTD()
+        {
+            HistogramModel histogram = new HistogramModel();
+            string? errorMessage = null;
+            List<decimal> observations = new List<decimal>();
+
+            using (SqlConnection connection = _sqlDataAccess.SQLConnection())
+            {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "dbo.usp_GetDaysCountToCloseSalesOrderYTD";
+                    command.Connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        //Check for errors
+                        //only expecting one column
+                        //Name of column on no error is DaysToClose
+                        //Name of column on error is Message
+                        string name = reader.GetName(0);
+                        if (name.Equals("DaysToClose"))
+                        {
+                            //No error
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    observations.Add(reader.GetDecimal(0));
+                                }
+
+                                histogram.Observations = observations;
+                            }
+                        }
+                        else
+                        {
+                            //error
+                            reader.Read();
+
+                            errorMessage = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+            return (histogram, errorMessage); //Error message will be null if no error raised
+        }
+
         public (BarChartModel, string) GetMonthlyRevenueYTDChart()
         {
             BarChartModel barChart = new BarChartModel();

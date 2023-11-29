@@ -8,6 +8,10 @@ namespace BussinessLogicLibrary.SalesMetrics
         BarChartModel GetTop10ProductsRevenueYTDChart();
         BarChartModel GetMonthlyRevenueYTDChart();
         decimal GetTop10ProductsRevenueYTD();
+        HistogramModel GetDaysCountToCloseOrdersYTD();
+        decimal GetCountOfOrdersYTD();
+        decimal GetCountofOpenOrdersYTD();
+        decimal GetCountOfCancelledOrders();
 
     }
 }
