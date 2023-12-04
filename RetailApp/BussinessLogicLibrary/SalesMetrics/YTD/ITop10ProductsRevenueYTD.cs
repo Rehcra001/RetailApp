@@ -1,4 +1,4 @@
-﻿namespace BussinessLogicLibrary.SalesMetrics
+﻿namespace BussinessLogicLibrary.SalesMetrics.YTD
 {
     public interface ITop10ProductsRevenueYTD
     {

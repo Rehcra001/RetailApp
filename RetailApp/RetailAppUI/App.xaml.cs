@@ -7,7 +7,8 @@ using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.Purchases;
 using BussinessLogicLibrary.Receipts;
 using BussinessLogicLibrary.Sales;
-using BussinessLogicLibrary.SalesMetrics;
+using BussinessLogicLibrary.SalesMetrics.MTD;
+using BussinessLogicLibrary.SalesMetrics.YTD;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.VAT;
@@ -121,6 +122,7 @@ namespace RetailAppUI
             services.AddTransient<ISalesOrderDetailRepository, SalesOrderDetailRepository>();
             services.AddTransient<IIssueRepository, IssuesRepository>();
             services.AddTransient<ISalesMetricsYTDRepository, SalesMetricsYTDRepository>();
+            services.AddTransient<ISalesMetricMTDRepository, SalesMetricMTDRepository>();
 
             //Managers
             services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
@@ -159,17 +161,27 @@ namespace RetailAppUI
             services.AddTransient<IUpdateSalesOrderManager, UpdateSalesOrderManager>();
             services.AddTransient<IGetFullSalesOrderByID, GetFullSalesOrderByID>();
 
-            //Sales Metrics
-            services.AddTransient<ISalesMetricsManager, SalesMetricsManager>();
+            //Sales Metrics YTD
+            services.AddTransient<ISalesMetricsYTDManager, SalesMetricsYTDManager>();
             services.AddTransient<ITop10ProductsByRevenueYTDChart, Top10ProductsByRevenueYTDChart>();
             services.AddTransient<IMonthlyRevenueYTDChart, MonthlyRevenueYTDChart>();
             services.AddTransient<ISalesRevenueYTD, SalesRevenueYTD>();
             services.AddTransient<ITop10ProductsRevenueYTD, Top10ProductsRevenueYTD>();
             services.AddTransient<IDaysCountToCloseSalesOrderYTD, DaysCountToCloseSalesOrderYTD>();
             services.AddTransient<ICountOfSalesOrdersYTD, CountOfSalesOrdersYTD>();
-            services.AddTransient<ICountOfOpenSalesOrders, CountOfOpenSalesOrders>();
-            services.AddTransient<ICountOfCancelledSalesOrders, CountOfCancelledSalesOrders>();
+            services.AddTransient<ICountOfOpenSalesOrdersYTD, CountOfOpenSalesOrdersYTD>();
+            services.AddTransient<ICountOfCancelledSalesOrdersYTD, CountOfCancelledSalesOrdersYTD>();
 
+            //Sales Metrics MTD
+            services.AddTransient<ISalesMetricsMTDManager, SalesMetricsMTDManager>();
+            services.AddTransient<IRevenueMTD, RevenueMTD>();
+            services.AddTransient<ITop10ProductsByRevenueMTD, Top10ProductsByRevenueMTD>();
+            services.AddTransient<IProductsByRevenueMTD, ProductsByRevenueMTD>();
+            services.AddTransient<IRevenueTop10ProductsMTD, RevenueTop10ProductsMTD>();
+            services.AddTransient<ICountOfSalesOrdersMTD, CountOfSalesOrdersMTD>();
+            services.AddTransient<ICountOfOpenSalesOrdersMTD, CountOfOpenSalesOrdersMTD>();
+            services.AddTransient<ICountOfCancelledSalesOrdersMTD, CountOfCancelledSalesOrdersMTD>();
+            services.AddTransient<IDaysCountToCloseSalesOrdersMTD, DaysCountToCloseSalesOrdersMTD>();
 
             //Services
             services.AddSingleton<INavigationService, NavigationService>();

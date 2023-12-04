@@ -1,6 +1,6 @@
 ﻿using ModelsLibrary;
 
-namespace BussinessLogicLibrary.SalesMetrics
+namespace BussinessLogicLibrary.SalesMetrics.YTD
 {
     public interface ISalesRevenueYTD
     {

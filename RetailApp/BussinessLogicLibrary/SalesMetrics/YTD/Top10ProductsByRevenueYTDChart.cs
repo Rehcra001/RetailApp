@@ -1,7 +1,7 @@
 ﻿using ChartModelsLibrary.ChartModels;
 using DataAccessLibrary.SalesMetricsRepository;
 
-namespace BussinessLogicLibrary.SalesMetrics
+namespace BussinessLogicLibrary.SalesMetrics.YTD
 {
     public class Top10ProductsByRevenueYTDChart : ITop10ProductsByRevenueYTDChart
     {

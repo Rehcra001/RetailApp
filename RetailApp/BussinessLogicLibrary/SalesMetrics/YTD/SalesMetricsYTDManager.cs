@@ -6,9 +6,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BussinessLogicLibrary.SalesMetrics
+namespace BussinessLogicLibrary.SalesMetrics.YTD
 {
-    public class SalesMetricsManager : ISalesMetricsManager
+    public class SalesMetricsYTDManager : ISalesMetricsYTDManager
     {
         private ITop10ProductsByRevenueYTDChart _top10ProductSalesRevenueYTDChart;
         private IMonthlyRevenueYTDChart _monthlyRevenueYTDChart;
@@ -16,17 +16,17 @@ namespace BussinessLogicLibrary.SalesMetrics
         private ITop10ProductsRevenueYTD _top10ProductsRevenueYTD;
         private IDaysCountToCloseSalesOrderYTD _daysCountToCloseSalesOrderYTD;
         private ICountOfSalesOrdersYTD _countOfSalesOrdersYTD;
-        private ICountOfOpenSalesOrders _countOfOpenSalesOrders;
-        private ICountOfCancelledSalesOrders _countOfCancelledSalesOrders;
+        private ICountOfOpenSalesOrdersYTD _countOfOpenSalesOrders;
+        private ICountOfCancelledSalesOrdersYTD _countOfCancelledSalesOrders;
 
-        public SalesMetricsManager(ITop10ProductsByRevenueYTDChart top10ProductSalesRevenueYTD,
+        public SalesMetricsYTDManager(ITop10ProductsByRevenueYTDChart top10ProductSalesRevenueYTD,
                                    IMonthlyRevenueYTDChart monthlyRevenueYTDChart,
                                    ISalesRevenueYTD salesRevenueYTD,
                                    ITop10ProductsRevenueYTD top10ProductsRevenueYTD,
                                    IDaysCountToCloseSalesOrderYTD daysCountToCloseSalesOrderYTD,
                                    ICountOfSalesOrdersYTD countOfSalesOrders,
-                                   ICountOfOpenSalesOrders countOfOpenSalesOrders,
-                                   ICountOfCancelledSalesOrders countOfCancelledSalesOrders)
+                                   ICountOfOpenSalesOrdersYTD countOfOpenSalesOrders,
+                                   ICountOfCancelledSalesOrdersYTD countOfCancelledSalesOrders)
         {
             _top10ProductSalesRevenueYTDChart = top10ProductSalesRevenueYTD;
             _monthlyRevenueYTDChart = monthlyRevenueYTDChart;

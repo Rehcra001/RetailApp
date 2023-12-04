@@ -1,8 +1,8 @@
 ﻿using ChartModelsLibrary.ChartModels;
 
-namespace BussinessLogicLibrary.SalesMetrics
+namespace BussinessLogicLibrary.SalesMetrics.YTD
 {
-    public interface ISalesMetricsManager
+    public interface ISalesMetricsYTDManager
     {
         decimal GetSalesRevenueYTD();
         BarChartModel GetTop10ProductsRevenueYTDChart();

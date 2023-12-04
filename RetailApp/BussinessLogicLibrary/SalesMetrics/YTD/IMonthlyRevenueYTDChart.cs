@@ -1,6 +1,6 @@
 ﻿using ChartModelsLibrary.ChartModels;
 
-namespace BussinessLogicLibrary.SalesMetrics
+namespace BussinessLogicLibrary.SalesMetrics.YTD
 {
     public interface IMonthlyRevenueYTDChart
     {

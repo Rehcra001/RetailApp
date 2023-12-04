@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BussinessLogicLibrary.SalesMetrics
+namespace BussinessLogicLibrary.SalesMetrics.YTD
 {
-    public class CountOfOpenSalesOrders : ICountOfOpenSalesOrders
+    public class CountOfOpenSalesOrdersYTD : ICountOfOpenSalesOrdersYTD
     {
         private readonly ISalesMetricsYTDRepository _salesMetricsYTDRepository;
 
-        public CountOfOpenSalesOrders(ISalesMetricsYTDRepository salesMetricsYTDRepository)
+        public CountOfOpenSalesOrdersYTD(ISalesMetricsYTDRepository salesMetricsYTDRepository)
         {
             _salesMetricsYTDRepository = salesMetricsYTDRepository;
         }

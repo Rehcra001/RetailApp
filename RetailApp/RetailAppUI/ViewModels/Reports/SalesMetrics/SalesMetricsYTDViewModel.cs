@@ -1,4 +1,4 @@
-﻿using BussinessLogicLibrary.SalesMetrics;
+﻿using BussinessLogicLibrary.SalesMetrics.YTD;
 using ChartModelsLibrary.ChartModels;
 using ModelsLibrary;
 using RetailAppUI.Commands;
@@ -15,7 +15,7 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
 {
     public class SalesMetricsYTDViewModel : BaseViewModel
     {
-        private ISalesMetricsManager _salesMetricsManager;
+        private ISalesMetricsYTDManager _salesMetricsManager;
 
         private INavigationService _navigation;
         public INavigationService Navigation
@@ -89,7 +89,7 @@ namespace RetailAppUI.ViewModels.Reports.SalesMetrics
         //Commands
         public RelayCommand CloseViewCommand { get; set; }
 
-        public SalesMetricsYTDViewModel(INavigationService navigation, ISalesMetricsManager salesMetricsManager)
+        public SalesMetricsYTDViewModel(INavigationService navigation, ISalesMetricsYTDManager salesMetricsManager)
         {
             Navigation = navigation;
             _salesMetricsManager = salesMetricsManager;
