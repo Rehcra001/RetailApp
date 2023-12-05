@@ -98,6 +98,7 @@ namespace RetailAppUI
             services.AddTransient<SalesOrderViewModel>();
             services.AddTransient<ReportsSwitchboardViewModel>();
             services.AddTransient<SalesMetricsYTDViewModel>();
+            services.AddTransient<SalesMetricsMTDViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());

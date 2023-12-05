@@ -16,6 +16,7 @@
              xmlns:SalesMetricsYTDView="clr-namespace:RetailAppUI.Views.Reports.SalesMetrics"
              xmlns:SalesMetricsYTDViewModel="clr-namespace:RetailAppUI.ViewModels.Reports.SalesMetrics">
 
+
     <Application.Resources>
         <ResourceDictionary>
             
@@ -93,6 +94,10 @@
 
             <DataTemplate DataType="{x:Type TypeName=SalesMetricsYTDViewModel:SalesMetricsYTDViewModel}">
                 <SalesMetricsYTDView:SalesMetricsYTDView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type TypeName=SalesMetricsYTDViewModel:SalesMetricsMTDViewModel}">
+                <SalesMetricsYTDView:SalesMetricsMTDView/>
             </DataTemplate>
 
             <ResourceDictionary.MergedDictionaries>

@@ -29,6 +29,7 @@ namespace RetailAppUI.ViewModels.Reports
         //commands
         public RelayCommand CloseViewCommand { get; set; }
         public RelayCommand NavigateToSalesDashboardYTDCommand { get; set; }
+        public RelayCommand NavigateToSalesDashboardMTDCommand { get; set; }
 
         public ReportsSwitchboardViewModel(INavigationService navigation,
                                            ICurrentViewService currentView)
@@ -39,8 +40,19 @@ namespace RetailAppUI.ViewModels.Reports
             //Instantiate commands
             CloseViewCommand = new RelayCommand(CloseView, CanCloseView);
             NavigateToSalesDashboardYTDCommand = new RelayCommand(NavigateToSalesDashboardYTD, CanNavigateToSalesDashboardYTD);
+            NavigateToSalesDashboardMTDCommand = new RelayCommand(NavigateToSalesDashboardMTD, CanNavigateToSalesDashboardMTDC);
         }
-        
+
+        private bool CanNavigateToSalesDashboardMTDC(object obj)
+        {
+            return true;
+        }
+
+        private void NavigateToSalesDashboardMTD(object obj)
+        {
+            Navigation.NavigateTo<SalesMetricsMTDViewModel>();
+        }
+
         private bool CanNavigateToSalesDashboardYTD(object obj)
         {
             return true;

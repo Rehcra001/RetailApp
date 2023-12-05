@@ -131,14 +131,14 @@ namespace DataAccessLibrary.SalesMetricsRepository
                     {
                         //Check for errors
                         string name = reader.GetName(0);
-                        if (name.Equals("DaysCount"))
+                        if (name.Equals("DaysToClose"))
                         {
                             //No error
                             if (reader.HasRows)
                             {
                                 while (reader.Read())
                                 {
-                                    counts.Add(Convert.ToDecimal(reader["DaysCount"]));
+                                    counts.Add(Convert.ToDecimal(reader["DaysToClose"]));
                                 }
                                 daysCount.Observations = counts;
                             }

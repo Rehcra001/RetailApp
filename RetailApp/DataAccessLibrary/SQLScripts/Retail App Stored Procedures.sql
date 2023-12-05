@@ -3001,17 +3001,10 @@ BEGIN
 				  MONTH(I.IssueDate) = MONTH(GETDATE())
 			GROUP BY I.SalesOrderID
 		  
-		),
-		Counts AS
-		(
-			SELECT DATEDIFF(d, SOC.OrderDate, DC.DateClosed) AS DaysToClose
-			FROM SalesOrdersClosedMTD AS SOC
-			JOIN MaxDateClosedMTD AS DC ON SOC.SalesOrderID = DC.SalesOrderID
 		)
-		SELECT DaysToClose, COUNT(*) AS DaysCount
-		FROM Counts
-		GROUP BY DaysToClose
-		ORDER BY DaysToClose;
+		SELECT DATEDIFF(d, SOC.OrderDate, DC.DateClosed) AS DaysToClose
+		FROM SalesOrdersClosedMTD AS SOC
+		JOIN MaxDateClosedMTD AS DC ON SOC.SalesOrderID = DC.SalesOrderID
 	END TRY
 
 	BEGIN CATCH

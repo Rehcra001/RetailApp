@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="RetailAppUI.Views.Reports.SalesMetrics.SalesMetricsMTDView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RetailAppUI.Views.Reports.SalesMetrics" 
+             xmlns:controls="clr-namespace:RetailAppUI.Controls" 
+             xmlns:barcharts="clr-namespace:ChartsLibrary.BarCharts;assembly=ChartsLibrary" 
+             xmlns:histogram="clr-namespace:ChartsLibrary.Histogram;assembly=ChartsLibrary"
+             mc:Ignorable="d" 
+             d:DesignHeight="740" d:DesignWidth="830">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Sales MTD Dashboard"
+               FontSize="25"
+               Foreground="White"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Grid.ColumnSpan="3"/>
+
+        <Button Grid.Column="2"                    
+            Content="X"
+            Width="30"
+            Margin="5,0,5,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            VerticalContentAlignment="Center"
+            HorizontalContentAlignment="Center"
+            Style="{StaticResource ButtonTheme}"
+            Command="{Binding CloseViewCommand}"/>
+
+        <!--Year to Date Revenue-->
+        <controls:ValuesControl ValueData="{Binding RevenueMTD}"
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            Padding="15,0"
+                            ShowValuePrefix="True"
+                            ValuePrefix="R"
+                            BorderCornerRadius="10"
+                            ShowBorder="True"
+                            BorderColor="Transparent"
+                            Width="300"/>
+
+        <barcharts:BarChart Grid.Column="0"
+                        Grid.Row="2"
+                        Margin="5"
+                        BarChartData="{Binding SalesRevenueByProduct}"
+                        ShowHorizontalAxisTitle="False"
+                        ShowVerticalAxisTitle="False"
+                        ShowHorizontalAxisInChartArea="True"
+                        ShowChartTitle="False"
+                        TitlesFontColor="White"/>
+
+        <!--Top 10 products MTD Revenue-->
+        <barcharts:BarChart Grid.Column="1"
+                        Grid.Row="2"
+                        Margin="5"
+                        BarChartData="{Binding Top10ProductsByRevenue}"
+                        ShowHorizontalAxisTitle="False"
+                        ShowVerticalAxisTitle="False"
+                        ShowHorizontalAxisInChartArea="True"
+                        ShowChartTitle="False"
+                        TitlesFontColor="White"/>
+
+        <controls:ValuesControl ValueData="{Binding Top10RevenueMTD}"
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            Padding="15,0"
+                            ShowValuePrefix="True"
+                            ValuePrefix="R"
+                            BorderCornerRadius="10"
+                            ShowBorder="True"
+                            BorderColor="Transparent"
+                            Width="300"/>
+
+        <histogram:HistogramControl HistogramData="{Binding DaysCountToCloseOrderMTD}"
+                                Grid.Column="0"
+                                Grid.Row="3"
+                                Margin="5"
+                                TitlesFontColor="White"
+                                ShowHorizontalAxisTitle="False"
+                                ShowVerticalAxisTitle="False"
+                                ChartTitleContent="Days Count To Close Orders"/>
+
+        <Grid Grid.Column="2"
+          Grid.Row="3"
+          Margin="0,20,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <controls:ValuesControl ValueData="{Binding CountOfOrdersMTD}"
+                                Grid.Row="0"
+                                BorderLineWidth="0.5"
+                                BorderCornerRadius="10"
+                                ValueNumberOfDecimals="0"
+                                Margin="10, 5, 10, 0"/>
+
+            <controls:ValuesControl ValueData="{Binding CountOfOpenOrdersMTD}"
+                    Grid.Row="1"
+                    BorderLineWidth="0.5"
+                    BorderCornerRadius="10"
+                    ValueNumberOfDecimals="0"
+                                Margin="10, 5, 10, 0"/>
+
+            <controls:ValuesControl ValueData="{Binding CountOfCancelledOrdersMTD}"
+                    Grid.Row="2"
+                    BorderLineWidth="0.5"
+                    BorderCornerRadius="10"
+                    ValueNumberOfDecimals="0"
+                    Margin="10, 5, 10, 0"/>
+        </Grid>
+
+    </Grid>
+</UserControl>

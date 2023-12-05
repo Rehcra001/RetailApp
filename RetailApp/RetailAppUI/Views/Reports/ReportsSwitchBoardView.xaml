@@ -48,5 +48,13 @@
                 Command="{Binding NavigateToSalesDashboardYTDCommand}">
             Sales YTD Dashboard
         </Button>
+
+        <Button Grid.Column="1"
+                Grid.Row="1"
+                Style="{StaticResource ButtonTheme}"
+                Width="150"
+                Command="{Binding NavigateToSalesDashboardMTDCommand}">
+            Sales MTD Dashboard
+        </Button>
     </Grid>
 </UserControl>
