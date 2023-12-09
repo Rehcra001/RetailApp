@@ -44,7 +44,7 @@
         <Button Grid.Column="0"
                 Grid.Row="1"
                 Style="{StaticResource ButtonTheme}"
-                Width="150"
+                Width="175"
                 Command="{Binding NavigateToSalesDashboardYTDCommand}">
             Sales YTD Dashboard
         </Button>
@@ -52,9 +52,17 @@
         <Button Grid.Column="1"
                 Grid.Row="1"
                 Style="{StaticResource ButtonTheme}"
-                Width="150"
+                Width="175"
                 Command="{Binding NavigateToSalesDashboardMTDCommand}">
             Sales MTD Dashboard
+        </Button>
+
+        <Button Grid.Column="0"
+                Grid.Row="2"
+                Style="{StaticResource ButtonTheme}"
+                Width="175"
+                Command="{Binding NavigateToVendorDashboardYTDCommand}">
+            Vendor YTD Dashboard
         </Button>
     </Grid>
 </UserControl>

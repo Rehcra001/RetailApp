@@ -3013,3 +3013,40 @@ BEGIN
 END;
 GO
 
+--Vendor Metrics
+--Vendor all products leadtime distribution by days
+--from order date to last receipt date
+ CREATE PROCEDURE dbo.usp_GetLeadTimeDaysCountAllProductsByVendorYTD
+(
+	@VendorID INT
+)AS
+BEGIN
+	BEGIN TRY
+		;WITH LastReceipt AS
+		(
+			SELECT POH.PurchaseOrderID, POH.OrderDate, MAX(RC.ReceiptDate) AS LastReceiptDate
+			FROM dbo.PurchaseOrderHeader AS POH
+			JOIN dbo.Receipts AS RC ON POH.PurchaseOrderID = RC.PurchaseOrderID
+			WHERE POH.VendorID = @VendorID AND 
+				  RC.ReverseReferenceID IS NULL AND
+				  YEAR(RC.ReceiptDate) = YEAR(GETDATE())
+			GROUP BY POH.PurchaseOrderID, POH.OrderDate
+		)
+		SELECT CAST(DATEDIFF(d, OrderDate, LastReceiptDate) AS DECIMAL) AS LeadTimeDays
+		FROM LastReceipt
+		ORDER BY LeadTimeDays;
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
+
+
+--Procurement Metrics--
+
+--return the count of days for all suppliers lead time
+--Used to generate a histogram/distribution of suplier lead times
+--From order date to receipt of closed order lines
+

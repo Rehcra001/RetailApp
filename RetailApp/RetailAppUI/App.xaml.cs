@@ -12,6 +12,7 @@ using BussinessLogicLibrary.SalesMetrics.YTD;
 using BussinessLogicLibrary.Statuses;
 using BussinessLogicLibrary.UnitPers;
 using BussinessLogicLibrary.VAT;
+using BussinessLogicLibrary.VendorMetrics.YTD;
 using BussinessLogicLibrary.Vendors;
 using DataAccessLibrary;
 using DataAccessLibrary.CategoryRepository;
@@ -29,6 +30,7 @@ using DataAccessLibrary.SalesOrderHeaderRepository;
 using DataAccessLibrary.StatusRepository;
 using DataAccessLibrary.UnitsPerRepository;
 using DataAccessLibrary.VATRepository;
+using DataAccessLibrary.VendorMetricsRepository;
 using DataAccessLibrary.VendorRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +42,8 @@ using RetailAppUI.ViewModels.Products;
 using RetailAppUI.ViewModels.Purchases;
 using RetailAppUI.ViewModels.Reports;
 using RetailAppUI.ViewModels.Reports.SalesMetrics;
+using RetailAppUI.ViewModels.Reports.VendorMetrics;
+using RetailAppUI.ViewModels.Reports.VendorMetrics.ViewTilesYTD;
 using RetailAppUI.ViewModels.Sales;
 using RetailAppUI.Views;
 using System;
@@ -99,6 +103,8 @@ namespace RetailAppUI
             services.AddTransient<ReportsSwitchboardViewModel>();
             services.AddTransient<SalesMetricsYTDViewModel>();
             services.AddTransient<SalesMetricsMTDViewModel>();
+            services.AddTransient<VendorMetricsYTDViewModel>();
+            services.AddTransient<VendorLeadTimesAllProductsViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());
@@ -107,8 +113,7 @@ namespace RetailAppUI
             services.AddSingleton<IRelationalDataAccess, RelationalDataAccess>();
 
             //Repositories
-            services.AddTransient<ICompanyDetailRepository, CompanyDetailRepository>();
-            services.AddTransient<IVendorRepository, VendorRepository>();
+            services.AddTransient<ICompanyDetailRepository, CompanyDetailRepository>();            
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddTransient<IUnitsPerRepository, UnitsPerRepository>();
@@ -124,10 +129,10 @@ namespace RetailAppUI
             services.AddTransient<IIssueRepository, IssuesRepository>();
             services.AddTransient<ISalesMetricsYTDRepository, SalesMetricsYTDRepository>();
             services.AddTransient<ISalesMetricMTDRepository, SalesMetricMTDRepository>();
+            services.AddTransient<IVendorMetricsRepositoryYTD, VendorMetricsRepositoryYTD>();
 
             //Managers
             services.AddTransient<ICompanyDetailManager, CompanyDetailManager>();
-            services.AddTransient<IVendorManager, VendorManager>();
             services.AddTransient<ICustomerManager, CustomerManager>();
             services.AddTransient<ICategoryManager, CategoryManager>();
             services.AddTransient<IUnitPerManager, UnitPerManager>();
@@ -136,6 +141,16 @@ namespace RetailAppUI
             services.AddTransient<IReceiptManager, ReceiptManager>();
             services.AddTransient<IVATManager, VATManager>();
             services.AddTransient<IIssuesManager, IssuesManager>();
+
+            //Vendors
+            services.AddTransient<IVendorRepository, VendorRepository>();
+            services.AddTransient<IVendorManager, VendorManager>();
+            services.AddTransient<IVendorLeadTimesAllProductsViewModel, VendorLeadTimesAllProductsViewModel>();
+
+            //Vendor Metrics YTD
+            services.AddTransient<IVendorMetricsManagerYTD, VendorMetricsManagerYTD>();
+            services.AddTransient<ILeadTimeDaysCountByVendorIDYTD, LeadTimeDaysCountByVendorIDYTD>();
+
 
             //Products
             services.AddTransient<IProductsManager, ProductsManager>();
