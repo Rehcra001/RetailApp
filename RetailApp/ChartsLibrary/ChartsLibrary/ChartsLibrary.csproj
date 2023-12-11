@@ -10,4 +10,10 @@
     <ProjectReference Include="..\..\ChartModelsLibrary\ChartModelsLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Update="Histogram\HistogramControl.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Page>
+  </ItemGroup>
+
 </Project>

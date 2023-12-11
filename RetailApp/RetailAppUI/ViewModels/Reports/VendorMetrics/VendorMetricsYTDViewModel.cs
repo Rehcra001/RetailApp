@@ -1,9 +1,9 @@
 ﻿using BussinessLogicLibrary.Products;
 using BussinessLogicLibrary.VendorMetrics.YTD;
 using BussinessLogicLibrary.Vendors;
+using ChartModelsLibrary.ChartModels;
 using ModelsLibrary;
 using RetailAppUI.Services;
-using RetailAppUI.ViewModels.Reports.VendorMetrics.ViewTilesYTD;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,13 +26,6 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
             set { _navigation = value; OnPropertyChanged(); }
         }
 
-        private ISharedDataService _sharedData;
-        public ISharedDataService SharedData
-        {
-            get { return _sharedData; }
-            set { _sharedData = value; }
-        }
-
 
         private ObservableCollection<VendorModel> _vendors;
         public ObservableCollection<VendorModel> Vendors
@@ -45,7 +38,10 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
         public VendorModel SelectedVendor
         {
             get { return _selectedVendor; }
-            set { _selectedVendor = value; LoadVendorProducts(); OnPropertyChanged(); }
+            set { _selectedVendor = value; 
+                  LoadVendorProducts(); 
+                  LoadSelectedVendorHistogram(); 
+                  OnPropertyChanged(); }
         }
 
         private IEnumerable<ProductModel> _products;
@@ -69,23 +65,33 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
             set { _selectedProduct = value; OnPropertyChanged(); }
         }
 
+        private HistogramModel _vendorsHistogram;
+        public HistogramModel VendorsHistogram
+        {
+            get { return _vendorsHistogram; }
+            set { _vendorsHistogram = value; OnPropertyChanged(); }
+        }
+
 
         public VendorMetricsYTDViewModel(INavigationService navigationService,
-                                         ISharedDataService sharedDataService,
                                          IVendorManager vendorManager,
                                          IProductsManager productsManager,
                                          IVendorMetricsManagerYTD vendorMetricsManagerYTD)
         {
             Navigation = navigationService;
-            SharedData = sharedDataService;
             _vendorManager = vendorManager;
             _productsManager = productsManager;
             _vendorMetricsManagerYTD = vendorMetricsManagerYTD;
+
             //Load initial data
             LoadVendors();
             LoadProducts();
         }
 
+        private void LoadSelectedVendorHistogram()
+        {
+            VendorsHistogram = _vendorMetricsManagerYTD.GetVendorLeadTimesYTD(SelectedVendor.VendorID);
+        }
 
         private void LoadVendors()
         {

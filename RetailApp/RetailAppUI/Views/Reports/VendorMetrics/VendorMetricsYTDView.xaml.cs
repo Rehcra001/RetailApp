@@ -1,20 +1,8 @@
-﻿using BussinessLogicLibrary.SalesMetrics.MTD;
-using ChartModelsLibrary.ChartModels;
+﻿using ChartModelsLibrary.ChartModels;
 using ChartsLibrary.Histogram;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RetailAppUI.Views.Reports.VendorMetrics
 {
@@ -28,5 +16,18 @@ namespace RetailAppUI.Views.Reports.VendorMetrics
             InitializeComponent();
         }
 
+
+        private void VendorComboBox_SourceUpdated(object sender, DataTransferEventArgs e)
+        {
+            HistogramContent.Children.Clear();
+            HistogramControl vendorsHistogram = new HistogramControl();
+            vendorsHistogram.HistogramData = (HistogramModel)HistogramContent.DataContext;
+            vendorsHistogram.TitlesFontColor = Brushes.White;
+            vendorsHistogram.ChartTitleContent = "Days Count of Vendor Lead Time (All Products)";
+            vendorsHistogram.VerticalAxisTitleContent = "Count of Orders";
+            vendorsHistogram.HorizontalAxisTitleContent = "Days";
+            HistogramContent.Children.Add(vendorsHistogram);
+            vendorsHistogram.HistogramControl_Loaded(null, null);
+        }
     }
 }

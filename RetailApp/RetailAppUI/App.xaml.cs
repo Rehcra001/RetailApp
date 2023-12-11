@@ -43,7 +43,6 @@ using RetailAppUI.ViewModels.Purchases;
 using RetailAppUI.ViewModels.Reports;
 using RetailAppUI.ViewModels.Reports.SalesMetrics;
 using RetailAppUI.ViewModels.Reports.VendorMetrics;
-using RetailAppUI.ViewModels.Reports.VendorMetrics.ViewTilesYTD;
 using RetailAppUI.ViewModels.Sales;
 using RetailAppUI.Views;
 using System;
@@ -104,7 +103,6 @@ namespace RetailAppUI
             services.AddTransient<SalesMetricsYTDViewModel>();
             services.AddTransient<SalesMetricsMTDViewModel>();
             services.AddTransient<VendorMetricsYTDViewModel>();
-            services.AddTransient<VendorLeadTimesAllProductsViewModel>();
 
             //Add appsettings.json Configuration
             services.AddSingleton(AddConfiguration());
@@ -145,7 +143,6 @@ namespace RetailAppUI
             //Vendors
             services.AddTransient<IVendorRepository, VendorRepository>();
             services.AddTransient<IVendorManager, VendorManager>();
-            services.AddTransient<IVendorLeadTimesAllProductsViewModel, VendorLeadTimesAllProductsViewModel>();
 
             //Vendor Metrics YTD
             services.AddTransient<IVendorMetricsManagerYTD, VendorMetricsManagerYTD>();

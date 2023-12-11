@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RetailAppUI.Views.Reports.VendorMetrics" 
-             xmlns:viewModel="clr-namespace:RetailAppUI.ViewModels.Reports.VendorMetrics.ViewTilesYTD"
-             xmlns:view="clr-namespace:RetailAppUI.Views.Reports.VendorMetrics.ViewTilesYTD"
+             xmlns:histogram="clr-namespace:ChartsLibrary.Histogram;assembly=ChartsLibrary"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="20">
@@ -20,7 +19,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        
         <TextBlock Text="Vendor YTD Dashboard"
                FontSize="25"
                Foreground="White"
@@ -55,11 +54,13 @@
                        HorizontalAlignment="Left"
                        Margin="0,0,10,0"/>
 
-            <ComboBox ItemsSource="{Binding Vendors}"
-                      SelectedItem="{Binding SelectedVendor}"
+            <ComboBox x:Name="VendorComboBox"
+                      ItemsSource="{Binding Vendors}"
+                      SelectedItem="{Binding SelectedVendor, NotifyOnSourceUpdated=True}"
                       Grid.Column="1"
                       Style="{StaticResource ComboBoxTheme}"
-                      Margin="0,0,10,0">
+                      Margin="0,0,10,0"
+                      SourceUpdated="VendorComboBox_SourceUpdated">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding CompanyName}"
@@ -99,6 +100,13 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </Grid>
-
+        
+        <!--Adds a Histogram of Vendor lead times for all products-->
+        <!--Histogram control is created in the code behind using the datacontext assigned to the grid linked to the View Model-->
+        <Grid x:Name="HistogramContent"
+              Grid.Row="2"
+              Margin="0,20,0,0"
+              DataContext="{Binding VendorsHistogram}">    
+        </Grid>
     </Grid>
 </UserControl>

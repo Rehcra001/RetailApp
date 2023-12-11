@@ -48,6 +48,7 @@ namespace ChartsLibrary.Histogram
         private double HorizontalAxisLabelWidth { get; set; }
 
         private const double MARGIN = 5;
+        private const int MIN_NUMBER_OF_BINS = 6;
 
         #region Histogram Data Model
 
@@ -76,7 +77,7 @@ namespace ChartsLibrary.Histogram
             set { SetValue(NumberOfBinsProperty, value); }
         }
         public static readonly DependencyProperty NumberOfBinsProperty =
-            DependencyProperty.Register("NumberOfBins", typeof(int), typeof(HistogramControl), new PropertyMetadata(0));
+            DependencyProperty.Register("NumberOfBins", typeof(int), typeof(HistogramControl), new PropertyMetadata(MIN_NUMBER_OF_BINS));
 
         #endregion
 
@@ -310,7 +311,7 @@ namespace ChartsLibrary.Histogram
             InitializeComponent();
         }
 
-        private void HistogramControl_Loaded(object sender, RoutedEventArgs e)
+        public void HistogramControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (HistogramData is not null)
             {
@@ -399,7 +400,7 @@ namespace ChartsLibrary.Histogram
         {
             double spacing = ChartAreaHeight / NumberOfVerticalAxisLabels;
             double leftStart = VerticalAxisTitleWidth + VerticalAxisWidth;
-            double topStart = ChartTitleHeight + spacing ;
+            double topStart = ChartTitleHeight + spacing;
 
 
             for (int i = 0; i < NumberOfVerticalAxisLabels - 1; i++)
@@ -411,7 +412,7 @@ namespace ChartsLibrary.Histogram
                 line.Y2 = line.Y1;
                 line.Stroke = ChartAreaGridLinesColor;
                 line.StrokeThickness = 0.25;
-                
+
                 histogramCanvas.Children.Add(line);
             }
         }
@@ -425,7 +426,7 @@ namespace ChartsLibrary.Histogram
             for (int i = 0; i < HorizontalAxisLabelTextBlocks.Count; i++)
             {
                 histogramCanvas.Children.Add(HorizontalAxisLabelTextBlocks[i]);
-                Canvas.SetLeft(HorizontalAxisLabelTextBlocks[i], leftStart + spacing * i );
+                Canvas.SetLeft(HorizontalAxisLabelTextBlocks[i], leftStart + spacing * i);
                 Canvas.SetTop(HorizontalAxisLabelTextBlocks[i], topStart + HorizontalAxisLabelHeights[i]);
             }
         }
@@ -452,14 +453,14 @@ namespace ChartsLibrary.Histogram
             {
                 histogramCanvas.Children.Add(VerticalAxisLabelTextBlocks[i]);
                 Canvas.SetLeft(VerticalAxisLabelTextBlocks[i], leftStart - VerticalAxisLabelWidths[i] - MARGIN);
-                Canvas.SetTop(VerticalAxisLabelTextBlocks[i], topStart - (labelSpacing * i) );
+                Canvas.SetTop(VerticalAxisLabelTextBlocks[i], topStart - (labelSpacing * i));
             }
         }
 
         private void AddVerticalAxisTitle()
         {
             double topStart = (ChartTitleHeight + ChartAreaHeight) - (ChartAreaHeight - VerticalAxisTitleHeight) / 2;
-            double leftStart =  MARGIN;
+            double leftStart = MARGIN;
 
             histogramCanvas.Children.Add(VerticalAxisTitleTextBlock);
             Canvas.SetTop(VerticalAxisTitleTextBlock, topStart);
@@ -626,7 +627,7 @@ namespace ChartsLibrary.Histogram
         }
 
         private void SetHorizontalAxisHeight()
-        {            
+        {
             HorizontalAxisHeight = HorizontalAxisLabelHeights.Max() + MARGIN * 2;
         }
 
@@ -640,7 +641,7 @@ namespace ChartsLibrary.Histogram
         }
 
         private void SetVerticalAxisWidth()
-        {            
+        {
             VerticalAxisWidth = VerticalAxisLabelWidths.Max() + MARGIN * 2;
         }
         private void SetVerticalAxisLabelHeight()
@@ -716,6 +717,10 @@ namespace ChartsLibrary.Histogram
         {
             foreach (decimal observation in HistogramData.Observations!)
             {
+                if (BinWidth == 0)
+                {
+                    BinWidth = 1;
+                }
                 int index = (int)((observation - LowerBound) / BinWidth);
                 if (index > Bins.Length - 1)
                 {
@@ -739,9 +744,22 @@ namespace ChartsLibrary.Histogram
             //Check if NumberOfBins is greater than zero
             //if yes then use NumberOfBins
             //if no then calculate number of bins using Sturges formula
-            if (NumberOfBins == 0)
+            if (NumberOfBins < MIN_NUMBER_OF_BINS)
             {
-                NumberOfBins = (int)Math.Ceiling(1 + (3.3 * Math.Log10(HistogramData.Observations!.Count())));
+                NumberOfBins = MIN_NUMBER_OF_BINS;
+            }
+            else
+            {
+                int numBins = (int)Math.Ceiling(1 + (3.3 * Math.Log10(HistogramData.Observations!.Count())));
+                if (numBins < MIN_NUMBER_OF_BINS)
+                {
+                    NumberOfBins = MIN_NUMBER_OF_BINS;
+                }
+                else
+                {
+                    NumberOfBins = (int)Math.Ceiling(1 + (3.3 * Math.Log10(HistogramData.Observations!.Count())));
+                }
+                
             }
         }
 
