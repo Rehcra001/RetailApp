@@ -41,7 +41,7 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics.ViewTilesYTD
         {
             try
             {
-                VendorLeadTimes = new HistogramModel();
+                //VendorLeadTimes = new HistogramModel();
                 List<decimal> obs = new List<decimal>
                 {
                     20,30,12,15,15,16,22,4,0,0,0

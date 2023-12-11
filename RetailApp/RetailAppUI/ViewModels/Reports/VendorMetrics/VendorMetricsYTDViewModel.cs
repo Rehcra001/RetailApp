@@ -45,7 +45,7 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
         public VendorModel SelectedVendor
         {
             get { return _selectedVendor; }
-            set { _selectedVendor = value; LoadSelectedVendorLeadTimesAllProducts(); LoadVendorProducts(); OnPropertyChanged(); }
+            set { _selectedVendor = value; LoadVendorProducts(); OnPropertyChanged(); }
         }
 
         private IEnumerable<ProductModel> _products;
@@ -69,13 +69,6 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
             set { _selectedProduct = value; OnPropertyChanged(); }
         }
 
-        private VendorLeadTimesAllProductsViewModel selectedVendorLeadTimesAllProducts;
-        public VendorLeadTimesAllProductsViewModel SelectedVendorLeadTimesAllProductsViewModel
-        {
-            get { return selectedVendorLeadTimesAllProducts; }
-            set { selectedVendorLeadTimesAllProducts = value; OnPropertyChanged(); }
-        }
-
 
         public VendorMetricsYTDViewModel(INavigationService navigationService,
                                          ISharedDataService sharedDataService,
@@ -91,19 +84,8 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
             //Load initial data
             LoadVendors();
             LoadProducts();
-            
         }
 
-        private void LoadSelectedVendorLeadTimesAllProducts()
-        {
-            SharedData.SharedData = SelectedVendor.VendorID;
-            if (SharedData.SharedData is not null)
-            {
-                
-                SelectedVendorLeadTimesAllProductsViewModel = new VendorLeadTimesAllProductsViewModel(_vendorMetricsManagerYTD, SharedData);
-            }
-            
-        }
 
         private void LoadVendors()
         {

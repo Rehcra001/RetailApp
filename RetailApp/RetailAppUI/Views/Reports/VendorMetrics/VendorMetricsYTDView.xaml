@@ -100,15 +100,5 @@
             </ComboBox>
         </Grid>
 
-
-        <ContentControl Content="{Binding SelectedVendorLeadTimesAllProductsViewModel}"
-                        Grid.Column="0"
-                        Grid.Row="2">
-            <ContentControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type viewModel:VendorLeadTimesAllProductsViewModel}">
-                    <view:VendorLeadTimesAllProductsView/>
-                </DataTemplate>
-            </ContentControl.ContentTemplate>
-        </ContentControl>
     </Grid>
 </UserControl>

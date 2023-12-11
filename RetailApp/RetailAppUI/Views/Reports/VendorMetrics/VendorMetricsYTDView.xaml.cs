@@ -1,4 +1,7 @@
-﻿using System;
+﻿using BussinessLogicLibrary.SalesMetrics.MTD;
+using ChartModelsLibrary.ChartModels;
+using ChartsLibrary.Histogram;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,5 +27,6 @@ namespace RetailAppUI.Views.Reports.VendorMetrics
         {
             InitializeComponent();
         }
+
     }
 }
