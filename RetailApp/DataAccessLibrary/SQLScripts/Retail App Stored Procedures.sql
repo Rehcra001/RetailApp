@@ -3043,6 +3043,38 @@ BEGIN
 END;
 GO
 
+--Vendor delivery compliance
+--distribution of vendor delivery compliance: where negative values indicated early deliveries
+--and positive values indicate late deliveries for all Vendor products per closed order line
+CREATE PROCEDURE dbo.usp_GetVendorDeliveryComplianceDistributionYTD
+(
+	@VendorID INT
+)AS
+BEGIN
+	BEGIN TRY
+		;WITH ClosedOrderLines AS
+		(
+			SELECT POH.PurchaseOrderID, POD.ProductID, POH.RequiredDate, CAST(MAX(RC.ReceiptDate) AS DATE) AS DateClosed
+			FROM dbo.PurchaseOrderHeader AS POH
+			JOIN dbo.PurchaseOrderDetail AS POD ON POH.PurchaseOrderID = POD.PurchaseOrderID
+			JOIN dbo.Receipts AS RC ON POD.PurchaseOrderID = RC.PurchaseOrderID AND POD.ProductID = RC.ProductID
+			WHERE POD.OrderLineStatusID = 2 OR POD.OrderLineStatusID = 3 AND
+				  RC.ReverseReferenceID IS NULL AND
+				  POH.VendorID = @VendorID
+				 
+			GROUP BY POH.PurchaseOrderID, POD.ProductID, POH.RequiredDate, POH.OrderDate
+		)
+		SELECT DATEDIFF(d, CL.RequiredDate, CL.DateClosed) AS DeliveryCompliance
+		FROM ClosedOrderLines AS CL
+		WHERE YEAR(CL.DateClosed) = YEAR(GETDATE())
+		ORDER BY DATEDIFF(d, CL.RequiredDate, CL.DateClosed)
+	END TRY
+
+	BEGIN CATCH
+		SELECT ERROR_MESSAGE() AS Message;
+	END CATCH;
+END;
+GO
 
 --Procurement Metrics--
 

@@ -3,6 +3,7 @@ using BussinessLogicLibrary.VendorMetrics.YTD;
 using BussinessLogicLibrary.Vendors;
 using ChartModelsLibrary.ChartModels;
 using ModelsLibrary;
+using RetailAppUI.Commands;
 using RetailAppUI.Services;
 using System;
 using System.Collections.Generic;
@@ -39,8 +40,8 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
         {
             get { return _selectedVendor; }
             set { _selectedVendor = value; 
-                  LoadVendorProducts(); 
-                  LoadSelectedVendorHistogram(); 
+                  LoadVendorProducts();
+                  LoadSelectedVendorMetricsDataYTD(); 
                   OnPropertyChanged(); }
         }
 
@@ -65,13 +66,21 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
             set { _selectedProduct = value; OnPropertyChanged(); }
         }
 
-        private HistogramModel _vendorsHistogram;
-        public HistogramModel VendorsHistogram
+        private HistogramModel _vendorsLeadTimes;
+        public HistogramModel VendorLeadTimes
         {
-            get { return _vendorsHistogram; }
-            set { _vendorsHistogram = value; OnPropertyChanged(); }
+            get { return _vendorsLeadTimes; }
+            set { _vendorsLeadTimes = value; OnPropertyChanged(); }
         }
 
+        private HistogramModel _vendorDeliveryCompliance;
+        public HistogramModel VendorDeliveryCompliance
+        {
+            get { return _vendorDeliveryCompliance; }
+            set { _vendorDeliveryCompliance = value; OnPropertyChanged(); }
+        }
+
+        public RelayCommand CloseViewCommand { get; set; }
 
         public VendorMetricsYTDViewModel(INavigationService navigationService,
                                          IVendorManager vendorManager,
@@ -83,14 +92,32 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
             _productsManager = productsManager;
             _vendorMetricsManagerYTD = vendorMetricsManagerYTD;
 
+            //Instantiate commands
+            CloseViewCommand = new RelayCommand(CloseView, CanCloseViewCommand);
+
             //Load initial data
             LoadVendors();
             LoadProducts();
+
+
+        }
+
+        
+
+        private void LoadSelectedVendorMetricsDataYTD()
+        {
+            LoadSelectedVendorHistogram();
+            LoadSelectedVendorDeliveryComplianceYTD();
+        }
+
+        private void LoadSelectedVendorDeliveryComplianceYTD()
+        {
+            VendorDeliveryCompliance = _vendorMetricsManagerYTD.GetVendorDeliveryComplianceYTD(SelectedVendor.VendorID);
         }
 
         private void LoadSelectedVendorHistogram()
         {
-            VendorsHistogram = _vendorMetricsManagerYTD.GetVendorLeadTimesYTD(SelectedVendor.VendorID);
+            VendorLeadTimes = _vendorMetricsManagerYTD.GetVendorLeadTimesYTD(SelectedVendor.VendorID);
         }
 
         private void LoadVendors()
@@ -127,6 +154,16 @@ namespace RetailAppUI.ViewModels.Reports.VendorMetrics
         {
             List<ProductModel> vendorProducts = Products.Where(x => x.VendorID == SelectedVendor.VendorID).ToList();
             SelectedVendorProducts = new ObservableCollection<ProductModel>(vendorProducts);
+        }
+
+        private bool CanCloseViewCommand(object obj)
+        {
+            return true;
+        }
+
+        private void CloseView(object obj)
+        {
+            Navigation.NavigateTo<ReportsSwitchboardViewModel>();
         }
     }
 }

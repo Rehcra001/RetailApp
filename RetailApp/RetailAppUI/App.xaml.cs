@@ -147,6 +147,7 @@ namespace RetailAppUI
             //Vendor Metrics YTD
             services.AddTransient<IVendorMetricsManagerYTD, VendorMetricsManagerYTD>();
             services.AddTransient<ILeadTimeDaysCountByVendorIDYTD, LeadTimeDaysCountByVendorIDYTD>();
+            services.AddTransient<IVendorDeliveryComplianceYTD, VendorDeliveryComplianceYTD>();
 
 
             //Products

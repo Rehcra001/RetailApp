@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
         <TextBlock Text="Vendor YTD Dashboard"
@@ -103,10 +104,18 @@
         
         <!--Adds a Histogram of Vendor lead times for all products-->
         <!--Histogram control is created in the code behind using the datacontext assigned to the grid linked to the View Model-->
-        <Grid x:Name="HistogramContent"
+        <Grid x:Name="VendorLeadTimes"
               Grid.Row="2"
               Margin="0,20,0,0"
-              DataContext="{Binding VendorsHistogram}">    
+              DataContext="{Binding VendorLeadTimes}">    
+        </Grid>
+
+        <!--Adds a Histogram of Vendor Delivery compliance for all products per order line-->
+        <!--Histogram control is created in the code behind using the datacontext assigned to the grid linked to the View Model-->
+        <Grid x:Name="vendorDeliveryCompliance"
+              Grid.Row="3"
+              Margin="0,20,0,0"
+              DataContext="{Binding VendorDeliveryCompliance}">
         </Grid>
     </Grid>
 </UserControl>

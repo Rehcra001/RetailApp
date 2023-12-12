@@ -1,10 +1,14 @@
 ﻿using ChartModelsLibrary.ChartModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BussinessLogicLibrary.VendorMetrics.YTD
 {
-    public interface IVendorMetricsManagerYTD
+    public interface IVendorDeliveryComplianceYTD
     {
-        HistogramModel GetVendorLeadTimesYTD(int id);
         HistogramModel GetVendorDeliveryComplianceYTD(int id);
     }
 }
